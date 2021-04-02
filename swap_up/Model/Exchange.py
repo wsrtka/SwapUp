@@ -3,7 +3,7 @@ import swap_up.Model.Class as Class
 import swap_up.Model.User as User
 
 
-class Exchange:
+class Exchange(models.Model):
     __student_id = None  # tutaj nie jestem pewien co to ma być?
     # to ma być FK do klasy User czy sobie generujemy nowy id dla studenta?
     __class_id = models.ForeignKey(Class, on_delete=models.CASCADE)
@@ -14,7 +14,8 @@ class Exchange:
     __other_student_id = models.ForeignKey(User, on_delete=models.CASCADE)
     __other_exchange_id = models.IntegerField()
 
-    def __init__(self, info, state, other_student_id, other_exchange_id):
+    def __init__(self, info, state, other_student_id, other_exchange_id, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.__additional_information = info
         self.__state = state
         self.__other_exchange_id = other_exchange_id

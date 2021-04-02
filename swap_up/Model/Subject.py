@@ -1,14 +1,15 @@
 from django.db import models
 
 
-class Subject:
+class Subject(models.Model):
     __subject_name = models.CharField(max_length=30)
     __type = models.CharField(max_length=30)
     __semester = models.IntegerField()
     __path = models.CharField(max_length=30)
     __mandatory = models.BooleanField()
 
-    def __init__(self, subject_name, type, semester, path, mandatory):
+    def __init__(self, subject_name, type, semester, path, mandatory, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.__subject_name = subject_name
         self.__type = type
         self.__semester = semester

@@ -3,14 +3,15 @@ import swap_up.Model.Subject as Subject
 import swap_up.Model.Teacher as Teacher
 
 
-class Class:
+class Class(models.Model):
     __subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
     __day = models.DateField()
     __time = models.TimeField()
     __row = models.CharField(max_length=20)
     __teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
 
-    def __init__(self, day, time, row):
+    def __init__(self, day, time, row, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.__day = day
         self.__row = row
         self.__time = time

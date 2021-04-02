@@ -2,6 +2,7 @@ from django.db import models
 import swap_up.Model.Subject as Subject
 import swap_up.Model.Class as Class
 
+
 class User(models.Model):
     __first_name = models.CharField(max_length=30)
     __last_name = models.CharField(max_length=30)
@@ -14,7 +15,8 @@ class User(models.Model):
     __list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE)  # będą działały więc póki co zostawiam bez
     __path = models.CharField(max_length=40)
 
-    def __init__(self, first_name, last_name, index_number, year, role, mail, path):
+    def __init__(self, first_name, last_name, index_number, year, role, mail, path, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.__first_name = first_name
         self.__last_name = last_name
         self.__year = year
