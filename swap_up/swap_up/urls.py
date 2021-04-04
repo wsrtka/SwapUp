@@ -20,4 +20,5 @@ from exchange import views as exchange_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', exchange_views.IndexView.as_view(), name='index'),
+    path('exchange/', include('exchange.urls'))
     ]

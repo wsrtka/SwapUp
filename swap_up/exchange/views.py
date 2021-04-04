@@ -10,11 +10,12 @@ class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
 
 # widoki potrzebne do zaimplementowania
+# zmienić potem path na odpowiedni plik html
+def home(request):
+    return render(request, 'exchange/index.html')
+
 def register():
-    pass
+    return render(request, 'exchange/index.html')
 
 def login():
-    pass
-
-def home():
-    pass
+    return render(request, 'exchange/index.html')
