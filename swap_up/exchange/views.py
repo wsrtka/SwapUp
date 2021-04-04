@@ -8,3 +8,13 @@ from django.views import generic
 
 class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
+
+# widoki potrzebne do zaimplementowania
+def register():
+    pass
+
+def login():
+    pass
+
+def home():
+    pass
