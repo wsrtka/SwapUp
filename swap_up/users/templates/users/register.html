@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container content">
+    <section class="section box mt-6 mb-6">
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <fieldset>
+                <legend class="title">Join Today</legend>
+                {{ form.as_p }}
+            </fieldset>
+    
+            <button type="submit" class="button is-primary">Sign Up</button>
+        </form>
+
+        <hr>
+    
+        <div>
+            <small>Already have an account? <a href="#">Sing in here.</a></small>
+        </div>
+
+    </section>
+</div>
+
+{% endblock %}

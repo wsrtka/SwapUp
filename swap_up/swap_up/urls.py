@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from exchange import views as exchange_views
+from users import views as user_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', exchange_views.IndexView.as_view(), name='index'),
-    path('exchange/', include('exchange.urls'))
+    path('exchange/', include('exchange.urls')),
+    path('register/', user_views.register, name='register')
     ]
