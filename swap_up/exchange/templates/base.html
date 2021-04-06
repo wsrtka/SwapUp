@@ -1,72 +1,92 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html class="has-navbar-fixed-top">
     <head>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{% static 'exchange/main.css' %}">
     </head>
+
 {% block body %}
 
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-    <div class="navbar-brand">
-      <a class="navbar-item" href="{% url 'user-home' %}">
-        <img src="../static/exchange/logo-big-rectangle.png" width="65" height="28">
-      </a>
-  
-      <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-        <span aria-hidden="true"></span>
-      </a>
-    </div>
-  
-    <div id="navbarBasic" class="navbar-menu">
-      <div class="navbar-start">
-        <a class="navbar-item" href="{% url 'user-home' %}">
-          Home
-        </a>
-  
-        <a class="navbar-item">
-          Offers
-        </a>
-  
-        <div class="navbar-item has-dropdown is-hoverable">
-          <a class="navbar-link">
-            Manage
-          </a>
-  
-          <div class="navbar-dropdown">
-            <a class="navbar-item">
-              Your offers
-            </a>
-            <a class="navbar-item">
-              Exchange
-            </a>
-            <a class="navbar-item">
-              Account
-            </a>
-            <hr class="navbar-divider">
-          </div>
-        </div>
-      </div>
-  
-      <div class="navbar-end">
-        <div class="navbar-item">
-          <div class="buttons">
-            <a class="button is-primary">
-              <strong>Sign up</strong>
-            </a>
-            <a class="button is-light">
-              Log in
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </nav>
+  <div class="navbar-brand">
+    <a class="navbar-item" href="{% url 'user-home' %}">
+      <img src="../static/exchange/logo-big-rectangle.png" width="65" height="28">
+    </a>
 
-{% block content %}
-{% endblock %}
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+
+  <div id="navbarBasic" class="navbar-menu">
+    <div class="navbar-start">
+      <a class="navbar-item" href="{% url 'user-home' %}">
+        Home
+      </a>
+
+      <a class="navbar-item">
+        Offers
+      </a>
+
+      <div class="navbar-item has-dropdown is-hoverable">
+        <a class="navbar-link">
+          Manage
+        </a>
+
+        <div class="navbar-dropdown">
+          <a class="navbar-item">
+            Your offers
+          </a>
+          <a class="navbar-item">
+            Exchange
+          </a>
+          <hr class="navbar-divider">
+          <a class="navbar-item">
+            Account
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="buttons">
+          <a class="button is-primary">
+            <strong>Sign up</strong>
+          </a>
+          <a class="button is-light">
+            Log in
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container content">
+
+  {% if messages %}
+  {% for message in messages %}
+      <article class="message is-{{ message.tags }} mt-6">
+        <div class="message-header">
+          <p>{{ message.tags }}</p>
+          <button class="delete" aria-label="delete"></button>
+        </div>
+        <div class="message-body">
+          {{ message }}
+        </div>
+      </article>
+  {% endfor %}
+  {% endif %}
+
+  {% block content %}
+  {% endblock %}
+
+</div>
 
 <footer class="footer">
     <div class="content has-text-centered">
@@ -74,5 +94,7 @@
     </div>
 </footer>
 
+
 {% endblock body %}
+
 </html>
