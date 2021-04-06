@@ -142,7 +142,6 @@ class Class(models.Model):
         self.subject_id = subject_id
 
 
-
 class Student(models.Model):
     index_number = models.IntegerField()
     semester = models.IntegerField()
