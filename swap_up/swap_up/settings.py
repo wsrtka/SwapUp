@@ -33,6 +33,8 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'exchange.apps.ExchangeConfig',
     'users.apps.UsersConfig',
+    'crispy_forms',
+    'django_crispy_bulma',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -120,3 +122,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+# Settings for crispy forms (better form rendering)
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = (
+    'bootstrap',
+    'bulma'
+)
+
+CRISPY_TEMPLATE_PACK = 'bulma'

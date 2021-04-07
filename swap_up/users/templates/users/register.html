@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{% load crispy_forms_tags %}
 {% block content %}
 
 <div class="container content">
@@ -10,7 +10,7 @@
             
             <fieldset>
                 <legend class="title">Join Today</legend>
-                {{ form.as_p }}
+                {{ form|crispy }}
             </fieldset>
     
             <button type="submit" class="button is-primary">Sign Up</button>
