@@ -144,22 +144,15 @@ class Class(models.Model):
 
 
 class Student(models.Model):
-    index_number = models.IntegerField()
-    semester = models.IntegerField()
-    list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE)    # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE)                  # będą działały więc póki co zostawiam bez
-    path = models.CharField(max_length=40)
+    index_number = models.IntegerField(unique=True, null=True)
+    semester = models.IntegerField(null=True)
+    list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
+    list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+    path = models.CharField(max_length=40, null=True)
+    # tutaj łączymy studenta z użytkownikiem
+    # User w Django ma imie, nazwisko, email
+    # ma też grupy, i te grupy będą związane z określonymi uprawnieniami
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    def __init__(self, first_name, last_name, index_number, year, role, mail, path, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.first_name = first_name
-        self.last_name = last_name
-        self.year = year
-        self.index_number = index_number
-        self.role = role
-        self.mail = mail
-        self.path = path
 
     @property
     def index_number(self):

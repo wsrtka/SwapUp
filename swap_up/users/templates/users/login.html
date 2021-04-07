@@ -9,17 +9,17 @@
             {% csrf_token %}
             
             <fieldset>
-                <legend class="title">Join Today</legend>
+                <legend class="title">Log In</legend>
                 {{ form|crispy }}
             </fieldset>
     
-            <button type="submit" class="button is-primary mt-5">Sign Up</button>
+            <button type="submit" class="button is-primary mt-5">Sign In</button>
         </form>
 
         <hr>
     
         <div>
-            <small>Already have an account? <a href="{% url 'login' %}">Sign in here.</a></small>
+            <small>Don't have an account yet? <a href="{% url 'register' %}">Sign up here.</a></small>
         </div>
 
     </section>
