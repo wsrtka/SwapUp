@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+
+<p> Upload your schedule</p>
+    <h2>This is going to look better soon</h2>
+    <form enctype="multipart/form-data" method="POST" class="post-form">
+        {% csrf_token %}
+        {{ form | crispy }}
+        <button type="submit" class="save btn btn-primary">Save</button>
+    </form>
+
+{% endblock %}
