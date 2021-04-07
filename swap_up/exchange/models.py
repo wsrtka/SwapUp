@@ -153,12 +153,6 @@ class Student(models.Model):
     # ma też grupy, i te grupy będą związane z określonymi uprawnieniami
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    def __init__(self, index_number, semester, path, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.semester = semester
-        self.index_number = index_number
-        self.path = path
-
     @property
     def index_number(self):
         return self.index_number
