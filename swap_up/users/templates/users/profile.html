@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container content">
+
+    <h1 class="hero mt-6">Welcome, {{user.username}}!</h1>
+
+    <section class="section box">
+        Here you can manage your profile settings.
+    </section>
+
+</div>
+
+{% endblock %}

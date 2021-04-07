@@ -23,6 +23,8 @@
   </div>
 
   <div id="navbarBasic" class="navbar-menu">
+
+    <!-- domyślnie ten div będzie widoczny jedynie dla zalogowanych użytkowników -->
     <div class="navbar-start">
       <a class="navbar-item" href="{% url 'user-home' %}">
         Home
@@ -41,12 +43,13 @@
           <a class="navbar-item" href="#">
             Your offers
           </a>
+          <!-- ten link będzie widoczny tylko dla adminów -->
           <a class="navbar-item" href="#">
             Exchange
           </a>
           <hr class="navbar-divider">
-          <a class="navbar-item" href="#">
-            Account
+          <a class="navbar-item" href="{% url 'profile' %}">
+            Profile
           </a>
         </div>
       </div>
