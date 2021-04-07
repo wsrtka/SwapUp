@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container content">
+    <section class="section box mt-6 mb-6">
+        <h3 class='hero'>You have been logged out.</h3>
+        <div>
+            <small><a href="{% url 'login' %}">Sign in here.</a></small>
+        </div>
+
+    </section>
+</div>
+
+{% endblock %}
