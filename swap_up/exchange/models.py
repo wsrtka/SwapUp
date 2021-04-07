@@ -143,7 +143,7 @@ class Class(models.Model):
 
 
 class Student(models.Model):
-    index_number = models.IntegerField()
+    index_number = models.IntegerField(unique=True)
     semester = models.IntegerField()
     list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE)    # tutaj nie jestem pewien czy normalne settery
     list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE)                  # będą działały więc póki co zostawiam bez
