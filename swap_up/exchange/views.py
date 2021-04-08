@@ -19,11 +19,8 @@ from django.http import HttpResponseRedirect
 class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
 
-# widoki potrzebne do zaimplementowania
-# zmienić potem path na odpowiedni plik html
 def home(request):
     return render(request, 'exchange/index.html')
-
 
 def upload_shedule(request):
     if request.method == 'POST':
@@ -47,5 +44,8 @@ def upload_shedule(request):
 def register():
     return render(request, 'exchange/index.html')
 
-def login():
-    return render(request, 'exchange/index.html')
+def offers(request):
+    return render(request, 'exchange/offers.html')
+
+def manage(request):
+    return render(request, 'exchange/manage.html')
