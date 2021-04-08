@@ -9,13 +9,11 @@ from django.views import generic
 class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
 
-# widoki potrzebne do zaimplementowania
-# zmienić potem path na odpowiedni plik html
 def home(request):
     return render(request, 'exchange/index.html')
 
-def register():
-    return render(request, 'exchange/index.html')
+def offers(request):
+    return render(request, 'exchange/offers.html')
 
-def login():
-    return render(request, 'exchange/index.html')
+def manage(request):
+    return render(request, 'exchange/manage.html')
