@@ -25,12 +25,42 @@ def home(request):
     return render(request, 'exchange/index.html')
 
 
+def import_schedule(csv_file):
+    classes = []
+
+    # csv_file = request.FILES[filename]
+    data = csv_file.read().decode('UTF-8')
+
+    io_string = io.StringIO(data)
+    # next(io_string)
+    for column in csv.reader(io_string, delimeter = ',', quotechar = "|"):
+        subject_name = column[0]
+        day = column[1]
+        time = column[2]
+        row = column[3]
+        teacher_name = column[4]
+
+        subject = get_subject_by_name(subject_name)
+        teacher = get_teacher_by_name(teacher_name)
+
+        
+        _, created_class = Class.objects.create(
+            subject_id = subject,
+            day = day,
+            time = time,
+            row = row,
+            teacher_id = teacher
+        )
+
+        classes.append(created_class)
+
 def upload_shedule(request):
     if request.method == 'POST':
         form = UploadFileForm(request.POST, request.FILES)
         print(form.is_valid())
         if form.is_valid():
-            #handle_uploaded_file(request.FILES['file'])
+            import_schedule(request.FILES['file'])
+            # handle_uploaded_file(request.FILES['file'])
             """
             def handle_uploaded_file(f):
                 #przykładowa funkcja handle_uploaded_file
