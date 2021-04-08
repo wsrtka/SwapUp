@@ -44,3 +44,15 @@ def offers(request):
 
 def manage(request):
     return render(request, 'exchange/manage.html')
+
+def add_offer(request):
+    return render(request, 'exchange/add_offer.html')
+
+def add_exchange(request):
+    return render(request, 'exchange/add_exchange.html')
+
+def edit_exchange(request):
+    return render(request, 'exchange/edit_exchange.html')
+
+def user_offers(request):
+    return render(request, 'exchange/user_offers.html')
