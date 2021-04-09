@@ -6,6 +6,8 @@ from django.utils import timezone
 
 from django.http import HttpResponseRedirect
 
+from .forms import AddExchangeForm
+from .forms import AddAcceptanceConditions
 
 # from .forms import UploadFileForm
 
@@ -109,7 +111,22 @@ def add_offer(request):
     return render(request, 'exchange/add_offer.html')
 
 def add_exchange(request):
-    return render(request, 'exchange/add_exchange.html')
+    # if this is a POST request we need to process the form data
+    if request.method == 'POST':
+        # create a form instance and populate it with data from the request:
+        form = AddExchangeForm(request.POST)
+        # check whether it's valid:
+        if form.is_valid():
+            # process the data in form.cleaned_data as required
+            # ...
+            # redirect to a new URL:
+            return HttpResponseRedirect('/thanks/')
+
+    # if a GET (or any other method) we'll create a blank form
+    else:
+        form = AddExchangeForm()
+
+    return render(request, 'exchange/add_exchange.html', {'form': form})
 
 def edit_exchange(request):
     return render(request, 'exchange/edit_exchange.html')
