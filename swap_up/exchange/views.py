@@ -8,13 +8,10 @@ from django.http import HttpResponseRedirect
 
 
 # from .forms import UploadFileForm
-<<<<<<< HEAD
-=======
 
 
 # Imaginary function to handle an uploaded file.
 """from somewhere import handle_uploaded_file"""
->>>>>>> 99f0c860044651a589b68b06644a94132bdc33a3
 
 
 class IndexView(generic.TemplateView):
