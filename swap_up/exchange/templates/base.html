@@ -7,6 +7,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{% static 'exchange/main.css' %}">
     </head>
+    <style type="text/css" media="screen">
+      body {
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+ 
+      #wrapper {
+        flex: 1;
+      }
+    </style>
 
 {% block body %}
 
