@@ -10,6 +10,7 @@ class Subject(models.Model):
     path = models.CharField(max_length=30)
     mandatory = models.BooleanField()
 
+
     def __init__(self, subject_name, category, semester, path, mandatory, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.subject_name = subject_name
@@ -17,6 +18,8 @@ class Subject(models.Model):
         self.semester = semester
         self.path = path
         self.mandatory = mandatory
+
+
 
     @property
     def subject_name(self):
@@ -57,6 +60,8 @@ class Subject(models.Model):
     @mandatory.setter
     def mandatory(self, mandatory):
         self.mandatory = mandatory
+
+
 
 
 class Teacher(models.Model):
@@ -103,12 +108,16 @@ class Class(models.Model):
     time = models.TimeField()
     row = models.CharField(max_length=20)
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    capacity = models.IntegerField()
+    week = models.CharField(max_length=1)
 
-    def __init__(self, day, time, row, *args, **kwargs):
+    def __init__(self, day, time, row, capacity, week, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.day = day
         self.row = row
         self.time = time
+        self.capacity = capacity
+        self.week = week
 
     @property
     def day(self):
@@ -141,6 +150,22 @@ class Class(models.Model):
     @subject_id.setter
     def subject_id(self, subject_id):
         self.subject_id = subject_id
+
+    @property
+    def capacity(self):
+        return self.capacity
+
+    @capacity.setter
+    def capacity(self, capacity):
+        self.capacity = capacity
+
+    @property
+    def week(self):
+        return self.week
+
+    @week.setter
+    def week(self, week):
+        self.week = week
 
 
 class Student(models.Model):

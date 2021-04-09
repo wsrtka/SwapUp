@@ -7,11 +7,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 
 
-from .forms import UploadFileForm
-
-
-# Imaginary function to handle an uploaded file.
-"""from somewhere import handle_uploaded_file"""
+# from .forms import UploadFileForm
 
 
 # Create your views here.
