@@ -31,10 +31,15 @@ def import_schedule(csv_file):
     # next(io_string)
     for column in csv.reader(io_string, delimeter = ',', quotechar = "|"):
         subject_name = column[0]
-        day = column[1]
-        time = column[2]
-        row = column[3]
+        term_type = column[1]
+        term_capacity = column[2]
+        group_number = column[3]
         teacher_name = column[4]
+        room = column[5]
+        # TODO: zajecia co tydzien nie maja tej kolumny, sprawdzac liczbe kolumn
+        week = column[6] 
+        day = column[7]
+        hour = column[8]
 
         subject = get_subject_by_name(subject_name)
         teacher = get_teacher_by_name(teacher_name)
