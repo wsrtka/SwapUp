@@ -4,7 +4,7 @@
 {% load crispy_forms_tags %}
 {% load my_tags %}
 
-<form action="/your-name/" method="post">
+<form method="post">
     {% csrf_token %}
     <div class="form-row">
         <p class="title is-3 is-spaced" >You have:</p>
@@ -56,7 +56,21 @@
         {% endfor %}
         </div>
     </div>
+    
+    <label class="label">Teachers you want</label>
+    <div>
+        {{form.teacher1 | as_crispy_field}}
+    </div>
+    <div>
+        {{form.teacher2 | as_crispy_field}}
+    </div>
+    <div>
+        {{form.teacher3 | as_crispy_field}}
+    </div>
+
+    <button class="button is-primary" type="submit", name="submit", value="submit">Submit</button>	
 
 </form>
+
 
 {% endblock %}
