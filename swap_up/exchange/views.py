@@ -59,16 +59,16 @@ def import_schedule(csv_file, user):
 
 
 def upload_shedule(request):
-    if request.user.is_authenticated:
-        if request.method == 'POST':
-            form = UploadFileForm(request.POST, request.FILES)
-            print(form.is_valid())
-            if form.is_valid():
-                import_schedule(request.FILES['file'], request.user)
-                return HttpResponseRedirect('/exchange/')
-        else:
-            form = UploadFileForm()
-        return render(request, 'exchange/upload_shedule.html', {'form': form})
+    # if request.user.is_authenticated:
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        print(form.is_valid())
+        if form.is_valid():
+            import_schedule(request.FILES['file'], request.user)
+            return HttpResponseRedirect('/exchange/')
+    else:
+        form = UploadFileForm()
+    return render(request, 'exchange/upload_shedule.html', {'form': form})
 
 def register():
     return render(request, 'exchange/index.html')

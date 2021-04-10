@@ -68,7 +68,7 @@ class Teacher(models.Model):
 
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=30, null=True)
 
     def __init__(self, first_name, last_name, title, *args, **kwargs):
         super().__init__(*args, **kwargs)
