@@ -171,8 +171,15 @@ class Class(models.Model):
 class Student(models.Model):
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
-    list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+    
+    
+    # list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
+    # list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+    
+    list_of_additional_subjects = models.ManyToManyField(Subject, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
+    list_of_classes = models.ManyToManyField(Class, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+ 
+    
     path = models.CharField(max_length=40, null=True)
     # tutaj łączymy studenta z użytkownikiem
     # User w Django ma imie, nazwisko, email
