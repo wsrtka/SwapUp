@@ -21,31 +21,31 @@ def home(request):
     return render(request, 'exchange/index.html')
 
 
+
 def import_schedule(csv_file):
+    
     classes = []
+    csv_file = request.FILES[filename]
+   
+    with open(csv_file, newline='\n') as csv_file:
+        reader = csv.reader(csv_file, delimiter = ';', quotechar = '|')
+        for row in reader:
+            # print(len(row))
+            subject_name = column[0]
+            term_type = column[1]
+            term_capacity = column[2]
+            group_number = column[3]
+            teacher_name = column[4]
+            room = column[5]
+            week = column[6] 
+            day = column[7]
+            hour = column[8]
 
-    # csv_file = request.FILES[filename]
-    data = csv_file.read().decode('UTF-8')
-
-    io_string = io.StringIO(data)
-    # next(io_string)
-    for column in csv.reader(io_string, delimeter = ',', quotechar = "|"):
-        subject_name = column[0]
-        term_type = column[1]
-        term_capacity = column[2]
-        group_number = column[3]
-        teacher_name = column[4]
-        room = column[5]
-        # TODO: zajecia co tydzien nie maja tej kolumny, sprawdzac liczbe kolumn
-        week = column[6] 
-        day = column[7]
-        hour = column[8]
-
-        subject = get_subject_by_name(subject_name)
-        teacher = get_teacher_by_name(teacher_name)
+            subject = get_subject_by_name(subject_name)
+            teacher = get_teacher_by_name(teacher_name)
 
         
-        _, created_class = Class.objects.create(
+        created_class = Class(
             subject_id = subject,
             day = day,
             time = time,
@@ -54,6 +54,7 @@ def import_schedule(csv_file):
         )
 
         classes.append(created_class)
+
 
 def upload_shedule(request):
     if request.method == 'POST':
