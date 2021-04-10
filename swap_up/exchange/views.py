@@ -40,8 +40,9 @@ def import_schedule(csv_file, user):
         day = column[7]
         hour = column[8]
 
-        subject = get_subject_by_name(subject_name)
-        teacher = get_teacher_by_name(teacher_name)
+        subject = Subject.objects.get(subject_name = subject_name)
+        teacher_first_name, teacher_last_name = teacher_name.split()
+        teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
 
         created_class = Class.objects.create(
             subject_id = subject,
