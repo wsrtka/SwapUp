@@ -30,24 +30,24 @@ def import_schedule(csv_file, user):
     student = Student.objects.get(user = user)
    
     reader = csv.reader(csv_file, delimiter = ';', quotechar = '|')
+    
     for row in reader:
-
-    io_string = io.StringIO(data)
-    # next(io_string)
-    for column in csv.reader(io_string, delimiter = ',', quotechar = "|"):
-        try:
-            subject_name = column[0] 
-            term_type = column[1]
-            term_capacity = column[2]
-            group_number = column[3]
-            teacher_name = column[4]
-            room = column[5]
-            # TODO: zajecia co tydzien nie maja tej kolumny, sprawdzac liczbe kolumn
-            week = column[6] 
-            day = column[7]
-            hour = column[8]
-        except:
-            pass
+        io_string = io.StringIO(data)
+        # next(io_string)
+        for column in csv.reader(io_string, delimiter = ',', quotechar = "|"):
+            try:
+                subject_name = column[0] 
+                term_type = column[1]
+                term_capacity = column[2]
+                group_number = column[3]
+                teacher_name = column[4]
+                room = column[5]
+                # TODO: zajecia co tydzien nie maja tej kolumny, sprawdzac liczbe kolumn
+                week = column[6] 
+                day = column[7]
+                hour = column[8]
+            except:
+                pass
 
         subject = Subject.objects.get(subject_name = subject_name)
         teacher_first_name, teacher_last_name = teacher_name.split()
