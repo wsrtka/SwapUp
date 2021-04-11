@@ -11,16 +11,6 @@ class Subject(models.Model):
     mandatory = models.BooleanField()
 
 
-    def __init__(self, subject_name, category, semester, path, mandatory, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.subject_name = subject_name
-        self.category = category
-        self.semester = semester
-        self.path = path
-        self.mandatory = mandatory
-
-
-
     @property
     def subject_name(self):
         return self.subject_name
@@ -35,7 +25,7 @@ class Subject(models.Model):
 
     @category.setter
     def category(self, type):
-        self.type = category
+        self.category = type
 
     @property
     def semester(self):
@@ -70,11 +60,6 @@ class Teacher(models.Model):
     last_name = models.CharField(max_length=30)
     title = models.CharField(max_length=30)
 
-    def __init__(self, first_name, last_name, title, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.first_name = first_name
-        self.last_name = last_name
-        self.title = title
 
     @property
     def first_name(self):
@@ -111,13 +96,6 @@ class Class(models.Model):
     capacity = models.IntegerField()
     week = models.CharField(max_length=1)
 
-    def __init__(self, day, time, row, capacity, week, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.day = day
-        self.row = row
-        self.time = time
-        self.capacity = capacity
-        self.week = week
 
     @property
     def day(self):
@@ -171,8 +149,8 @@ class Class(models.Model):
 class Student(models.Model):
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
-    list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+    list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)
+    list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)
     path = models.CharField(max_length=40, null=True)
     # tutaj łączymy studenta z użytkownikiem
     # User w Django ma imie, nazwisko, email
@@ -214,12 +192,6 @@ class Offer(models.Model):
     other_student_id = models.ForeignKey(User, on_delete=models.CASCADE)
     other_offer_id = models.IntegerField()
 
-    def __init__(self, info, state, other_student_id, other_exchange_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.additional_information = info
-        self.state = state
-        self.other_exchange_id = other_exchange_id
-        self.other_student_id = other_student_id
 
     @property
     def additional_information(self):

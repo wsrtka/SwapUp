@@ -76,10 +76,10 @@ def upload_shedule(request):
         form = UploadFileForm()
     return render(request, 'exchange/upload_shedule.html', {'form': form})
 
-def register():
+def register(request):
     return render(request, 'exchange/index.html')
 
-def login():
+def login(request):
     return render(request, 'exchange/index.html')
 
 def offers(request):
