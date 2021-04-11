@@ -30,8 +30,8 @@ def import_schedule(csv_file, user):
     student = Student.objects.get(user = user)
    
     reader = csv.reader(csv_file, delimiter = ';', quotechar = '|')
-    
     for row in reader:
+
         io_string = io.StringIO(data)
         # next(io_string)
         for column in csv.reader(io_string, delimiter = ',', quotechar = "|"):
@@ -65,13 +65,14 @@ def import_schedule(csv_file, user):
 
 
 def upload_csv(request):
+    #if request.user
     if request.method == 'POST' and request.FILES['myfile']:
 
         myfile = request.FILES['myfile']
         for line in myfile:
             print(line)
 
-        import_schedule(request.FILES['myfile'])
+        import_schedule(request.FILES['myfile'], request.user)
 
         return render(request, 'exchange/upload_csv.html')
 
