@@ -68,7 +68,7 @@ class Teacher(models.Model):
 
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=30, null=True)
 
     def __init__(self, first_name, last_name, title, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -171,8 +171,15 @@ class Class(models.Model):
 class Student(models.Model):
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
-    list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+    
+    
+    # list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
+    # list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+    
+    list_of_additional_subjects = models.ManyToManyField(Subject, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
+    list_of_classes = models.ManyToManyField(Class, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
+ 
+    
     path = models.CharField(max_length=40, null=True)
     # tutaj łączymy studenta z użytkownikiem
     # User w Django ma imie, nazwisko, email

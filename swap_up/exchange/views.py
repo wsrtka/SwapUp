@@ -23,11 +23,14 @@ def home(request):
     return render(request, 'exchange/index.html')
 
 
-def import_schedule(csv_file):
-    classes = []
 
-    # csv_file = request.FILES[filename]
-    data = csv_file.read().decode('UTF-8')
+def import_schedule(csv_file, user):
+    
+    classes = []
+    student = Student.objects.get(user = user)
+   
+    reader = csv.reader(csv_file, delimiter = ';', quotechar = '|')
+    for row in reader:
 
     io_string = io.StringIO(data)
     # next(io_string)
@@ -46,11 +49,11 @@ def import_schedule(csv_file):
         except:
             pass
 
-        subject = get_subject_by_name(subject_name)
-        teacher = get_teacher_by_name(teacher_name)
+        subject = Subject.objects.get(subject_name = subject_name)
+        teacher_first_name, teacher_last_name = teacher_name.split()
+        teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
 
-        
-        _, created_class = Class.objects.create(
+        created_class = Class.objects.create(
             subject_id = subject,
             day = day,
             time = time,
