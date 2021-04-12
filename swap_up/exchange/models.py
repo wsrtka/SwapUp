@@ -2,11 +2,45 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+
 class Exchange(models.Model):
-    creation_date=models.DateField()
-    modification_date=models.DateField()
-    name=models.CharField(max_length=30)
-    semester=models.IntegerField()
+    creation_date = models.DateField()
+    modification_date = models.DateField()
+    name = models.CharField(max_length=30)
+    semester = models.IntegerField()
+
+    @property
+    def creation_date(self):
+        return self.creation_date
+
+    @creation_date.setter
+    def creation_date(self,date):
+        self.creation_date=date
+
+    @property
+    def modification_date(self):
+        return  self.modification_date
+
+    @modification_date.setter
+    def modification_date(self, date):
+        self.modification_date=date
+
+    @property
+    def name(self):
+        return self.name
+
+    @name.setter
+    def name(self,name):
+        self.name=name
+
+    @property
+    def semester(self):
+        return self.semester
+
+    @semester.setter
+    def semester(self, semester):
+        self.semester=semester
+
 
 
 
@@ -16,8 +50,6 @@ class Subject(models.Model):
     semester = models.IntegerField()
     path = models.CharField(max_length=30)
     mandatory = models.BooleanField()
-
-
 
     @property
     def subject_name(self):
@@ -60,10 +92,7 @@ class Subject(models.Model):
         self.mandatory = mandatory
 
 
-
-
 class Teacher(models.Model):
-
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     title = models.CharField(max_length=30, null=True)
@@ -94,7 +123,6 @@ class Teacher(models.Model):
 
 
 class Class(models.Model):
-
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
     day = models.DateField()
     time = models.TimeField()
@@ -102,7 +130,6 @@ class Class(models.Model):
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     capacity = models.IntegerField()
     week = models.CharField(max_length=1)
-
 
     @property
     def day(self):
@@ -157,13 +184,12 @@ class Student(models.Model):
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
 
-
     # list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
     # list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
 
-    list_of_additional_subjects = models.ManyToManyField(Subject, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ManyToManyField(Class, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
-
+    list_of_additional_subjects = models.ManyToManyField(Subject, null=True,
+                                                         blank=True)  # tutaj nie jestem pewien czy normalne settery
+    list_of_classes = models.ManyToManyField(Class, null=True, blank=True)  # będą działały więc póki co zostawiam bez
 
     path = models.CharField(max_length=40, null=True)
     # tutaj łączymy studenta z użytkownikiem
@@ -197,7 +223,6 @@ class Student(models.Model):
 
 
 class Offer(models.Model):
-
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
     class_id = models.ForeignKey(Class, on_delete=models.CASCADE)
     preferred_class_id_list = None
@@ -205,8 +230,7 @@ class Offer(models.Model):
     state = models.CharField(max_length=10)
     other_student_id = models.ForeignKey(User, on_delete=models.CASCADE)
     other_offer_id = models.IntegerField()
-    exchange=models.ForeignKey(Exchange,on_delete=models.CASCADE)
-
+    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, default=None)
 
     @property
     def additional_information(self):
@@ -245,8 +269,8 @@ class Offer(models.Model):
         return self.preferred_class_id_list
 
     @preferred_class_id_list.setter
-    def preferred_class_id_list(self,preferred_class_id_list):
-        self.preferred_class_id_list=preferred_class_id_list
+    def preferred_class_id_list(self, preferred_class_id_list):
+        self.preferred_class_id_list = preferred_class_id_list
 
     @property
     def class_id(self):
@@ -254,4 +278,4 @@ class Offer(models.Model):
 
     @class_id.setter
     def class_id(self, class_id):
-        self.class_id=class_id
+        self.class_id = class_id
