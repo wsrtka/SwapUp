@@ -133,7 +133,7 @@ def offers(request):
     return render(request, 'exchange/offers.html')
 
 def manage(request):
-    return render(request, 'exchange/manage.html')
+    return render(request, 'exchange/manage.html', {'exchanges': ["Semestr 1","Semestr 2","Semestr 3","Semestr 4","Semestr 5"]})
 
 def add_exchange(request):
     return render(request, 'exchange/add_exchange.html')
@@ -166,4 +166,50 @@ def edit_exchange(request):
     return render(request, 'exchange/edit_exchange.html')
 
 def user_offers(request):
-    return render(request, 'exchange/user_offers.html')
+    #TODO Te słowniki można by tworzyć w tym miesjcu na podstawie bazy
+    # I podawać poprawne zamiast tych przykładowych
+
+    offer1 = {
+        "subject": "Teoria nicości2",
+        "have_time": "Pn A, 8:00",
+        "have_teacher": "Zenon Iksiński",
+        "state" : "new", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "other_student": None,
+        "other_time": None,
+        "other_teacher": None
+    }
+
+    offer2 = {
+        "subject": "Teoria nicości",
+        "have_time": "Pn A, 8:00",
+        "have_teacher": "Zenon Iksiński",
+        "state" : "pending", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "other_student": "Staszek Ciaptak-Gąsiennica",
+        "other_time": "Wt B, 9:35",
+        "other_teacher": None
+    }
+
+    offer3 = {
+        "subject": "Wprowadzenie do teorii nicości",
+        "have_time": "Pn A, 8:00",
+        "have_teacher": "Zenon Iksiński",
+        "state" : "closed", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "other_student": "Józio Chmura-Mamałyga",
+        "other_time": "Wt B, 9:35",
+        "other_teacher": None
+    }
+
+
+    offers = [offer1, offer2, offer3]
+    return render(request, 'exchange/user_offers.html', {'offers': offers})
+
+
+def schedule(request):
+    #Todo
+
+    Pn = [
+        {'start': 8.00, 'end': 9.35, 'subject': "Analiza", 'week':None, 'teacher':"Zenon Iksiński"},
+        {'start': 9.35, 'end': 11.15, 'subject': "Analiza", 'week':None, 'teacher':"Zenon Iksiński"},
+        {'start': 14.40, 'end': 16.10, 'subject': "Analiza", 'week':None, 'teacher':"Zenon Iksiński"},
+    ]
+    return render(request, 'exchange/shedule.html', {'Pn':pn, 'Wt':wt, 'Śr':sr, 'Czw':czw, 'Pt':pt, 'Sb':sb, 'Nd':nd})
