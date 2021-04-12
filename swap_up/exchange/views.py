@@ -85,7 +85,7 @@ def import_schedule_for_year(csv_file):
             hour = row[8]
             student_name = row[9]
 
-            subject = Subject.objects.create(
+            subject, created_subject = Subject.objects.get_or_create(
                 subject_name = subject_name_row,
                 category = term_capacity,
                 semester = semester
