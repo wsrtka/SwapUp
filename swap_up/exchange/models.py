@@ -106,10 +106,12 @@ class Class(models.Model):
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
     day = models.DateField()
     time = models.TimeField()
-    row = models.CharField(max_length=20)
+    group_number = models.IntegerField(null=True)
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     capacity = models.IntegerField()
-    week = models.CharField(max_length=1)
+    week = models.CharField(max_length=1, null=True)
+    room = models.CharField(max_length=20, default='zdalnie')
+
 
     def __init__(self, day, time, row, capacity, week, *args, **kwargs):
         super().__init__(*args, **kwargs)
