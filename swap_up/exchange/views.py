@@ -80,18 +80,40 @@ def import_schedule_for_year(csv_file):
                 week = week
             )
 
-            # created_class.save()
             student.list_of_classes.add(created_class)
-            # student.save()
+
+
+
+def download_schedule(request):
+    current_user = request.user
+    student = Student.objects.get(user = user)
+    f = open('schedule.csv', 'wb')
+    for c in student.list_of_classes:
+        subject_id = c.subject_id
+        subject = Subject.objects.get(id = subject_id)
+        teacher_id = c.teacher_id
+        teacher = Teacher.objects.get(id = teacher_id)
+        f.write(
+            subject.subject_name + ";" + subject.category
+            + ";" + c.capacity + ";" + c.group_number + ";" + teacher.first_name + " " + teacher.last_name
+            + ";" + c.room + ";" + c.week + ";" + c.day + ";" + c.time
+            + "\n"
+        )
+
+    f.close()
+    f = open('schedule.csv', 'r')
+    response = HttpResponse(f, content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=schedule.csv'
+    return response
+        
 
 
 def upload_csv(request):
-    #if request.user
     if request.method == 'POST' and request.FILES['myfile']:
 
         myfile = request.FILES['myfile']
-        for line in myfile:
-            print(line)
+        # for line in myfile:
+        #     print(line)
 
         import_schedule_for_year(request.FILES['myfile'])
 
