@@ -122,10 +122,10 @@ def offers(request):
 def manage(request):
     return render(request, 'exchange/manage.html')
 
-def add_offer(request):
-    return render(request, 'exchange/add_offer.html')
-
 def add_exchange(request):
+    return render(request, 'exchange/add_exchange.html')
+
+def add_offer(request):
   
 
     # if this is a POST request we need to process the form data
@@ -147,7 +147,7 @@ def add_exchange(request):
     }
 
 
-    return render(request, 'exchange/add_exchange.html', context)
+    return render(request, 'exchange/add_offer.html', context)
 
 def edit_exchange(request):
     return render(request, 'exchange/edit_exchange.html')
