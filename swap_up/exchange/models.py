@@ -43,7 +43,6 @@ class Exchange(models.Model):
 
 
 
-
 class Subject(models.Model):
     subject_name = models.CharField(max_length=30)
     category = models.CharField(max_length=30)
@@ -123,61 +122,19 @@ class Teacher(models.Model):
 
 
 class Class(models.Model):
+
+    WEEK_CHOICES = [
+        ('A', 'Week A'),
+        ('B', 'Week B')
+    ]
+    
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    
     day = models.DateField()
     time = models.TimeField()
-    row = models.CharField(max_length=20)
-    teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
     capacity = models.IntegerField()
-    week = models.CharField(max_length=1)
-
-    @property
-    def day(self):
-        return self.day
-
-    @day.setter
-    def day(self, day):
-        self.day = day
-
-    @property
-    def time(self):
-        return self.time
-
-    @time.setter
-    def time(self, time):
-        self.time = time
-
-    @property
-    def row(self):
-        return self.row
-
-    @row.setter
-    def row(self, row):
-        self.row = row
-
-    @property
-    def subject_id(self):
-        return self.subject_id
-
-    @subject_id.setter
-    def subject_id(self, subject_id):
-        self.subject_id = subject_id
-
-    @property
-    def capacity(self):
-        return self.capacity
-
-    @capacity.setter
-    def capacity(self, capacity):
-        self.capacity = capacity
-
-    @property
-    def week(self):
-        return self.week
-
-    @week.setter
-    def week(self, week):
-        self.week = week
+    week = models.CharField(max_length=1, choices=WEEK_CHOICES)
 
 
 class Student(models.Model):
@@ -187,9 +144,8 @@ class Student(models.Model):
     # list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
     # list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
 
-    list_of_additional_subjects = models.ManyToManyField(Subject, null=True,
-                                                         blank=True)  # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ManyToManyField(Class, null=True, blank=True)  # będą działały więc póki co zostawiam bez
+    list_of_additional_subjects = models.ManyToManyField(Subject, blank=True)  # tutaj nie jestem pewien czy normalne settery
+    list_of_classes = models.ManyToManyField(Class, blank=True)  # będą działały więc póki co zostawiam bez
 
     path = models.CharField(max_length=40, null=True)
     # tutaj łączymy studenta z użytkownikiem
