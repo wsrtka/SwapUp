@@ -1,7 +1,76 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% load crispy_forms_tags %}
+{% load my_tags %}
 
-<p> Hello from add-offer.html </p>
+<form method="post">
+    {% csrf_token %}
+    <div class="form-row">
+        <p class="title is-3 is-spaced" >You have:</p>
+    </div>
+    <div class="columns">
+       <div class="column">
+            {{ form.subject_name|as_crispy_field }}
+        </div>
+        <div class="column">
+            {{ form.teacher|as_crispy_field }}
+        </div>
+    </div>
+    <div class='columns'>
+        <div class="column">{{form.have_day_of_the_week|as_crispy_field}}</div>
+        <div class="column">{{form.have_time|as_crispy_field}}</div>
+    </div>
+    <div>
+        {{form.comment|as_crispy_field}}
+    </div>
+
+    <div class="form-row">
+        <p class="title is-3 is-spaced mt-3" >You want:</p>
+    </div>
+
+    <label class="label">Time you want</label>
+    <div class="columns">
+        <div class="column">
+        {% for field in form.want_time %}
+        {% if forloop.counter0|modulo:3 ==  0 and  forloop.counter0 > 0%}</div><div class="column">{% endif %}
+            <label for="{{ field.id_for_label }}" class="col-md-1 control-label">
+                <span class="checkbox">{{ field.tag }} 
+                {{ field.choice_label }}
+                </span>
+            </label><br/>
+        {% endfor %}
+        </div>
+    </div>
+
+    <label class="label">Day you want</label>
+    <div class="columns">
+        <div class="column">
+        {% for field in form.want_day %}
+        {% if forloop.counter0|modulo:2 ==  0 and  forloop.counter0 > 0%}</div><div class="column">{% endif %}
+            <label for="{{ field.id_for_label }}" class="col-md-1 control-label">
+                <span class="checkbox">{{ field.tag }} 
+                {{ field.choice_label }}
+                </span>
+            </label><br/>
+        {% endfor %}
+        </div>
+    </div>
+    
+    <label class="label">Teachers you want</label>
+    <div>
+        {{form.teacher1 | as_crispy_field}}
+    </div>
+    <div>
+        {{form.teacher2 | as_crispy_field}}
+    </div>
+    <div>
+        {{form.teacher3 | as_crispy_field}}
+    </div>
+
+    <button class="button is-primary" type="submit", name="submit", value="submit">Submit</button>	
+
+</form>
+
 
 {% endblock %}
