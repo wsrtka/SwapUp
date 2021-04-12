@@ -8,6 +8,6 @@ urlpatterns = [
     path('offers/add', views.add_offer, name='add-offer'),
     path('add/', views.add_exchange, name='add-exchange'),
     path('upload/', views.upload_csv, name='upload-csv'),
-    path('manage/edit', views.edit_exchange, name='edite-exchange'),
+    path('manage/edit', views.edit_exchange, name='edit-exchange'),
     path('my-offers', views.user_offers, name='user-offers')
 ]
