@@ -3,10 +3,11 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.views import generic
 from django.utils import timezone
-
+import io
+import csv
 from django.http import HttpResponseRedirect
 
-from .forms import AddExchangeForm
+from .forms import AddExchangeForm, UploadFileForm
 
 
 from django.shortcuts import render
@@ -22,31 +23,37 @@ def home(request):
     return render(request, 'exchange/index.html')
 
 
-def import_schedule(csv_file):
+
+def import_schedule(csv_file, user):
+    
     classes = []
+    student = Student.objects.get(user = user)
+   
+    reader = csv.reader(csv_file, delimiter = ';', quotechar = '|')
+    for row in reader:
 
-    # csv_file = request.FILES[filename]
-    data = csv_file.read().decode('UTF-8')
+        io_string = io.StringIO(data)
+        # next(io_string)
+        for column in csv.reader(io_string, delimiter = ',', quotechar = "|"):
+            try:
+                subject_name = column[0] 
+                term_type = column[1]
+                term_capacity = column[2]
+                group_number = column[3]
+                teacher_name = column[4]
+                room = column[5]
+                # TODO: zajecia co tydzien nie maja tej kolumny, sprawdzac liczbe kolumn
+                week = column[6] 
+                day = column[7]
+                hour = column[8]
+            except:
+                pass
 
-    io_string = io.StringIO(data)
-    # next(io_string)
-    for column in csv.reader(io_string, delimeter = ',', quotechar = "|"):
-        subject_name = column[0]
-        term_type = column[1]
-        term_capacity = column[2]
-        group_number = column[3]
-        teacher_name = column[4]
-        room = column[5]
-        # TODO: zajecia co tydzien nie maja tej kolumny, sprawdzac liczbe kolumn
-        week = column[6] 
-        day = column[7]
-        hour = column[8]
+        subject = Subject.objects.get(subject_name = subject_name)
+        teacher_first_name, teacher_last_name = teacher_name.split()
+        teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
 
-        subject = get_subject_by_name(subject_name)
-        teacher = get_teacher_by_name(teacher_name)
-
-        
-        _, created_class = Class.objects.create(
+        created_class = Class.objects.create(
             subject_id = subject,
             day = day,
             time = time,
@@ -56,25 +63,22 @@ def import_schedule(csv_file):
 
         classes.append(created_class)
 
-def upload_shedule(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        print(form.is_valid())
-        if form.is_valid():
-            import_schedule(request.FILES['file'])
-            # handle_uploaded_file(request.FILES['file'])
-            """
-            def handle_uploaded_file(f):
-                #przykładowa funkcja handle_uploaded_file
-                with open('some/file/name.txt', 'wb+') as destination:
-                    for chunk in f.chunks():
-                        destination.write(chunk)
-            """
 
-            return HttpResponseRedirect('/exchange/')
-    else:
-        form = UploadFileForm()
-    return render(request, 'exchange/upload_shedule.html', {'form': form})
+def upload_csv(request):
+    #if request.user
+    if request.method == 'POST' and request.FILES['myfile']:
+
+        myfile = request.FILES['myfile']
+        for line in myfile:
+            print(line)
+
+        import_schedule(request.FILES['myfile'], request.user)
+
+        return render(request, 'exchange/upload_csv.html')
+
+    return render(request, 'exchange/upload_csv.html')
+
+
 
 def register(request):
     return render(request, 'exchange/index.html')
