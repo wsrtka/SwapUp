@@ -75,7 +75,7 @@ class Class(models.Model):
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
     
-    day = models.DateField(null=True)
+    day = models.CharField(max_length=10, null=True)
     time = models.TimeField(null=True)
     capacity = models.IntegerField(null=True)
     week = models.CharField(max_length=1, choices=WEEK_CHOICES, null=True)

@@ -36,7 +36,7 @@ def import_schedule_for_year(csv_file):
         
         else:
 
-            subject_name_row = str(row[0])
+            subject_name_row = row[0]
             term_type = row[1]
             term_capacity = row[2]
             group_number = row[3]
@@ -44,7 +44,7 @@ def import_schedule_for_year(csv_file):
             room = row[5]
             week = row[6] 
             day = row[7]
-            hour = row[8]
+            time = row[8]
             student_name = row[9]
 
             subject, created_subject = Subject.objects.get_or_create(
@@ -53,49 +53,35 @@ def import_schedule_for_year(csv_file):
                 semester = semester
             )
 
+            teacher_first_name, teacher_last_name = teacher_name.split()
+            student_first_name, student_last_name = student_name.split()
 
-            # teacher_first_name, teacher_last_name = teacher_name.split()
-            # student_first_name, student_last_name = student_name.split()
+            teacher, teacher_created = Teacher.objects.get_or_create(
+                first_name = teacher_first_name,
+                last_name = teacher_last_name
+            )
 
-            # test_teacher = Teacher.objects.create(
-            #     first_name = 'Jan',
-            #     last_name = 'Kowalski'
-            # )
-            # test_teacher.save()
+            user = User.objects.get(
+                first_name = student_first_name,
+                last_name = student_last_name
+            )
 
-            # teacher, teacher_created = Teacher.objects.get_or_create(
-            #     first_name = teacher_first_name,
-            #     last_name = teacher_last_name
-            # )
-            # if teacher_created:
-            #     teacher.save()
+            student = Student.objects.get(
+                user = user
+            )
 
-            # user = User.objects.get(
-            #     first_name = student_first_name,
-            #     last_name = student_last_name
-            # )
-            # if user == None:
-            #     print('user is none')
-
-            # student = Student.objects.get(
-            #     user = user
-            # )
-
-            # # subject = Subject.objects.get(subject_name = subject_name)
-            # # teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
-
-            # created_class = Class.objects.create(
-            #     subject_id = subject,
-            #     day = day,
-            #     time = time,
-            #     group_number = group_number,
-            #     teacher_id = teacher,
-            #     capacity = term_capacity,
-            #     week = week
-            # )
+            created_class = Class.objects.create(
+                subject_id = subject,
+                day = day,
+                time = time,
+                group_number = group_number,
+                teacher_id = teacher,
+                capacity = term_capacity,
+                week = week
+            )
 
             # created_class.save()
-            # student.list_of_classes.add(created_class)
+            student.list_of_classes.add(created_class)
             # student.save()
 
 
