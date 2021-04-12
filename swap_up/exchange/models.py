@@ -7,8 +7,8 @@ class Subject(models.Model):
     subject_name = models.CharField(max_length=30)
     category = models.CharField(max_length=30)
     semester = models.IntegerField()
-    path = models.CharField(max_length=30)
-    mandatory = models.BooleanField()
+    path = models.CharField(max_length=30, null=True)
+    mandatory = models.BooleanField(null=True)
 
 
     def __init__(self, subject_name, category, semester, path, mandatory, *args, **kwargs):

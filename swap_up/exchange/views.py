@@ -64,36 +64,39 @@ def import_schedule(csv_file, user):
 
 def import_schedule_for_year(csv_file):
     
-    reader = csv.reader(csv_file, delimiter = ';', quotechar = '|')
-    for row in reader:
+    classes = []
+    student = Student.objects.get(user = user)
+   
+    with io.TextIOWrapper(csv_file, encoding='utf-8', newline='\n') as f:
+        reader = csv.reader(f, delimiter=';')
+        for row in reader:
 
-        subject_name = column[0]
-        term_type = column[1]
-        term_capacity = column[2]
-        group_number = column[3]
-        teacher_name = column[4]
-        room = column[5]
-        week = column[6] 
-        day = column[7]
-        hour = column[8]
+            subject_name = column[0]
+            term_type = column[1]
+            term_capacity = column[2]
+            group_number = column[3]
+            teacher_name = column[4]
+            room = column[5]
+            week = column[6] 
+            day = column[7]
+            hour = column[8]
 
-        subject = Subject.objects.get(subject_name = subject_name)
-        teacher_first_name, teacher_last_name = teacher_name.split()
-        teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
+            subject = Subject.objects.get(subject_name = subject_name)
+            teacher_first_name, teacher_last_name = teacher_name.split()
+            teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
 
-        created_class = Class.objects.create(
-            subject_id = subject,
-            day = day,
-            time = time,
-            row = row,
-            teacher_id = teacher
-        )
+            created_class = Class.objects.create(
+                subject_id = subject,
+                day = day,
+                time = time,
+                row = row,
+                teacher_id = teacher
+            )
 
-        classes.append(created_class)
+            classes.append(created_class)
 
     for c in classes:
         student.list_of_classes.add(c)
-
 
 
 def upload_csv(request):
