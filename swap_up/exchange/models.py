@@ -11,13 +11,11 @@ class Subject(models.Model):
     mandatory = models.BooleanField(null=True)
 
 
-    def __init__(self, subject_name, category, semester, path, mandatory, *args, **kwargs):
+    def __init__(self, subject_name, category, semester, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.subject_name = subject_name
         self.category = category
         self.semester = semester
-        self.path = path
-        self.mandatory = mandatory
 
 
 
@@ -70,11 +68,10 @@ class Teacher(models.Model):
     last_name = models.CharField(max_length=30)
     title = models.CharField(max_length=30, null=True)
 
-    def __init__(self, first_name, last_name, title, *args, **kwargs):
+    def __init__(self, first_name, last_name, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.first_name = first_name
         self.last_name = last_name
-        self.title = title
 
     @property
     def first_name(self):
