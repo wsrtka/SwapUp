@@ -3,274 +3,118 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
+PATHS = [
+        ('A', 'Algorythmic path'),
+        ('AA', 'Algorythmic-application path'),
+        ('SD', 'Software development path')
+    ]
+
+
+class Exchange(models.Model):
+
+    class Semester(models.IntegerChoices):
+        SEM1 = 1
+        SEM2 = 2
+        SEM3 = 3
+        SEM4 = 4
+        SEM5 = 5
+        SEM6 = 6
+        SEM7 = 7
+        SEM8 = 8
+        SEM9 = 9
+        SEM10 = 10
+    
+    creation_date = models.DateField(null=True)
+    modification_date = models.DateField(null=True)
+    name = models.CharField(max_length=30, null=True)
+    semester = models.IntegerField(choices=Semester.choices, null=True)
+
+
 class Subject(models.Model):
-    subject_name = models.CharField(max_length=30)
-    category = models.CharField(max_length=30)
-    semester = models.IntegerField()
-    path = models.CharField(max_length=30, null=True)
+
+    class Semester(models.IntegerChoices):
+        SEM1 = 1
+        SEM2 = 2
+        SEM3 = 3
+        SEM4 = 4
+        SEM5 = 5
+        SEM6 = 6
+        SEM7 = 7
+        SEM8 = 8
+        SEM9 = 9
+        SEM10 = 10
+
+    subject_name = models.CharField(max_length=30, null=True)
+    category = models.CharField(max_length=30, null=True)
+    path = models.CharField(max_length=30, choices=PATHS, null=True)
+    semester = models.IntegerField(choices=Semester.choices, null=True)
     mandatory = models.BooleanField(null=True)
-
-
-    def __init__(self, subject_name, category, semester, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.subject_name = subject_name
-        self.category = category
-        self.semester = semester
-
-
-
-    @property
-    def subject_name(self):
-        return self.subject_name
-
-    @subject_name.setter
-    def subject_name(self, name):
-        self.subject_name = name
-
-    @property
-    def category(self):
-        return self.category
-
-    @category.setter
-    def category(self, type):
-        self.type = category
-
-    @property
-    def semester(self):
-        return self.semester
-
-    @semester.setter
-    def semester(self, semester):
-        self.semester = semester
-
-    @property
-    def path(self):
-        return self.path
-
-    @path.setter
-    def path(self, path):
-        self.path = path
-
-    @property
-    def mandatory(self):
-        return self.mandatory
-
-    @mandatory.setter
-    def mandatory(self, mandatory):
-        self.mandatory = mandatory
-
-
 
 
 class Teacher(models.Model):
 
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    title = models.CharField(max_length=30, null=True)
+    TITLES = [
+        ('inż.', 'inżynier'),
+        ('mgr. inż.', 'magister inżynier'),
+        ('dr.', 'doktor'),
+        ('dr. inż.', 'doktor inżynier')
+    ]
 
-    def __init__(self, first_name, last_name, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.first_name = first_name
-        self.last_name = last_name
-
-    @property
-    def first_name(self):
-        return self.first_name
-
-    @first_name.setter
-    def first_name(self, name):
-        self.first_name = name
-
-    @property
-    def last_name(self):
-        return self.last_name
-
-    @last_name.setter
-    def last_name(self, name):
-        self.last_name = name
-
-    @property
-    def title(self):
-        return self.title
-
-    @title.setter
-    def title(self, title):
-        self.title = title
+    first_name = models.CharField(max_length=30, null=True)
+    last_name = models.CharField(max_length=30, null=True)
+    title = models.CharField(max_length=30, choices=TITLES, null=True)
 
 
 class Class(models.Model):
 
-    subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    day = models.DateField()
-    time = models.TimeField()
+    WEEK_CHOICES = [
+        ('A', 'Week A'),
+        ('B', 'Week B')
+    ]
+    
+    subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
+    teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
+    
+    day = models.DateField(null=True)
+    time = models.TimeField(null=True)
+    capacity = models.IntegerField(null=True)
+    week = models.CharField(max_length=1, choices=WEEK_CHOICES, null=True)
+
     group_number = models.IntegerField(null=True)
-    teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
-    capacity = models.IntegerField()
-    week = models.CharField(max_length=1, null=True)
-    room = models.CharField(max_length=20, default='zdalnie')
-
-
-    def __init__(self, day, time, row, capacity, week, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.day = day
-        self.row = row
-        self.time = time
-        self.capacity = capacity
-        self.week = week
-
-    @property
-    def day(self):
-        return self.day
-
-    @day.setter
-    def day(self, day):
-        self.day = day
-
-    @property
-    def time(self):
-        return self.time
-
-    @time.setter
-    def time(self, time):
-        self.time = time
-
-    @property
-    def row(self):
-        return self.row
-
-    @row.setter
-    def row(self, row):
-        self.row = row
-
-    @property
-    def subject_id(self):
-        return self.subject_id
-
-    @subject_id.setter
-    def subject_id(self, subject_id):
-        self.subject_id = subject_id
-
-    @property
-    def capacity(self):
-        return self.capacity
-
-    @capacity.setter
-    def capacity(self, capacity):
-        self.capacity = capacity
-
-    @property
-    def week(self):
-        return self.week
-
-    @week.setter
-    def week(self, week):
-        self.week = week
+    room = models.CharField(max_length=20, null=True)
 
 
 class Student(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
-    
-    
+    path = models.CharField(max_length=40, choices=PATHS, null=True)
+
     # list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
     # list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
-    
-    list_of_additional_subjects = models.ManyToManyField(Subject, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ManyToManyField(Class, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
- 
-    
-    path = models.CharField(max_length=40, null=True)
-    # tutaj łączymy studenta z użytkownikiem
-    # User w Django ma imie, nazwisko, email
-    # ma też grupy, i te grupy będą związane z określonymi uprawnieniami
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
-    @property
-    def index_number(self):
-        return self.index_number
-
-    @index_number.setter
-    def index_number(self, number):
-        self.index_number = number
-
-    @property
-    def semester(self):
-        return self.semester
-
-    @semester.setter
-    def semester(self, semester):
-        self.semester = semester
-
-    @property
-    def path(self):
-        return self.path
-
-    @path.setter
-    def path(self, path):
-        self.path = path
+    list_of_additional_subjects = models.ManyToManyField(Subject)  # tutaj nie jestem pewien czy normalne settery
+    list_of_classes = models.ManyToManyField(Class)  # będą działały więc póki co zostawiam bez
 
 
 class Offer(models.Model):
 
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
-    class_id = models.ForeignKey(Class, on_delete=models.CASCADE)
+    STATES = [
+        ('A', 'Active'),
+        ('R', 'Reserved'),
+        ('T', 'Taken')
+    ]
+
+    student_id = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
+    other_student_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    class_id = models.ForeignKey(Class, on_delete=models.CASCADE, null=True)
+    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)
+
+    additional_information = models.CharField(max_length=100, null=True)
+    state = models.CharField(max_length=10, choices=STATES, default=STATES[0])
+    other_offer_id = models.IntegerField(null=True)
+
     preferred_class_id_list = None
-    additional_information = models.CharField(max_length=100)
-    state = models.CharField(max_length=10)
-    other_student_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    other_offer_id = models.IntegerField()
 
-    def __init__(self, info, state, other_student_id, other_exchange_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.additional_information = info
-        self.state = state
-        self.other_exchange_id = other_exchange_id
-        self.other_student_id = other_student_id
-
-    @property
-    def additional_information(self):
-        return self.additional_information
-
-    @additional_information.setter
-    def additional_information(self, additional_information):
-        self.additional_information = additional_information
-
-    @property
-    def state(self):
-        return self.state
-
-    @state.setter
-    def state(self, state):
-        self.state = state
-
-    @property
-    def other_student_id(self):
-        return self.other_student_id
-
-    @other_student_id.setter
-    def other_student_id(self, other_student_id):
-        self.other_student_id = other_student_id
-
-    @property
-    def other_exchange_id(self):
-        return self.other_exchange_id
-
-    @other_exchange_id.setter
-    def other_exchange_id(self, other_exchange_id):
-        self.other_exchange_id = other_exchange_id
-
-    @property
-    def preferred_class_id_list(self):
-        return self.preferred_class_id_list
-
-    @preferred_class_id_list.setter
-    def preferred_class_id_list(self,preferred_class_id_list):
-        self.preferred_class_id_list=preferred_class_id_list
-
-    @property
-    def class_id(self):
-        return self.class_id
-
-    @class_id.setter
-    def class_id(self, class_id):
-        self.class_id=class_id

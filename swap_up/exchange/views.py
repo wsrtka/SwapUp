@@ -64,39 +64,77 @@ def import_schedule(csv_file, user):
 
 def import_schedule_for_year(csv_file):
     
-    classes = []
-    student = Student.objects.get(user = user)
-   
-    with io.TextIOWrapper(csv_file, encoding='utf-8', newline='\n') as f:
-        reader = csv.reader(f, delimiter=';')
-        for row in reader:
+    semester = 0
 
-            subject_name = column[0]
-            term_type = column[1]
-            term_capacity = column[2]
-            group_number = column[3]
-            teacher_name = column[4]
-            room = column[5]
-            week = column[6] 
-            day = column[7]
-            hour = column[8]
+    for line in csv_file:
+        row = line.decode("utf-8").split(";")
 
-            subject = Subject.objects.get(subject_name = subject_name)
-            teacher_first_name, teacher_last_name = teacher_name.split()
-            teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
+        if len(row) == 1:
+            semester = row[0]
+        
+        else:
 
-            created_class = Class.objects.create(
-                subject_id = subject,
-                day = day,
-                time = time,
-                row = row,
-                teacher_id = teacher
+            subject_name_row = str(row[0])
+            term_type = row[1]
+            term_capacity = row[2]
+            group_number = row[3]
+            teacher_name = row[4]
+            room = row[5]
+            week = row[6] 
+            day = row[7]
+            hour = row[8]
+            student_name = row[9]
+
+            subject = Subject.objects.create(
+                subject_name = subject_name_row,
+                category = term_capacity,
+                semester = semester
             )
 
-            classes.append(created_class)
 
-    for c in classes:
-        student.list_of_classes.add(c)
+            # teacher_first_name, teacher_last_name = teacher_name.split()
+            # student_first_name, student_last_name = student_name.split()
+
+            # test_teacher = Teacher.objects.create(
+            #     first_name = 'Jan',
+            #     last_name = 'Kowalski'
+            # )
+            # test_teacher.save()
+
+            # teacher, teacher_created = Teacher.objects.get_or_create(
+            #     first_name = teacher_first_name,
+            #     last_name = teacher_last_name
+            # )
+            # if teacher_created:
+            #     teacher.save()
+
+            # user = User.objects.get(
+            #     first_name = student_first_name,
+            #     last_name = student_last_name
+            # )
+            # if user == None:
+            #     print('user is none')
+
+            # student = Student.objects.get(
+            #     user = user
+            # )
+
+            # # subject = Subject.objects.get(subject_name = subject_name)
+            # # teacher = Teacher.objects.get(first_name = teacher_first_name, last_name = teacher_last_name)
+
+            # created_class = Class.objects.create(
+            #     subject_id = subject,
+            #     day = day,
+            #     time = time,
+            #     group_number = group_number,
+            #     teacher_id = teacher,
+            #     capacity = term_capacity,
+            #     week = week
+            # )
+
+            # created_class.save()
+            # student.list_of_classes.add(created_class)
+            # student.save()
 
 
 def upload_csv(request):
@@ -106,9 +144,8 @@ def upload_csv(request):
         myfile = request.FILES['myfile']
         for line in myfile:
             print(line)
-            # print(line[0])
 
-        import_schedule(request.FILES['myfile'], request.user)
+        import_schedule_for_year(request.FILES['myfile'])
 
         return render(request, 'exchange/upload_csv.html')
 
