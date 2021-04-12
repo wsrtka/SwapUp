@@ -2,6 +2,13 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+class Exchange(models.Model):
+    creation_date=models.DateField()
+    modification_date=models.DateField()
+    name=models.CharField(max_length=30)
+    semester=models.IntegerField()
+
+
 
 class Subject(models.Model):
     subject_name = models.CharField(max_length=30)
@@ -191,6 +198,7 @@ class Offer(models.Model):
     state = models.CharField(max_length=10)
     other_student_id = models.ForeignKey(User, on_delete=models.CASCADE)
     other_offer_id = models.IntegerField()
+    exchange=models.ForeignKey(Exchange,on_delete=models.CASCADE)
 
 
     @property
