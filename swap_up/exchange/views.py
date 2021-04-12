@@ -80,10 +80,10 @@ def upload_csv(request):
 
 
 
-def register():
+def register(request):
     return render(request, 'exchange/index.html')
 
-def login():
+def login(request):
     return render(request, 'exchange/index.html')
 
 def offers(request):
