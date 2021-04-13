@@ -110,14 +110,18 @@ def download_schedule(request):
 
 
 def upload_csv(request):
-    if request.method == 'POST' and request.FILES['myfile']:
 
-        myfile = request.FILES['myfile']
-        import_schedule_for_year(request.FILES['myfile'])
+    if request.user.is_superuser:
+        if request.method == 'POST' and request.FILES['myfile']:
+
+            myfile = request.FILES['myfile']
+            import_schedule_for_year(request.FILES['myfile'])
+
+            return render(request, 'exchange/upload_csv.html')
 
         return render(request, 'exchange/upload_csv.html')
-
-    return render(request, 'exchange/upload_csv.html')
+    else:
+        return render(request, 'base.html')
 
 
 def exhange(request, exchange_id):
