@@ -12,9 +12,6 @@ from .forms import AddExchangeForm, UploadFileForm
 
 from django.shortcuts import render
 from .models import *
-  
-  
-
 
 
 class IndexView(generic.TemplateView):
@@ -126,18 +123,105 @@ def upload_csv(request):
     return render(request, 'exchange/upload_csv.html')
 
 
+def exhange(request, exchange_id):
 
-def register():
+    # TODO
+    item1 = {
+        "student": "Jacek Gorm",
+        "subject": "Teoria nicości2",
+        "time": "Pn A, 8:00",
+        "other_times": "Pn B, 9:00, Wt B, 16:15", #none means any class
+        "teacher": "Zenon Iksiński",
+        "other_teachers": None, #none means any teacher
+        "comment": None,
+    }
+    item2 = {
+        "student": "Jacek Gorm",
+        "subject": "WDI",
+        "time": "Śr, 10:00",
+        "other_times": "Pn B, 9:00, Wt B, 16:15",
+        "teacher": "Zenon Iksiński",
+        "other_teachers": "Ikakij Korek",
+        "comment": "daję 100zł",
+    }
+    item3 = {
+        "student": "Jacek Gorm",
+        "subject": "Analiza",
+        "time": "Pn B, 8:00",
+        "other_times": None,
+        "teacher": "Zenon Iksiński",
+        "other_teachers": "Ikakij Korek, Szymon Tukor",
+        "comment": "daję 100zł",
+    }
+    exchange1 = {
+        "name": "Semester 1",
+        "id" : 1,
+        "items": [item1, item2],
+    }
+    exchange2 = {
+        "name": "Semester 2",
+        "id": 2,
+        "items": [item1, item2, item3],
+    }
+    exchange3 = {
+        "name": "Semester 3",
+        "id": 3,
+        "items": [item1],
+    }
+    exchange4 = {
+        "name": "Semester 4",
+        "id": 4,
+        "items": [item1, item1],
+    }
+    exchange5 = {
+        "name": "Semester 5",
+        "id": 5,
+        "items": [item2],
+    }
+    items = []
+    name = ''
+    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
+    for exchange in exchanges:
+        if exchange["id"] == exchange_id:
+            items = exchange["items"]
+            name = exchange["name"]
+
+    return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
+
+
+def register(request):
     return render(request, 'exchange/index.html')
 
-def login():
+def login(request):
     return render(request, 'exchange/index.html')
 
 def offers(request):
     return render(request, 'exchange/offers.html')
 
 def manage(request):
-    return render(request, 'exchange/manage.html', {'exchanges': ["Semestr 1","Semestr 2","Semestr 3","Semestr 4","Semestr 5"]})
+    exchange1 = {
+        "name": "Semester 1",
+        "id": "1",
+    }
+    exchange2 = {
+        "name": "Semester 2",
+        "id": "2",
+    }
+    exchange3 = {
+        "name": "Semester 3",
+        "id": "3",
+    }
+    exchange4 = {
+        "name": "Semester 4",
+        "id": "4",
+    }
+    exchange5 = {
+        "name": "Semester 5",
+        "id": "5",
+    }
+    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
+
+    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
 
 def add_exchange(request):
     return render(request, 'exchange/add_exchange.html')
@@ -177,7 +261,7 @@ def user_offers(request):
         "subject": "Teoria nicości2",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "new", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "state" : "new",
         "other_student": None,
         "other_time": None,
         "other_teacher": None
@@ -187,7 +271,7 @@ def user_offers(request):
         "subject": "Teoria nicości",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "pending", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "state" : "pending",
         "other_student": "Staszek Ciaptak-Gąsiennica",
         "other_time": "Wt B, 9:35",
         "other_teacher": None
@@ -197,14 +281,19 @@ def user_offers(request):
         "subject": "Wprowadzenie do teorii nicości",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "closed", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "state" : "closed",
         "other_student": "Józio Chmura-Mamałyga",
         "other_time": "Wt B, 9:35",
         "other_teacher": None
     }
 
+    # static offers
+    # offers = [offer1, offer2, offer3]
+    
+    # dynamic offers
+    current_student = request.user.student
+    offers = Offer.objects.filter(student_id=current_student.id)
 
-    offers = [offer1, offer2, offer3]
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 

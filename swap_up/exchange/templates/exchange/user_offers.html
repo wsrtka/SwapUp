@@ -2,73 +2,87 @@
 
 {% block content %}
 
-<p class="title is-1"> This are your offers </p>
+<div class='box mt-6'>
 
-<table class='table'>
-    <thead>
-      <tr class="is-selected">
-            <th>You have</th>
-            <th>You are offered</th>
-            <th>You can swap with</th>
-            <th></th>
-        </tr>
-    </thead>
+    <h1 class="hero">Your offers</h1>
 
-    <tfoot>
+    <a class="button is-primary block" href="{% url 'add-offer' %}">Add new offer</a>
+
+    {% if offers %}
+
+    <table class='table is-striped is-hoverable is-fullwidth'>
+        <thead>
+        <tr class="has-background-primary">
+                <th class="has-text-primary-light">What you have</th>
+                <th class="has-text-primary-light">What you are offered</th>
+                <th class="has-text-primary-light">You can swap with</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <!-- <tfoot>
+            <tr>
+                <th>What you have</th>
+                <th>What you are offered</th>
+                <th>You can swap with</th>
+                <th></th>
+            </tr>
+        </tfoot> -->
+
+        <tbody>
+            {% for offer in offers %}
         <tr>
-            <th>You have</th>
-            <th>You are offered</th>
-            <th>You can swap with</th>
-            <th></th>
+            <td><strong>{{offer.subject}}</strong> {{offer.have_time}}, {{offer.have_teacher}}</td>
+            <td> {% if offer.other_student %}
+                <strong>{{offer.subject}}</strong> {{offer.other_time}}, {{offer.other_teacher}}
+                {% endif %}
+            </td>
+            <td>
+                {% if offer.other_student %}
+                {{offer.other_student}}
+                {% endif %}
+            </td>
+            <td style='text-align:center; vertical-align:middle'>
+                {% if offer.state == "closed" %}
+
+                Closed
+
+                {% endif %}
+                {% if offer.state == "pending" %}
+
+                <button class="button is-success">
+                    <span class="icon is-large">
+                        <span class="material-icons">
+                            check_circle
+                        </span>
+                    </span>
+                </button>
+                <button class="button is-danger">
+                    <span class="icon is-large">
+                        <span class="material-icons">
+                            highlight_off
+                        </span>
+                    </span>
+                </button>
+
+                {% endif %}
+                {% if offer.state == "new" %}
+                Waiting
+                {% endif %}
+            </td>
         </tr>
-    </tfoot>
+            {% endfor %}
 
-    <tbody>
-        {% for offer in offers %}
-      <tr>
-        <td><strong>{{offer.subject}}</strong> {{offer.have_time}}, {{offer.have_teacher}}</td>
-        <td> {% if offer.other_student %}
-            <strong>{{offer.subject}}</strong> {{offer.other_time}}, {{offer.other_teacher}}
-            {% endif %}
-        </td>
-        <td>
-            {% if offer.other_student %}
-            {{offer.other_student}}
-            {% endif %}
-        </td>
-        <td style='text-align:center; vertical-align:middle'>
-            {% if offer.state == "closed" %}
+        
+        </tbody>
+    </table>
 
-            Closed
+    {% else %}
 
-            {% endif %}
-            {% if offer.state == "pending" %}
+    <p>You have no offers.</p>
 
-            <button class="button is-success">
-                <span class="icon is-large">
-                    <span class="material-icons">
-                        check_circle
-                    </span>
-                </span>
-            </button>
-            <button class="button is-danger">
-                <span class="icon is-large">
-                    <span class="material-icons">
-                        highlight_off
-                    </span>
-                </span>
-            </button>
+    {% endif %}
 
-            {% endif %}
-            {% if offer.state == "new" %}
-            Waiting
-            {% endif %}
-        </td>
-      </tr>
-        {% endfor %}
-
-    
-    </tbody>
-  </table>
+</div>
 
 {% endblock %}

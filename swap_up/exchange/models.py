@@ -102,9 +102,9 @@ class Student(models.Model):
 class Offer(models.Model):
 
     STATES = [
-        ('A', 'Active'),
-        ('R', 'Reserved'),
-        ('T', 'Taken')
+        ('N', 'New'),
+        ('P', 'Pending'),
+        ('C', 'Closed')
     ]
 
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)

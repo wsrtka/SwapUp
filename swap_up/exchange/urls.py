@@ -9,5 +9,6 @@ urlpatterns = [
     path('add/', views.add_exchange, name='add-exchange'),
     path('upload/', views.upload_csv, name='upload-csv'),
     path('manage/edit', views.edit_exchange, name='edit-exchange'),
-    path('my-offers', views.user_offers, name='user-offers')
+    path('my-offers', views.user_offers, name='user-offers'),
+    path('manage/<int:exchange_id>', views.exhange, name='exchange')
 ]
