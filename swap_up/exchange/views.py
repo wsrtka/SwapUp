@@ -181,8 +181,6 @@ def exhange(request, exchange_id):
     name = ''
     exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
     for exchange in exchanges:
-        print(exchange_id)
-        print(exchange["id"])
         if exchange["id"] == exchange_id:
             items = exchange["items"]
             name = exchange["name"]
