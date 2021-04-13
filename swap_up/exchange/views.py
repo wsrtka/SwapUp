@@ -6,6 +6,7 @@ from django.utils import timezone
 import io
 import csv
 from django.http import HttpResponseRedirect
+from django.http import HttpResponse
 
 from .forms import AddExchangeForm, UploadFileForm
 
@@ -87,17 +88,16 @@ def import_schedule_for_year(csv_file):
 
 def download_schedule(request):
     current_user = request.user
-    student = Student.objects.get(user = user)
-    f = open('schedule.csv', 'wb')
-    for c in student.list_of_classes:
-        subject_id = c.subject_id
-        subject = Subject.objects.get(id = subject_id)
-        teacher_id = c.teacher_id
-        teacher = Teacher.objects.get(id = teacher_id)
+    student = Student.objects.get(user = current_user)
+    f = open('schedule.csv', 'w')
+
+    for c in student.list_of_classes.all():
+        subject = c.subject_id
+        teacher = c.teacher_id
         f.write(
-            subject.subject_name + ";" + subject.category
-            + ";" + c.capacity + ";" + c.group_number + ";" + teacher.first_name + " " + teacher.last_name
-            + ";" + c.room + ";" + c.week + ";" + c.day + ";" + c.time
+            str(subject.subject_name) + ";" + str(subject.category)
+            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.first_name) + " " + str(teacher.last_name)
+            + ";" + str(c.room) + ";" + str(c.week) + ";" + str(c.day) + ";" + str(c.time)
             + "\n"
         )
 
@@ -113,9 +113,6 @@ def upload_csv(request):
     if request.method == 'POST' and request.FILES['myfile']:
 
         myfile = request.FILES['myfile']
-        # for line in myfile:
-        #     print(line)
-
         import_schedule_for_year(request.FILES['myfile'])
 
         return render(request, 'exchange/upload_csv.html')
