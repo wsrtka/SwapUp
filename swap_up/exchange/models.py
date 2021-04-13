@@ -107,14 +107,17 @@ class Offer(models.Model):
         ('C', 'Closed')
     ]
 
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
-    other_student_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    class_id = models.ForeignKey(Class, on_delete=models.CASCADE, null=True)
+    # meta info
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)
-
-    additional_information = models.CharField(max_length=100, null=True)
     state = models.CharField(max_length=10, choices=STATES, default=STATES[0])
-    other_offer_id = models.IntegerField(null=True)
 
-    preferred_class_id_list = None
+    # offer info
+    unwanted_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='unwanted_class', null=True)
+    preferred_classes = models.ManyToManyField(Class, related_name='user_preferences')
+    preferred_teachers = models.ManyToManyField(Teacher)
+    additional_information = models.CharField(max_length=100, null=True)
 
+    # "transaction" info
+    other_student = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    other_offer = models.IntegerField(null=True)

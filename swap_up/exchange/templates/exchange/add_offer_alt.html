@@ -1,0 +1,24 @@
+
+
+<div class="container content">
+    <section class="section box mt-6 mb-6">
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <fieldset>
+                <legend class="title">Join Today</legend>
+                {{ form|crispy }}
+            </fieldset>
+    
+            <button type="submit" class="button is-primary mt-5">Sign Up</button>
+        </form>
+
+        <hr>
+    
+        <div>
+            <small>Already have an account? <a href="{% url 'login' %}">Sign in here.</a></small>
+        </div>
+
+    </section>
+</div>

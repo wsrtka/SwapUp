@@ -6,10 +6,7 @@ from django.utils import timezone
 import io
 import csv
 from django.http import HttpResponseRedirect
-
-from .forms import AddExchangeForm, UploadFileForm
-
-
+from .forms import *
 from django.shortcuts import render
 from .models import *
 
@@ -224,25 +221,23 @@ def add_exchange(request):
 
 def add_offer(request):
   
-
     # if this is a POST request we need to process the form data
     if request.method == 'POST':
 
-        form = AddExchangeForm(request.POST)
+        form = OfferForm(request.POST)
+        # form = AddOfferForm(request.POST)
         print(form.is_valid())
         if form.is_valid():
-            print(form.cleaned_data.get("subject_name"))
-
             return HttpResponseRedirect('/thanks/')
 
     # if a GET (or any other method) we'll create a blank form
     else:
-        form = AddExchangeForm()
+        # form = AddOfferForm()
+        form = OfferForm()
 
     context = {
         'form':form
     }
-
 
     return render(request, 'exchange/add_offer.html', context)
 
