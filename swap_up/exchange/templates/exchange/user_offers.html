@@ -2,28 +2,32 @@
 
 {% block content %}
 
-<div class='content box mt-6'>
+<div class='box mt-6'>
 
     <h1 class="hero">Your offers</h1>
 
-    <table class='table'>
+    <a class="button is-primary block" href="{% url 'add-offer' %}">Add new offer</a>
+
+    {% if offers %}
+
+    <table class='table is-striped is-hoverable is-fullwidth'>
         <thead>
-        <tr class="is-selected">
-                <th>You have</th>
-                <th>You are offered</th>
-                <th>You can swap with</th>
+        <tr class="has-background-primary">
+                <th class="has-text-primary-light">What you have</th>
+                <th class="has-text-primary-light">What you are offered</th>
+                <th class="has-text-primary-light">You can swap with</th>
                 <th></th>
             </tr>
         </thead>
 
-        <tfoot>
+        <!-- <tfoot>
             <tr>
-                <th>You have</th>
-                <th>You are offered</th>
+                <th>What you have</th>
+                <th>What you are offered</th>
                 <th>You can swap with</th>
                 <th></th>
             </tr>
-        </tfoot>
+        </tfoot> -->
 
         <tbody>
             {% for offer in offers %}
@@ -72,6 +76,13 @@
         
         </tbody>
     </table>
+
+    {% else %}
+
+    <p>You have no offers.</p>
+
+    {% endif %}
+
 </div>
 
 {% endblock %}
