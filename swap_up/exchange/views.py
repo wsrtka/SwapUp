@@ -61,26 +61,30 @@ def import_schedule_for_year(csv_file):
                 last_name = teacher_last_name
             )
 
-            user = User.objects.get(
-                first_name = student_first_name,
-                last_name = student_last_name
-            )
+            try:
+                user = User.objects.get(
+                    first_name = student_first_name,
+                    last_name = student_last_name
+                )
+            except User.DoesNotExist:
+                user = None
 
-            student = Student.objects.get(
-                user = user
-            )
+            if user != None:
+                student = Student.objects.get(
+                    user = user
+                )
 
-            created_class = Class.objects.create(
-                subject_id = subject,
-                day = day,
-                time = time,
-                group_number = group_number,
-                teacher_id = teacher,
-                capacity = term_capacity,
-                week = week
-            )
+                created_class, class_created = Class.objects.get_or_create(
+                    subject_id = subject,
+                    day = day,
+                    time = time,
+                    group_number = group_number,
+                    teacher_id = teacher,
+                    capacity = term_capacity,
+                    week = week
+                )
 
-            student.list_of_classes.add(created_class)
+                student.list_of_classes.add(created_class)
 
 
 
