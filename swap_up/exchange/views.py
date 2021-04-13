@@ -12,9 +12,6 @@ from .forms import AddExchangeForm, UploadFileForm
 
 from django.shortcuts import render
 from .models import *
-  
-  
-
 
 
 class IndexView(generic.TemplateView):
@@ -260,7 +257,7 @@ def user_offers(request):
         "subject": "Teoria nicości2",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "new", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "state" : "new",
         "other_student": None,
         "other_time": None,
         "other_teacher": None
@@ -270,7 +267,7 @@ def user_offers(request):
         "subject": "Teoria nicości",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "pending", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "state" : "pending",
         "other_student": "Staszek Ciaptak-Gąsiennica",
         "other_time": "Wt B, 9:35",
         "other_teacher": None
@@ -280,14 +277,19 @@ def user_offers(request):
         "subject": "Wprowadzenie do teorii nicości",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "closed", #Można zmienić nazwy stanów z new, pending i closed, to tylko moja propozycja
+        "state" : "closed",
         "other_student": "Józio Chmura-Mamałyga",
         "other_time": "Wt B, 9:35",
         "other_teacher": None
     }
 
+    # static offers
+    # offers = [offer1, offer2, offer3]
+    
+    # dynamic offers
+    current_student = request.user.student
+    offers = Offer.objects.filter(student_id=current_student.id)
 
-    offers = [offer1, offer2, offer3]
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 
