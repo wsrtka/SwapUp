@@ -10,5 +10,5 @@ urlpatterns = [
     path('upload/', views.upload_csv, name='upload-csv'),
     path('manage/edit', views.edit_exchange, name='edit-exchange'),
     path('my-offers', views.user_offers, name='user-offers'),
-    path('exchange', views.exhange, name='exchange')
+    path('manage/<int:exchange_id>', views.exhange, name='exchange')
 ]

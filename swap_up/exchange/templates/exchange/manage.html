@@ -16,9 +16,9 @@
     <div class="card block ">
         <header class="card-header">
             <p class="card-header-title">
-                {{exchange}}
+                {{exchange.name}}
             </p>
-            <a class="button is-dark has-text-primary" style=" margin: 15px;" href="{% url 'exchange' %}">
+            <a class="button is-dark has-text-primary" style=" margin: 15px;" href="/exchange/manage/{{exchange.id}}">
                 Go
             </a>
         </header>

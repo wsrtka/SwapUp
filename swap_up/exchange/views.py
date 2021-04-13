@@ -122,7 +122,8 @@ def upload_csv(request):
     return render(request, 'exchange/upload_csv.html')
 
 
-def exhange(request):
+def exhange(request, exchange_id):
+
     # TODO
     item1 = {
         "student": "Jacek Gorm",
@@ -151,9 +152,42 @@ def exhange(request):
         "other_teachers": "Ikakij Korek, Szymon Tukor",
         "comment": "daję 100zł",
     }
-    items = [item1, item2, item3]
+    exchange1 = {
+        "name": "Semester 1",
+        "id" : 1,
+        "items": [item1, item2],
+    }
+    exchange2 = {
+        "name": "Semester 2",
+        "id": 2,
+        "items": [item1, item2, item3],
+    }
+    exchange3 = {
+        "name": "Semester 3",
+        "id": 3,
+        "items": [item1],
+    }
+    exchange4 = {
+        "name": "Semester 4",
+        "id": 4,
+        "items": [item1, item1],
+    }
+    exchange5 = {
+        "name": "Semester 5",
+        "id": 5,
+        "items": [item2],
+    }
+    items = []
+    name = ''
+    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
+    for exchange in exchanges:
+        print(exchange_id)
+        print(exchange["id"])
+        if exchange["id"] == exchange_id:
+            items = exchange["items"]
+            name = exchange["name"]
 
-    return render(request, 'exchange/exchange.html', {'items': items})
+    return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
 
 
 def register():
@@ -166,7 +200,29 @@ def offers(request):
     return render(request, 'exchange/offers.html')
 
 def manage(request):
-    return render(request, 'exchange/manage.html', {'exchanges': ["Semestr 1","Semestr 2","Semestr 3","Semestr 4","Semestr 5"]})
+    exchange1 = {
+        "name": "Semester 1",
+        "id": "1",
+    }
+    exchange2 = {
+        "name": "Semester 2",
+        "id": "2",
+    }
+    exchange3 = {
+        "name": "Semester 3",
+        "id": "3",
+    }
+    exchange4 = {
+        "name": "Semester 4",
+        "id": "4",
+    }
+    exchange5 = {
+        "name": "Semester 5",
+        "id": "5",
+    }
+    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
+
+    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
 
 def add_exchange(request):
     return render(request, 'exchange/add_exchange.html')
