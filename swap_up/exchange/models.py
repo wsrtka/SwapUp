@@ -75,12 +75,6 @@ class Class(models.Model):
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
     
-<<<<<<< HEAD
-    day = models.DateField(null=True)
-    time = models.TimeField(null=True)
-    capacity = models.IntegerField(null=True)
-    week = models.CharField(max_length=1, choices=WEEK_CHOICES, null=True)
-=======
     day = models.CharField(max_length=10, null=True)
     time = models.TimeField(null=True)
     capacity = models.IntegerField(null=True)
@@ -88,7 +82,6 @@ class Class(models.Model):
 
     group_number = models.IntegerField(null=True)
     room = models.CharField(max_length=20, null=True)
->>>>>>> c2b49e0f4979039d95b661c5d8b1931b6ddebfc0
 
 
 class Student(models.Model):
@@ -113,19 +106,6 @@ class Offer(models.Model):
         ('R', 'Reserved'),
         ('T', 'Taken')
     ]
-<<<<<<< HEAD
-
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
-    other_student_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    class_id = models.ForeignKey(Class, on_delete=models.CASCADE, null=True)
-    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)
-
-    additional_information = models.CharField(max_length=100, null=True)
-    state = models.CharField(max_length=10, choices=STATES, default=STATES[0])
-    other_offer_id = models.IntegerField(null=True)
-
-    preferred_class_id_list = None
-=======
 
     student_id = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     other_student_id = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
@@ -138,4 +118,3 @@ class Offer(models.Model):
 
     preferred_class_id_list = None
 
->>>>>>> c2b49e0f4979039d95b661c5d8b1931b6ddebfc0
