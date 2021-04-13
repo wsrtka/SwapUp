@@ -122,6 +122,39 @@ def upload_csv(request):
     return render(request, 'exchange/upload_csv.html')
 
 
+def exhange(request):
+    # TODO
+    item1 = {
+        "student": "Jacek Gorm",
+        "subject": "Teoria nicości2",
+        "time": "Pn A, 8:00",
+        "other_times": "Pn B, 9:00, Wt B, 16:15", #none means any class
+        "teacher": "Zenon Iksiński",
+        "other_teachers": None, #none means any teacher
+        "comment": None,
+    }
+    item2 = {
+        "student": "Jacek Gorm",
+        "subject": "WDI",
+        "time": "Śr, 10:00",
+        "other_times": "Pn B, 9:00, Wt B, 16:15",
+        "teacher": "Zenon Iksiński",
+        "other_teachers": "Ikakij Korek",
+        "comment": "daję 100zł",
+    }
+    item3 = {
+        "student": "Jacek Gorm",
+        "subject": "Analiza",
+        "time": "Pn B, 8:00",
+        "other_times": None,
+        "teacher": "Zenon Iksiński",
+        "other_teachers": "Ikakij Korek, Szymon Tukor",
+        "comment": "daję 100zł",
+    }
+    items = [item1, item2, item3]
+
+    return render(request, 'exchange/exchange.html', {'items': items})
+
 
 def register():
     return render(request, 'exchange/index.html')

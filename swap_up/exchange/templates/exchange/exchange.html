@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<p class="title is-1"> Semester 2 </p>
+
+<table class='table'>
+    <thead>
+    <tr class="is-selected">
+        <th>Subject</th>
+        <th>Advertiser</th>
+        <th>Wanted</th>
+        <th>Comment</th>
+        <th></th>
+    </tr>
+    </thead>
+
+    <tfoot>
+    <tr>
+        <th>Subject</th>
+        <th>Advertiser</th>
+        <th>Wanted</th>
+        <th>Comment</th>
+        <th></th>
+    </tr>
+    </tfoot>
+    <tbody>
+    {% for item in items %}
+    <tr>
+        <td><strong>{{item.subject}}</strong> {{item.time}}, {{item.teacher}}</td>
+        <td>
+            {% if item.student %}
+            {{item.student}}
+            {% endif %}
+        </td>
+        <td>
+            <strong>
+                {% if item.other_times %}
+                {{item.other_times}}
+                {% else %}
+                any time
+                {% endif %}
+            </strong>,
+            {% if item.other_teachers %}
+            {{item.other_teachers}}
+            {% else %}
+            any teacher
+            {% endif %}
+        </td>
+        <td>
+            {% if item.comment %}
+            {{item.comment}}
+            {% endif %}
+        </td>
+        <td>
+            <button class="button is-success">
+                Swap
+            </button>
+        </td>
+
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
