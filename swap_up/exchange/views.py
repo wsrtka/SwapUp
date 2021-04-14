@@ -24,7 +24,7 @@ def home(request):
 
 def import_schedule_for_year(csv_file):
     
-    semester = 0
+    semester = -1
 
     for line in csv_file:
         row = line.decode("utf-8").split(";")
@@ -32,58 +32,69 @@ def import_schedule_for_year(csv_file):
         if len(row) == 1:
             semester = row[0]
         
-        else:
-
+        elif len(row) == 10:
             subject_name_row = row[0]
             term_type = row[1]
+            
             term_capacity = row[2]
+            if term_capacity == '':
+                term_capacity = -1
+            
             group_number = row[3]
+            if group_number == '':
+                group_number = -1
+
             teacher_name = row[4]
             room = row[5]
-            week = row[6] 
+            week = row[6]
             day = row[7]
             time = row[8]
-            student_name = row[9]
+            student_name = row[9]  
 
-            subject, created_subject = Subject.objects.get_or_create(
-                subject_name = subject_name_row,
-                category = term_capacity,
-                semester = semester
-            )
-
-            teacher_first_name, teacher_last_name = teacher_name.split()
-            student_first_name, student_last_name = student_name.split()
-
-            teacher, teacher_created = Teacher.objects.get_or_create(
-                first_name = teacher_first_name,
-                last_name = teacher_last_name
-            )
-
-            try:
-                user = User.objects.get(
-                    first_name = student_first_name,
-                    last_name = student_last_name
-                )
-            except User.DoesNotExist:
-                user = None
-
-            if user != None:
-                student = Student.objects.get(
-                    user = user
+            if subject_name_row != '' and teacher_name != '' and day != '' and time != '':
+                subject, created_subject = Subject.objects.get_or_create(
+                    subject_name = subject_name_row,
+                    category = term_capacity,
+                    semester = semester
                 )
 
-                created_class, class_created = Class.objects.get_or_create(
-                    subject_id = subject,
-                    day = day,
-                    time = time,
-                    group_number = group_number,
-                    teacher_id = teacher,
-                    capacity = term_capacity,
-                    week = week
+                teacher_first_name, teacher_last_name = teacher_name.split()
+                student_first_name, student_last_name = student_name.split()
+
+                teacher, teacher_created = Teacher.objects.get_or_create(
+                    first_name = teacher_first_name,
+                    last_name = teacher_last_name
                 )
 
-                student.list_of_classes.add(created_class)
+                try:
+                    user = User.objects.get(
+                        first_name = student_first_name,
+                        last_name = student_last_name
+                    )
+                    try:
+                        student = Student.objects.get(
+                            user = user
+                        )
 
+                        created_class, class_created = Class.objects.get_or_create(
+                            subject_id = subject,
+                            day = day,
+                            time = time,
+                            group_number = group_number,
+                            teacher_id = teacher,
+                            capacity = term_capacity,
+                            week = week
+                            )
+                        if not student.list_of_classes.filter(id = created_class.id).exists():
+                            student.list_of_classes.add(created_class)
+
+                    except Student.DoesNotExist:
+                        continue
+
+                except User.DoesNotExist:
+                    continue
+
+                    
 
 
 def download_schedule(request):
