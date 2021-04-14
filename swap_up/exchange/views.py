@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import *
 from django.shortcuts import render
 from .models import *
+from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class IndexView(generic.TemplateView):
@@ -203,7 +205,31 @@ def exhange(request, exchange_id):
 
 @login_required
 def offers(request):
-    return render(request, 'exchange/offers.html')
+
+    current_student = request.user.student
+    db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
+    # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
+
+    offers = []
+
+    # niestety tak jest najwygodniej przekazać parametry do kontekstu template'a
+    for offer in db_offers:
+        offer_dict = {}
+        offer_dict['student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
+        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict['time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict['teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict['comment'] = offer.additional_information if offer.additional_information else None
+        offer_dict['preferred_days'] = offer.preferred_days
+        offer_dict['preferred_hours'] = offer.preferred_times
+        offer_dict['preferred_teachers'] = [f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]
+
+        offers.append(offer_dict)
+
+    offers1 = offers[::2]
+    offers2 = offers[1::2]
+
+    return render(request, 'exchange/offers.html', {'offers1': offers1, 'offers2': offers2})
 
 
 @login_required
@@ -240,20 +266,58 @@ def add_exchange(request):
 
 @login_required
 def add_offer(request):
-  
-    # if this is a POST request we need to process the form data
+    
     if request.method == 'POST':
-
-        form = OfferForm(request.POST)
-        # form = AddOfferForm(request.POST)
-        print(form.is_valid())
+        
+        form = AddOfferForm(request.POST, user=request.user)
+        
         if form.is_valid():
-            return HttpResponseRedirect('/thanks/')
 
-    # if a GET (or any other method) we'll create a blank form
+            # pobranie danych z formularza
+            form_data = form.cleaned_data
+
+            # walidacja wybranego przedmiotu
+            # todo: sprawdzić, czy dany student faktycznie jest zapisany na te zajęcia
+            # jest to na razie jedyny sposób. Są validatory od Django, ale potrzebujemy jednego pola, które zawrze wszystkie cechy zajęć. Na razie cechy zajęć są rozrzucone po kilku polach w formularzu (dzień, czas, prowadzący)
+            try:
+                unwanted_class = Class.objects.get(
+                    subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
+                    teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
+                    day=form_data['have_day_of_the_week'],
+                    time=form_data['have_time']
+                )
+            except Class.DoesNotExist:
+                messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
+
+                context = {
+                    'form':form
+                }
+
+                return render(request, 'exchange/add_offer.html', context)
+                
+            # tworzenie nowej oferty w BD i ustawianie jej atrybutów
+            offer = Offer.objects.create(
+                student=request.user.student,
+                # exchange=Exchange.objects.get(semester=request.user.student.semester),
+                unwanted_class=unwanted_class,
+                additional_information=form_data['comment']
+            )
+
+            offer.preferred_days=form_data['want_day']
+            offer.preferred_times=form_data['want_time']
+            
+            teachers = []
+            
+            for teacher in form_data['preferred_teachers']:
+                teachers.append(Teacher.objects.get(last_name=teacher))
+            
+            # ten atrybut może powstać dopiero po tym, jak stworzony zostanie obiekt Offer
+            offer.preferred_teachers.set(teachers)
+
+            return HttpResponseRedirect('/exchange/my-offers')
+    
     else:
-        # form = AddOfferForm()
-        form = OfferForm()
+        form = AddOfferForm(user=request.user)
 
     context = {
         'form':form
@@ -269,8 +333,6 @@ def edit_exchange(request):
 
 @login_required
 def user_offers(request):
-    #TODO Te słowniki można by tworzyć w tym miesjcu na podstawie bazy
-    # I podawać poprawne zamiast tych przykładowych
 
     offer1 = {
         "subject": "Teoria nicości2",
@@ -307,7 +369,22 @@ def user_offers(request):
     
     # dynamic offers
     current_student = request.user.student
-    offers = Offer.objects.filter(student_id=current_student.id)
+    db_offers = Offer.objects.filter(student_id=current_student.id)
+
+    offers = []
+
+    # niestety tak jest najwygodniej przekazać parametry do kontekstu template'a
+    for offer in db_offers:
+        offer_dict = {}
+        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
+        offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
+        offer_dict['other_time'] = ''
+        offer_dict['other_teacher'] = ''
+
+        offers.append(offer_dict)
 
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
