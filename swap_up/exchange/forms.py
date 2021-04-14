@@ -16,20 +16,26 @@ class UploadFileForm(forms.Form):
 
 class AddOfferForm(forms.Form):
     
+    # te pola muszą tu zostać, żeby __init__ je widział
+    # to są pola korzystające z danych pobranych z bazy
     subject_name = forms.CharField(label='Subject', max_length=100, required=True)
     teacher = forms.CharField(label='Teacher', max_length=100, required=True)
     preferred_teachers = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
     def __init__(self, *args, **kwargs):
 
+        # pobieranie aktywnego użytkownika
         self.user = kwargs.pop('user', None)
     
         super(AddOfferForm, self).__init__(*args, **kwargs)
 
+        # pobieranie możliwości wyboru przedmiotu przez studenta
         subjects = Subject.objects.filter(semester=self.user.student.semester)
         subject_choices = [(subject.subject_name, subject.subject_name) for subject in subjects]
         self.fields['subject_name'].widget = forms.Select(choices=subject_choices)
 
+        # pobieranie dostępnych nauczycieli dla semestru poprzez znalezienie zajęć dla przedmiotów
+        # todo: procedura zbyt skomplikowana i do poprawy przez zmianę modelu
         classes = []
 
         for subject in subjects:

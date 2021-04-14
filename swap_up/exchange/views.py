@@ -239,10 +239,12 @@ def add_offer(request):
         
         if form.is_valid():
 
+            # pobranie danych z formularza
             form_data = form.cleaned_data
 
-            print(form_data)
-
+            # walidacja wybranego przedmiotu
+            # todo: sprawdzić, czy dany student faktycznie jest zapisany na te zajęcia
+            # jest to na razie jedyny sposób. Są validatory od Django, ale potrzebujemy jednego pola, które zawrze wszystkie cechy zajęć. Na razie cechy zajęć są rozrzucone po kilku polach w formularzu (dzień, czas, prowadzący)
             try:
                 unwanted_class = Class.objects.get(
                     subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
@@ -259,6 +261,7 @@ def add_offer(request):
 
                 return render(request, 'exchange/add_offer.html', context)
                 
+            # tworzenie nowej oferty w BD i ustawianie jej atrybutów
             offer = Offer.objects.create(
                 student=request.user.student,
                 # exchange=Exchange.objects.get(semester=request.user.student.semester),
@@ -274,6 +277,7 @@ def add_offer(request):
             for teacher in form_data['preferred_teachers']:
                 teachers.append(Teacher.objects.get(last_name=teacher))
             
+            # ten atrybut może powstać dopiero po tym, jak stworzony zostanie obiekt Offer
             offer.preferred_teachers.set(teachers)
 
             return HttpResponseRedirect('/exchange/my-offers')
@@ -295,8 +299,6 @@ def edit_exchange(request):
 
 @login_required
 def user_offers(request):
-    #TODO Te słowniki można by tworzyć w tym miesjcu na podstawie bazy
-    # I podawać poprawne zamiast tych przykładowych
 
     offer1 = {
         "subject": "Teoria nicości2",
@@ -336,6 +338,8 @@ def user_offers(request):
     db_offers = Offer.objects.filter(student_id=current_student.id)
 
     offers = []
+
+    # niestety tak jest najwygodniej przekazać parametry do kontekstu template'a
     for offer in db_offers:
         offer_dict = {}
         offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
@@ -347,7 +351,6 @@ def user_offers(request):
         offer_dict['other_teacher'] = ''
 
         offers.append(offer_dict)
-        print(offer_dict['state'])
 
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
