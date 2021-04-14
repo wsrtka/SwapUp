@@ -21,7 +21,6 @@ def home(request):
     return render(request, 'exchange/index.html')
 
 
-@login_required
 def import_schedule_for_year(csv_file):
     
     semester = -1
