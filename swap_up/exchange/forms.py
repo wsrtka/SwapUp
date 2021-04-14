@@ -5,9 +5,9 @@ from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from .models import *
 
 
-DAY_OF_THE_WEEK_CHOICES = [('MON', 'Monday'), ('TUE','Tuesday'), ('WED','Wednesday'), ('THU','Thursday'), ('FRI','Friday')]
-TIME_CHOICES = [('8-00', '8:30 - 9:30'), ('9-35', '9:35 - 11:05'), ('11-15', '11:15 - 12:45'),
- ('12-50', '12:50 - 14:20'), ('14-40', '14:40 - 16:10'), ('16-15', '16:15 - 17:45'), ('17-50', '17:50 - 19:20')]
+DAY_OF_THE_WEEK_CHOICES = [('Monday', 'Monday'), ('Tuesday','Tuesday'), ('Wednesday','Wednesday'), ('Thursday','Thursday'), ('Friday','Friday')]
+TIME_CHOICES = [('8:00', '8:00 - 9:30'), ('9:35', '9:35 - 11:05'), ('11:15', '11:15 - 12:45'),
+ ('12:50', '12:50 - 14:20'), ('14:40', '14:40 - 16:10'), ('16:15', '16:15 - 17:45'), ('17:50', '17:50 - 19:20')]
 
 
 class UploadFileForm(forms.Form):
@@ -27,7 +27,7 @@ class AddOfferForm(forms.Form):
         super(AddOfferForm, self).__init__(*args, **kwargs)
 
         subjects = Subject.objects.filter(semester=self.user.student.semester)
-        subject_choices = [(subject.subject_name[0], subject.subject_name) for subject in subjects]
+        subject_choices = [(subject.subject_name, subject.subject_name) for subject in subjects]
         self.fields['subject_name'].widget = forms.Select(choices=subject_choices)
 
         classes = []
@@ -35,7 +35,7 @@ class AddOfferForm(forms.Form):
         for subject in subjects:
             classes.extend(Class.objects.filter(subject_id=subject))
 
-        teachers = [(c.teacher_id.last_name[0], c.teacher_id.last_name) for c in classes]
+        teachers = [(c.teacher_id.last_name, c.teacher_id.last_name) for c in classes]
         self.fields['teacher'].widget = forms.Select(choices=teachers)
         self.fields['preferred_teachers'].choices = teachers
 

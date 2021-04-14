@@ -11,6 +11,8 @@ from django.contrib.auth.decorators import login_required
 from .forms import *
 from django.shortcuts import render
 from .models import *
+from django.contrib import messages
+from django.core.exceptions import ObjectDoesNotExist
 
 
 class IndexView(generic.TemplateView):
@@ -238,23 +240,43 @@ def add_offer(request):
         if form.is_valid():
 
             form_data = form.cleaned_data
-            offer = Offer(
+
+            print(form_data)
+
+            try:
+                unwanted_class = Class.objects.get(
+                    subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
+                    teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
+                    day=form_data['have_day_of_the_week'],
+                    time=form_data['have_time']
+                )
+            except Class.DoesNotExist:
+                messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
+
+                context = {
+                    'form':form
+                }
+
+                return render(request, 'exchange/add_offer.html', context)
+                
+            offer = Offer.objects.create(
                 student=request.user.student,
                 # exchange=Exchange.objects.get(semester=request.user.student.semester),
-                # todo: dodać walidację do poniższego
-                unwanted_class=None,
+                unwanted_class=unwanted_class,
                 additional_information=form_data['comment']
             )
 
             offer.preferred_days=form_data['want_day']
             offer.preferred_times=form_data['want_time']
             
-            # todo: get teachers list
-            # offer.preferred_teachers.set(None)
+            teachers = []
+            
+            for teacher in form_data['preferred_teachers']:
+                teachers.append(Teacher.objects.get(last_name=teacher))
+            
+            offer.preferred_teachers.set(teachers)
 
-            offer.save()
-
-            return HttpResponseRedirect('/thanks/')
+            return HttpResponseRedirect('/exchange/my-offers')
     
     else:
         form = AddOfferForm(user=request.user)
