@@ -55,7 +55,7 @@ def import_schedule_for_year(csv_file):
             if subject_name_row != '' and teacher_name != '' and day != '' and time != '':
                 subject, created_subject = Subject.objects.get_or_create(
                     subject_name = subject_name_row,
-                    category = term_capacity,
+                    category = term_type,
                     semester = semester
                 )
 
