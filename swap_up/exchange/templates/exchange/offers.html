@@ -9,17 +9,18 @@
 
 <section class="box">
     <div class="columns">
-        <div id="sidebar" class="column is-one-quarter">
+      <!-- ↓↓↓ Wykomentowana sekcja z filtrami ↓↓↓ -->
+        <!-- <div id="sidebar" class="column is-one-quarter">
             <nav class="panel">
                 <p class="panel-heading">
                   Search offers
                 </p>
                 <p class="panel-tabs">
                   <a class="is-active">Subjects</a>
-                  <!-- <a>Teachers</a>
+                  <a>Teachers</a>
                   <a>Paths</a>
                   <a>Days</a>
-                  <a>Hours</a> -->
+                  <a>Hours</a>
                 </p>
                 <a class="panel-block is-active">
                   Subject 1
@@ -36,36 +37,52 @@
                   <a class="panel-block">
                     Subject 5
                   </a>
-                <!-- <label class="panel-block">
+                <label class="panel-block">
                   <input type="checkbox">
                   remember me
-                </label> -->
+                </label>
                 <div class="panel-block">
                   <button class="button is-link is-outlined is-fullwidth">
                     Reset all filters
                   </button>
                 </div>
               </nav>
-        </div>
+        </div> -->
 
+        {% if offers1 %}
+        
         <div id="col1" class="column">
+
+          {% for offer in offers1 %}
             <div class="card block">
                 <header class="card-header">
                   <p class="card-header-title">
-                    Subject 1
+                    {{ offer.subject }}
                   </p>
                 </header>
                 <div class="card-content">
                   <div class="content">
-                    <em>Obi-Wan Kenobi</em> is giving away:
+                    <em>{{offer.student}}</em> is giving away:
                     <hr class="my-2">
-                    Term 1 <br>
-                    With: Teacher 1
+                    {{offer.time}} <br>
+                    With: {{offer.teacher}}
                     <hr class="my-2">
-                    Accepting: <br>
-                    Anything
+                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                      {% if offer.preferred_days %}
+                        <p>Preferred days: {{offer.preferred_days}}</p>
+                      {% endif %}
+                      {% if offer.preferred_times %}
+                        <p>Preferred times: {{offer.preferred_times}}</p>
+                      {% endif %}
+                      {% if offer.preferred_teachers %}
+                        <p>Preferred teachers: {{offer.preferred_teachers}}</p>
+                      {% endif %}
+                    {% else %}
+                      Anything
+                    {% endif %}
                     <br>
-                    <em>23:09, 04/01/2021</em>
+                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
+                    <!-- <em>23:09, 04/01/2021</em> -->
                   </div>
                 </div>
                 <footer class="card-footer">
@@ -73,54 +90,41 @@
                   <a href="#" class="card-footer-item">Accept</a>
                 </footer>
               </div>
-              <div class="card block">
-                <header class="card-header">
-                  <p class="card-header-title">
-                    Subject 1
-                  </p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <em>Obi-Wan Kenobi</em> is giving away:
-                    <hr class="my-2">
-                    Term 2 <br>
-                    With: Teacher 1
-                    <hr class="my-2">
-                    Accepting: <br>
-                    Term 3
-                    With: Teacher 3
-                    <br>
-                    <em>23:09, 04/01/2021</em>
-                  </div>
-                </div>
-                <footer class="card-footer">
-                  <!-- <a href="#" class="card-footer-item">Comment</a> -->
-                  <a href="#" class="card-footer-item">Accept</a>
-                </footer>
-              </div>
+          {% endfor %}
+
         </div>
 
         <div id="col2" class="column">
-            <div class="card">
+            {% for offer in offers2 %}
+            <div class="card block">
                 <header class="card-header">
                   <p class="card-header-title">
-                    Subject 2
+                    {{ offer.subject }}
                   </p>
                 </header>
                 <div class="card-content">
                   <div class="content">
-                    <em>Obi-Wan Kenobi</em> is giving away:
+                    <em>{{offer.student}}</em> is giving away:
                     <hr class="my-2">
-                    Term 1 <br>
-                    With: Teacher 1
+                    {{offer.time}} <br>
+                    With: {{offer.teacher}}
                     <hr class="my-2">
-                    Accepting: <br>
-                    Anything
+                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                      {% if offer.preferred_days %}
+                        <p>Preferred days: {{offer.preferred_days}}</p>
+                      {% endif %}
+                      {% if offer.preferred_times %}
+                        <p>Preferred days: {{offer.preferred_times}}</p>
+                      {% endif %}
+                      {% if offer.preferred_teachers %}
+                        <p>Preferred days: {{offer.preferred_teachers}}</p>
+                      {% endif %}
+                    {% else %}
+                      Anything
+                    {% endif %}
                     <br>
-                    <hr class="my-2">
-                    Additional info: <br>
-                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo iure quae omnis excepturi molestiae inventore? Nulla dolores quod impedit modi voluptate voluptatem vitae provident hic. Veritatis tempora aspernatur necessitatibus illum. <br>
-                    <em>23:09, 04/01/2021</em>
+                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
+                    <!-- <em>23:09, 04/01/2021</em> -->
                   </div>
                 </div>
                 <footer class="card-footer">
@@ -128,7 +132,16 @@
                   <a href="#" class="card-footer-item">Accept</a>
                 </footer>
               </div>
+          {% endfor %}
         </div>
+
+        {% else %}
+
+        <div class='column'>
+          There are no offers available.
+        </div>
+
+        {% endif %}
     </div>
 </section>
 
