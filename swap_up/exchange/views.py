@@ -7,10 +7,8 @@ import io
 import csv
 from django.http import HttpResponseRedirect
 from django.http import HttpResponse
-
-from .forms import AddExchangeForm, UploadFileForm
-
-
+from django.contrib.auth.decorators import login_required
+from .forms import *
 from django.shortcuts import render
 from .models import *
 
@@ -18,10 +16,12 @@ from .models import *
 class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
 
+
 def home(request):
     return render(request, 'exchange/index.html')
 
 
+@login_required
 def import_schedule_for_year(csv_file):
     
     semester = 0
@@ -85,7 +85,7 @@ def import_schedule_for_year(csv_file):
                 student.list_of_classes.add(created_class)
 
 
-
+@login_required
 def download_schedule(request):
     current_user = request.user
     student = Student.objects.get(user = current_user)
@@ -108,7 +108,7 @@ def download_schedule(request):
     return response
         
 
-
+@login_required
 def upload_csv(request):
 
     if request.user.is_superuser:
@@ -124,6 +124,7 @@ def upload_csv(request):
         return render(request, 'base.html')
 
 
+@login_required
 def exhange(request, exchange_id):
 
     # TODO
@@ -190,15 +191,12 @@ def exhange(request, exchange_id):
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
 
 
-def register(request):
-    return render(request, 'exchange/index.html')
-
-def login(request):
-    return render(request, 'exchange/index.html')
-
+@login_required
 def offers(request):
     return render(request, 'exchange/offers.html')
 
+
+@login_required
 def manage(request):
     exchange1 = {
         "name": "Semester 1",
@@ -224,9 +222,13 @@ def manage(request):
 
     return render(request, 'exchange/manage.html', {'exchanges': exchanges})
 
+
+@login_required
 def add_exchange(request):
     return render(request, 'exchange/add_exchange.html')
 
+
+@login_required
 def add_offer(request):
   
     # if this is a POST request we need to process the form data
@@ -249,9 +251,13 @@ def add_offer(request):
 
     return render(request, 'exchange/add_offer.html', context)
 
+
+@login_required
 def edit_exchange(request):
     return render(request, 'exchange/edit_exchange.html')
 
+
+@login_required
 def user_offers(request):
     #TODO Te słowniki można by tworzyć w tym miesjcu na podstawie bazy
     # I podawać poprawne zamiast tych przykładowych
@@ -296,6 +302,7 @@ def user_offers(request):
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 
+@login_required
 def schedule(request):
     #Todo
 
