@@ -6,7 +6,11 @@ from django.utils import timezone
 import io
 import csv
 from django.http import HttpResponseRedirect
-from .forms import *
+from django.http import HttpResponse
+
+from .forms import AddExchangeForm, UploadFileForm
+
+
 from django.shortcuts import render
 from .models import *
 
@@ -55,42 +59,45 @@ def import_schedule_for_year(csv_file):
                 last_name = teacher_last_name
             )
 
-            user = User.objects.get(
-                first_name = student_first_name,
-                last_name = student_last_name
-            )
+            try:
+                user = User.objects.get(
+                    first_name = student_first_name,
+                    last_name = student_last_name
+                )
+            except User.DoesNotExist:
+                user = None
 
-            student = Student.objects.get(
-                user = user
-            )
+            if user != None:
+                student = Student.objects.get(
+                    user = user
+                )
 
-            created_class = Class.objects.create(
-                subject_id = subject,
-                day = day,
-                time = time,
-                group_number = group_number,
-                teacher_id = teacher,
-                capacity = term_capacity,
-                week = week
-            )
+                created_class, class_created = Class.objects.get_or_create(
+                    subject_id = subject,
+                    day = day,
+                    time = time,
+                    group_number = group_number,
+                    teacher_id = teacher,
+                    capacity = term_capacity,
+                    week = week
+                )
 
-            student.list_of_classes.add(created_class)
+                student.list_of_classes.add(created_class)
 
 
 
 def download_schedule(request):
     current_user = request.user
-    student = Student.objects.get(user = user)
-    f = open('schedule.csv', 'wb')
-    for c in student.list_of_classes:
-        subject_id = c.subject_id
-        subject = Subject.objects.get(id = subject_id)
-        teacher_id = c.teacher_id
-        teacher = Teacher.objects.get(id = teacher_id)
+    student = Student.objects.get(user = current_user)
+    f = open('schedule.csv', 'w')
+
+    for c in student.list_of_classes.all():
+        subject = c.subject_id
+        teacher = c.teacher_id
         f.write(
-            subject.subject_name + ";" + subject.category
-            + ";" + c.capacity + ";" + c.group_number + ";" + teacher.first_name + " " + teacher.last_name
-            + ";" + c.room + ";" + c.week + ";" + c.day + ";" + c.time
+            str(subject.subject_name) + ";" + str(subject.category)
+            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.first_name) + " " + str(teacher.last_name)
+            + ";" + str(c.room) + ";" + str(c.week) + ";" + str(c.day) + ";" + str(c.time)
             + "\n"
         )
 
@@ -103,17 +110,18 @@ def download_schedule(request):
 
 
 def upload_csv(request):
-    if request.method == 'POST' and request.FILES['myfile']:
 
-        myfile = request.FILES['myfile']
-        # for line in myfile:
-        #     print(line)
+    if request.user.is_superuser:
+        if request.method == 'POST' and request.FILES['myfile']:
 
-        import_schedule_for_year(request.FILES['myfile'])
+            myfile = request.FILES['myfile']
+            import_schedule_for_year(request.FILES['myfile'])
+
+            return render(request, 'exchange/upload_csv.html')
 
         return render(request, 'exchange/upload_csv.html')
-
-    return render(request, 'exchange/upload_csv.html')
+    else:
+        return render(request, 'base.html')
 
 
 def exhange(request, exchange_id):
