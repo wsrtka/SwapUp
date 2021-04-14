@@ -114,7 +114,10 @@ class Offer(models.Model):
 
     # offer info
     unwanted_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='unwanted_class', null=True)
-    preferred_classes = models.ManyToManyField(Class, related_name='user_preferences')
+    preferred_days = None
+    preferred_times = None
+    # to będzie kiedyś, na to teraz sobie nie możemy pozwolić xd
+    # preferred_classes = models.ManyToManyField(Class, related_name='user_preferences')
     preferred_teachers = models.ManyToManyField(Teacher)
     additional_information = models.CharField(max_length=100, null=True)
 

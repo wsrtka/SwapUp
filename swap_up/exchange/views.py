@@ -232,10 +232,30 @@ def add_exchange(request):
 def add_offer(request):
     
     if request.method == 'POST':
+        
         form = AddOfferForm(request.POST, user=request.user)
-        print(form.is_valid())
+        
         if form.is_valid():
+
+            form_data = form.cleaned_data
+            offer = Offer(
+                student=request.user.student,
+                # exchange=Exchange.objects.get(semester=request.user.student.semester),
+                # todo: dodać walidację do poniższego
+                unwanted_class=None,
+                additional_information=form_data['comment']
+            )
+
+            offer.preferred_days=form_data['want_day']
+            offer.preferred_times=form_data['want_time']
+            
+            # todo: get teachers list
+            # offer.preferred_teachers.set(None)
+
+            offer.save()
+
             return HttpResponseRedirect('/thanks/')
+    
     else:
         form = AddOfferForm(user=request.user)
 
