@@ -59,14 +59,17 @@
         </div>
         
         <label class="label">Preferred teachers</label>
-        <div>
-            {{form.teacher1 | as_crispy_field}}
-        </div>
-        <div>
-            {{form.teacher2 | as_crispy_field}}
-        </div>
-        <div>
-            {{form.teacher3 | as_crispy_field}}
+        <div class="columns">
+            <div class="column">
+            {% for field in form.preferred_teachers %}
+            {% if forloop.counter0|modulo:2 ==  0 and  forloop.counter0 > 0%}</div><div class="column">{% endif %}
+                <label for="{{ field.id_for_label }}" class="col-md-1 control-label">
+                    <span class="checkbox">{{ field.tag }} 
+                    {{ field.choice_label }}
+                    </span>
+                </label><br/>
+            {% endfor %}
+            </div>
         </div>
 
         <button class="button is-primary" type="submit", name="submit", value="submit">Submit</button>	

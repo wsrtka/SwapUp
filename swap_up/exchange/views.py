@@ -230,20 +230,14 @@ def add_exchange(request):
 
 @login_required
 def add_offer(request):
-  
-    # if this is a POST request we need to process the form data
+    
     if request.method == 'POST':
-
-        form = OfferForm(request.POST)
-        # form = AddOfferForm(request.POST)
+        form = AddOfferForm(request.POST, user=request.user)
         print(form.is_valid())
         if form.is_valid():
             return HttpResponseRedirect('/thanks/')
-
-    # if a GET (or any other method) we'll create a blank form
     else:
-        # form = AddOfferForm()
-        form = OfferForm()
+        form = AddOfferForm(user=request.user)
 
     context = {
         'form':form
