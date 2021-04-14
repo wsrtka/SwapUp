@@ -1,7 +1,8 @@
 from django import forms
-from django.forms import MultipleChoiceField
+from django.forms import MultipleChoiceField, ModelForm
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
+from .models import *
 
 
 DAY_OF_THE_WEEK_CHOICES = [('MON', 'Monday'), ('TUE','Tuesday'), ('WED','Wednesday'), ('THU','Thursday'), ('FRI','Friday')]
@@ -11,7 +12,14 @@ TIME_CHOICES = [('8-00', '8:30 - 9:30'), ('9-35', '9:35 - 11:05'), ('11-15', '11
 class UploadFileForm(forms.Form):
     file = forms.FileField()
 
-class AddExchangeForm(forms.Form):
+
+class OfferForm(ModelForm):
+    class Meta:
+        model = Offer
+        fields = ['unwanted_class', 'preferred_classes', 'preferred_teachers', 'additional_information']
+
+
+class AddOfferForm(forms.Form):
     subject_name = forms.CharField(label='Subject', max_length=100, required=True)
     teacher = forms.CharField(label='Teacher', max_length=100, required=True)
     have_day_of_the_week = forms.CharField(
