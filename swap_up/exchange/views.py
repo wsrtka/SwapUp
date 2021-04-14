@@ -333,7 +333,21 @@ def user_offers(request):
     
     # dynamic offers
     current_student = request.user.student
-    offers = Offer.objects.filter(student_id=current_student.id)
+    db_offers = Offer.objects.filter(student_id=current_student.id)
+
+    offers = []
+    for offer in db_offers:
+        offer_dict = {}
+        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
+        offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
+        offer_dict['other_time'] = ''
+        offer_dict['other_teacher'] = ''
+
+        offers.append(offer_dict)
+        print(offer_dict['state'])
 
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 

@@ -42,13 +42,13 @@
                 {{offer.other_student}}
                 {% endif %}
             </td>
-            <td style='text-align:center; vertical-align:middle'>
-                {% if offer.state == "closed" %}
+            <td>
+                {% if offer.state == "Closed" %}
 
                 Closed
 
                 {% endif %}
-                {% if offer.state == "pending" %}
+                {% if offer.state == "Pending" %}
 
                 <button class="button is-success">
                     <span class="icon is-large">
@@ -66,8 +66,8 @@
                 </button>
 
                 {% endif %}
-                {% if offer.state == "new" %}
-                Waiting
+                {% if offer.state == "New" %}
+                Waiting for offers
                 {% endif %}
             </td>
         </tr>
