@@ -268,6 +268,11 @@ def add_exchange(request):
 def add_offer(request):
     
     if request.method == 'POST':
+        if 'schedule_button' in request.POST:
+            print("YOU ARE HERE FROM SCHEDULE VIEW, ID OF YOUR SUBJECT")
+            print(request.POST['schedule_button'])
+
+
         
         form = AddOfferForm(request.POST, user=request.user)
         
@@ -408,6 +413,10 @@ def schedule(request):
         subject = c.subject_id
         teacher = c.teacher_id
         
+        #Tutaj jest wartość, którą buttony z planu zajęć przesyłają fo formularza
+        # Powinno być coś w stylu class id
+        class_dict['id'] = 'Passed_Value'
+
         class_dict['subject_name'] = str(subject.subject_name)
         class_dict['category'] = str(subject.category)
         #class_dict['capacity'] = str(c.capacity)

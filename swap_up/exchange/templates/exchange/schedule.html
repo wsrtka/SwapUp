@@ -11,7 +11,7 @@
   }
   .subject_container{
    position: absolute;
-   opacity: 0.5;
+   opacity: 1;
    width: 100%;
   }
   .subject_container:hover {
@@ -36,12 +36,22 @@ span.bottom {
         <p class="title is-3 has-text-centered">{{day.name}}</p>
         <div class='day_container'>
             {% for class in day.schedule %}
-                <div class="card subject_container is-accent" style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%;">
-                    <div class="card-content">
-                        <span class="top">{{class.time}}</span> </br>
-                        <span class="bottom">{{class.subject_name}}</span>
+                <div class="card subject_container" style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%;">
+                    <div class="columns">
+                        <div class="column is-two-thirds">
+                            <span>{{class.time}}</span> </br>
+                            <span class="bottom">{{class.subject_name}}</span>
+                        </div>
+                        <div class="column">                        
+                            <form action="{% url 'add-offer' %}" method="post">
+                                {% csrf_token %}                                                              
+                                 <button type="submit" name='schedule_button' value={{class.id | safe}} class="button is-warning" onclick="return confirm('Are you sure?')">
+                                    Swap</button>
+                                 </form>
+
+                        </div>
                     </div>
-                  </div>
+                </div>
             {% endfor %}
         </div>
     </div>
