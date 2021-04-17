@@ -393,9 +393,4 @@ def user_offers(request):
 def schedule(request):
     #Todo
 
-    Pn = [
-        {'start': 8.00, 'end': 9.35, 'subject': "Analiza", 'week':None, 'teacher':"Zenon Iksiński"},
-        {'start': 9.35, 'end': 11.15, 'subject': "Analiza", 'week':None, 'teacher':"Zenon Iksiński"},
-        {'start': 14.40, 'end': 16.10, 'subject': "Analiza", 'week':None, 'teacher':"Zenon Iksiński"},
-    ]
-    return render(request, 'exchange/shedule.html', {'Pn':pn, 'Wt':wt, 'Śr':sr, 'Czw':czw, 'Pt':pt, 'Sb':sb, 'Nd':nd})
+    return render(request, 'exchange/schedule.html')
