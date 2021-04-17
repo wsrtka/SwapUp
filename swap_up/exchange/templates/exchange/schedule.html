@@ -2,6 +2,52 @@
 
 {% block content %}
 
-<p> Hello from schedule.html </p>
+{% load static %}
+<style>
+  .day_container{
+   position: relative;
+   background-color: aqua;
+   height:700px;
+  }
+  .subject_container{
+   position: absolute;
+   opacity: 0.5;
+   width: 100%;
+  }
+  .subject_container:hover {
+  background-color: yellow;
+}
+span.top {
+    position: relative;
+    top: -2.0ex;
+}
+
+span.bottom {
+    bottom: 0;
+}
+
+</style>
+
+
+<div class="columns is-vcentered is-centered">
+    {% for day  in context %}
+    <div class='column is-2'>
+
+        <p class="title is-3 has-text-centered">{{day.name}}</p>
+        <div class='day_container'>
+            {% for class in day.schedule %}
+                <div class="card subject_container is-accent" style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%;">
+                    <div class="card-content">
+                        <span class="top">{{class.time}}</span> </br>
+                        <span class="bottom">{{class.subject_name}}</span>
+                    </div>
+                  </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+</div>
+
 
 {% endblock %}

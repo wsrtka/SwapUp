@@ -4,6 +4,8 @@
 {% load crispy_forms_tags %}
 {% load my_tags %}
 
+<div class="container is-max-desktop">
+
 <div class='box'>
     <form method="post">
         {% csrf_token %}
@@ -75,6 +77,8 @@
         <button class="button is-primary" type="submit", name="submit", value="submit">Submit</button>	
 
     </form>
+</div>
+
 </div>
 
 {% endblock %}

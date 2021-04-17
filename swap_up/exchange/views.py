@@ -391,6 +391,60 @@ def user_offers(request):
 
 @login_required
 def schedule(request):
-    #Todo
+    current_user = request.user
+    student = Student.objects.get(user = current_user)
 
-    return render(request, 'exchange/schedule.html')
+    #TODO czy na pewno takie tygodnie
+    schedule = {
+        'Pn':[], 'Wt':[], 'Śr':[], 'Czw':[], 'Pt':[]
+    }
+
+    week = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']
+
+
+    for c in student.list_of_classes.all():
+        class_dict = {}
+
+        subject = c.subject_id
+        teacher = c.teacher_id
+        
+        class_dict['subject_name'] = str(subject.subject_name)
+        class_dict['category'] = str(subject.category)
+        #class_dict['capacity'] = str(c.capacity)
+        #class_dict['group_number'] = str(c.group_number) 
+        class_dict['teacher'] = str(teacher.first_name) + " " + str(teacher.last_name)
+        class_dict['room'] = str(c.room)
+        class_dict['week'] = str(c.week) 
+        print(c.time)
+        hour_start, minute_start, seconds_start = str(c.time).split(':')
+        hour_start, minute_start = int(hour_start), int(minute_start)
+        hour_end, minute_end = hour_start, minute_start
+
+        minute_end += 90
+        while minute_end >= 60:
+            hour_end += 1
+            minute_end -= 60
+
+        class_dict['time'] = str(hour_start) + ":" + "{:02d}".format(minute_start) + " - " + str(hour_end) + ":" + "{:02d}".format(minute_end)
+
+        class_dict['week'] = str(c.week) 
+        
+        #Template from 7:00 to 20:00 (13 h total)
+        time_from = 7
+        time_to = 20
+
+        class_dict['top'] = 100*(hour_start + minute_start/60 - time_from)/(time_to - time_from)
+        class_dict['bottom'] = 100*(time_to - hour_end - minute_end/60)/(time_to - time_from)
+
+
+
+        schedule[str(c.day)].append(class_dict)
+        
+        context = [{'schedule':schedule['Pn'], 'name':'Poniedziałek'},
+            {'schedule':schedule['Wt'], 'name':'Wtorek'},
+            {'schedule':schedule['Śr'], 'name':'Środa'},
+            {'schedule':schedule['Czw'], 'name':'Czwartek'},
+            {'schedule':schedule['Pt'], 'name':'Piątek'}
+            ]
+
+    return render(request, 'exchange/schedule.html', {'context':context})
