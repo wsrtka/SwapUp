@@ -3,3 +3,19 @@ bulma css import
 https://bulma.io/documentation/overview/
 */
 @import "https://cdn.jsdelivr.net/npm/bulma@0.9.2/css/bulma.min.css";
+
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+
+  #wrapper {
+    flex: 1;
+  }
+
+  .day_container{
+   position: relative;
+   background-color: red;
+   height: 1000px;
+  }

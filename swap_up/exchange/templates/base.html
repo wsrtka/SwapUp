@@ -3,23 +3,16 @@
 <!DOCTYPE html>
 <html class="has-navbar-fixed-top">
     <head>
-        <title>SwapUp</title>
+        {% if title %}
+          <title>SwapUp - {{title}} </title>
+        {% else %}
+          <title>SwapUp</title>
+        {% endif %}
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" type="text/css" href="{% static 'exchange/main.css' %}">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
       rel="stylesheet">
     </head>
-    <style type="text/css" media="screen">
-      body {
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-      }
- 
-      #wrapper {
-        flex: 1;
-      }
-    </style>
 
 {% block body %}
 
@@ -105,6 +98,10 @@
       </article>
   {% endfor %}
   {% endif %}
+
+</div>
+
+<div class="content">
 
   {% block content %}
   {% endblock %}
