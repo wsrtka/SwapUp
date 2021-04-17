@@ -13,3 +13,9 @@ body {
   #wrapper {
     flex: 1;
   }
+
+  .day_container{
+   position: relative;
+   background-color: red;
+   height: 1000px;
+  }
