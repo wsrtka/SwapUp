@@ -1,7 +1,10 @@
+from datetime import datetime
+
 from django.shortcuts import render
 # from django.template import loader
 from django.views.generic import View
 from django.views import generic
+from datetime import date
 from django.utils import timezone
 import io
 import csv
@@ -24,7 +27,6 @@ def home(request):
 
 
 def import_schedule_for_year(csv_file):
-    
     semester = -1
 
     for line in csv_file:
@@ -32,15 +34,15 @@ def import_schedule_for_year(csv_file):
 
         if len(row) == 1:
             semester = row[0]
-        
+
         elif len(row) == 10:
             subject_name_row = row[0]
             term_type = row[1]
-            
+
             term_capacity = row[2]
             if term_capacity == '':
                 term_capacity = -1
-            
+
             group_number = row[3]
             if group_number == '':
                 group_number = -1
@@ -50,43 +52,43 @@ def import_schedule_for_year(csv_file):
             week = row[6]
             day = row[7]
             time = row[8]
-            student_name = row[9]  
+            student_name = row[9]
 
             if subject_name_row != '' and teacher_name != '' and day != '' and time != '':
                 subject, created_subject = Subject.objects.get_or_create(
-                    subject_name = subject_name_row,
-                    category = term_type,
-                    semester = semester
+                    subject_name=subject_name_row,
+                    category=term_type,
+                    semester=semester
                 )
 
                 teacher_first_name, teacher_last_name = teacher_name.split()
                 student_first_name, student_last_name = student_name.split()
 
                 teacher, teacher_created = Teacher.objects.get_or_create(
-                    first_name = teacher_first_name,
-                    last_name = teacher_last_name
+                    first_name=teacher_first_name,
+                    last_name=teacher_last_name
                 )
 
                 try:
                     user = User.objects.get(
-                        first_name = student_first_name,
-                        last_name = student_last_name
+                        first_name=student_first_name,
+                        last_name=student_last_name
                     )
                     try:
                         student = Student.objects.get(
-                            user = user
+                            user=user
                         )
 
                         created_class, class_created = Class.objects.get_or_create(
-                            subject_id = subject,
-                            day = day,
-                            time = time,
-                            group_number = group_number,
-                            teacher_id = teacher,
-                            capacity = term_capacity,
-                            week = week
-                            )
-                        if not student.list_of_classes.filter(id = created_class.id).exists():
+                            subject_id=subject,
+                            day=day,
+                            time=time,
+                            group_number=group_number,
+                            teacher_id=teacher,
+                            capacity=term_capacity,
+                            week=week
+                        )
+                        if not student.list_of_classes.filter(id=created_class.id).exists():
                             student.list_of_classes.add(created_class)
 
                     except Student.DoesNotExist:
@@ -95,12 +97,11 @@ def import_schedule_for_year(csv_file):
                 except User.DoesNotExist:
                     continue
 
-                    
 
 @login_required
 def download_schedule(request):
     current_user = request.user
-    student = Student.objects.get(user = current_user)
+    student = Student.objects.get(user=current_user)
     f = open('schedule.csv', 'w')
 
     for c in student.list_of_classes.all():
@@ -108,7 +109,8 @@ def download_schedule(request):
         teacher = c.teacher_id
         f.write(
             str(subject.subject_name) + ";" + str(subject.category)
-            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.first_name) + " " + str(teacher.last_name)
+            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.first_name) + " " + str(
+                teacher.last_name)
             + ";" + str(c.room) + ";" + str(c.week) + ";" + str(c.day) + ";" + str(c.time)
             + "\n"
         )
@@ -118,14 +120,12 @@ def download_schedule(request):
     response = HttpResponse(f, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=schedule.csv'
     return response
-        
+
 
 @login_required
 def upload_csv(request):
-
     if request.user.is_superuser:
         if request.method == 'POST' and request.FILES['myfile']:
-
             myfile = request.FILES['myfile']
             import_schedule_for_year(request.FILES['myfile'])
 
@@ -138,15 +138,14 @@ def upload_csv(request):
 
 @login_required
 def exhange(request, exchange_id):
-
     # TODO
     item1 = {
         "student": "Jacek Gorm",
         "subject": "Teoria nicości2",
         "time": "Pn A, 8:00",
-        "other_times": "Pn B, 9:00, Wt B, 16:15", #none means any class
+        "other_times": "Pn B, 9:00, Wt B, 16:15",  # none means any class
         "teacher": "Zenon Iksiński",
-        "other_teachers": None, #none means any teacher
+        "other_teachers": None,  # none means any teacher
         "comment": None,
     }
     item2 = {
@@ -169,7 +168,7 @@ def exhange(request, exchange_id):
     }
     exchange1 = {
         "name": "Semester 1",
-        "id" : 1,
+        "id": 1,
         "items": [item1, item2],
     }
     exchange2 = {
@@ -205,9 +204,9 @@ def exhange(request, exchange_id):
 
 @login_required
 def offers(request):
-
     current_student = request.user.student
     db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
+    print(db_offers)
     # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
 
     offers = []
@@ -215,14 +214,19 @@ def offers(request):
     # niestety tak jest najwygodniej przekazać parametry do kontekstu template'a
     for offer in db_offers:
         offer_dict = {}
-        offer_dict['student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
-        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict['time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict['teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict[
+            'student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
+        offer_dict[
+            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict[
+            'time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict[
+            'teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
         offer_dict['comment'] = offer.additional_information if offer.additional_information else None
         offer_dict['preferred_days'] = offer.preferred_days
         offer_dict['preferred_hours'] = offer.preferred_times
-        offer_dict['preferred_teachers'] = [f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]
+        offer_dict['preferred_teachers'] = [f'{teacher.first_name} {teacher.last_name}' for teacher in
+                                            offer.preferred_teachers.all()]
 
         offers.append(offer_dict)
 
@@ -234,6 +238,42 @@ def offers(request):
 
 @login_required
 def manage(request):
+    exchange = Exchange.objects.create(
+        # creation_date=models.DateField(default=date.today),
+        # modification_date=models.DateField(auto_now=True),
+        name="Semester 1",
+        semester=1
+    )
+    exchange = Exchange.objects.create(
+        # creation_date=models.DateField(default=date.today),
+        # modification_date=models.DateField(auto_now=True),
+        name="Semester 2",
+        semester=2
+    )
+    exchange = Exchange.objects.create(
+        # creation_date=models.DateField(default=date.today),
+        # modification_date=models.DateField(auto_now=True),
+        name="Semester 2",
+        semester=3
+    )
+    exchange = Exchange.objects.create(
+        # creation_date=models.DateField(default=date.today),
+        # modification_date=models.DateField(auto_now=True),
+        name="Semester 2",
+        semester=4
+    )
+    # db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
+    current_student = request.user.student
+    db_exchanges = Exchange.objects.filter(semester=1)
+    # db_exchanges = set(Exchange.objects)
+    print(db_exchanges)
+    exchanges = []
+    for exchange in db_exchanges:
+        exchange_dict = {}
+        exchange_dict["name"] = f'Semester: {exchange.semester}'
+        exchange_dict["id"] = exchange.semester
+        print(exchange_dict)
+
     exchange1 = {
         "name": "Semester 1",
         "id": "1",
@@ -266,16 +306,13 @@ def add_exchange(request):
 
 @login_required
 def add_offer(request):
-    
     if request.method == 'POST':
         if 'schedule_button' in request.POST:
             print("YOU ARE HERE FROM SCHEDULE VIEW, ID OF YOUR SUBJECT")
             print(request.POST['schedule_button'])
 
-
-        
         form = AddOfferForm(request.POST, user=request.user)
-        
+
         if form.is_valid():
 
             # pobranie danych z formularza
@@ -295,11 +332,11 @@ def add_offer(request):
                 messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
 
                 context = {
-                    'form':form
+                    'form': form
                 }
 
                 return render(request, 'exchange/add_offer.html', context)
-                
+
             # tworzenie nowej oferty w BD i ustawianie jej atrybutów
             offer = Offer.objects.create(
                 student=request.user.student,
@@ -308,24 +345,24 @@ def add_offer(request):
                 additional_information=form_data['comment']
             )
 
-            offer.preferred_days=form_data['want_day']
-            offer.preferred_times=form_data['want_time']
-            
+            offer.preferred_days = form_data['want_day']
+            offer.preferred_times = form_data['want_time']
+
             teachers = []
-            
+
             for teacher in form_data['preferred_teachers']:
                 teachers.append(Teacher.objects.get(last_name=teacher))
-            
+
             # ten atrybut może powstać dopiero po tym, jak stworzony zostanie obiekt Offer
             offer.preferred_teachers.set(teachers)
 
             return HttpResponseRedirect('/exchange/my-offers')
-    
+
     else:
         form = AddOfferForm(user=request.user)
 
     context = {
-        'form':form
+        'form': form
     }
 
     return render(request, 'exchange/add_offer.html', context)
@@ -338,12 +375,11 @@ def edit_exchange(request):
 
 @login_required
 def user_offers(request):
-
     offer1 = {
         "subject": "Teoria nicości2",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "new",
+        "state": "new",
         "other_student": None,
         "other_time": None,
         "other_teacher": None
@@ -353,7 +389,7 @@ def user_offers(request):
         "subject": "Teoria nicości",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "pending",
+        "state": "pending",
         "other_student": "Staszek Ciaptak-Gąsiennica",
         "other_time": "Wt B, 9:35",
         "other_teacher": None
@@ -363,7 +399,7 @@ def user_offers(request):
         "subject": "Wprowadzenie do teorii nicości",
         "have_time": "Pn A, 8:00",
         "have_teacher": "Zenon Iksiński",
-        "state" : "closed",
+        "state": "closed",
         "other_student": "Józio Chmura-Mamałyga",
         "other_time": "Wt B, 9:35",
         "other_teacher": None
@@ -371,7 +407,7 @@ def user_offers(request):
 
     # static offers
     # offers = [offer1, offer2, offer3]
-    
+
     # dynamic offers
     current_student = request.user.student
     db_offers = Offer.objects.filter(student_id=current_student.id)
@@ -381,11 +417,15 @@ def user_offers(request):
     # niestety tak jest najwygodniej przekazać parametry do kontekstu template'a
     for offer in db_offers:
         offer_dict = {}
-        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict[
+            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict[
+            'have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict[
+            'have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
         offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
-        offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
+        offer_dict[
+            'other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
         offer_dict['other_time'] = ''
         offer_dict['other_teacher'] = ''
 
@@ -397,33 +437,32 @@ def user_offers(request):
 @login_required
 def schedule(request):
     current_user = request.user
-    student = Student.objects.get(user = current_user)
+    student = Student.objects.get(user=current_user)
 
-    #TODO czy na pewno takie tygodnie
+    # TODO czy na pewno takie tygodnie
     schedule = {
-        'Pn':[], 'Wt':[], 'Śr':[], 'Czw':[], 'Pt':[]
+        'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
     }
 
     week = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']
-
 
     for c in student.list_of_classes.all():
         class_dict = {}
 
         subject = c.subject_id
         teacher = c.teacher_id
-        
-        #Tutaj jest wartość, którą buttony z planu zajęć przesyłają fo formularza
+
+        # Tutaj jest wartość, którą buttony z planu zajęć przesyłają fo formularza
         # Powinno być coś w stylu class id
         class_dict['id'] = 'Passed_Value'
 
         class_dict['subject_name'] = str(subject.subject_name)
         class_dict['category'] = str(subject.category)
-        #class_dict['capacity'] = str(c.capacity)
-        #class_dict['group_number'] = str(c.group_number) 
+        # class_dict['capacity'] = str(c.capacity)
+        # class_dict['group_number'] = str(c.group_number)
         class_dict['teacher'] = str(teacher.first_name) + " " + str(teacher.last_name)
         class_dict['room'] = str(c.room)
-        class_dict['week'] = str(c.week) 
+        class_dict['week'] = str(c.week)
         print(c.time)
         hour_start, minute_start, seconds_start = str(c.time).split(':')
         hour_start, minute_start = int(hour_start), int(minute_start)
@@ -434,26 +473,25 @@ def schedule(request):
             hour_end += 1
             minute_end -= 60
 
-        class_dict['time'] = str(hour_start) + ":" + "{:02d}".format(minute_start) + " - " + str(hour_end) + ":" + "{:02d}".format(minute_end)
+        class_dict['time'] = str(hour_start) + ":" + "{:02d}".format(minute_start) + " - " + str(
+            hour_end) + ":" + "{:02d}".format(minute_end)
 
-        class_dict['week'] = str(c.week) 
-        
-        #Template from 7:00 to 20:00 (13 h total)
+        class_dict['week'] = str(c.week)
+
+        # Template from 7:00 to 20:00 (13 h total)
         time_from = 7
         time_to = 20
 
-        class_dict['top'] = 100*(hour_start + minute_start/60 - time_from)/(time_to - time_from)
-        class_dict['bottom'] = 100*(time_to - hour_end - minute_end/60)/(time_to - time_from)
-
-
+        class_dict['top'] = 100 * (hour_start + minute_start / 60 - time_from) / (time_to - time_from)
+        class_dict['bottom'] = 100 * (time_to - hour_end - minute_end / 60) / (time_to - time_from)
 
         schedule[str(c.day)].append(class_dict)
-        
-        context = [{'schedule':schedule['Pn'], 'name':'Poniedziałek'},
-            {'schedule':schedule['Wt'], 'name':'Wtorek'},
-            {'schedule':schedule['Śr'], 'name':'Środa'},
-            {'schedule':schedule['Czw'], 'name':'Czwartek'},
-            {'schedule':schedule['Pt'], 'name':'Piątek'}
-            ]
 
-    return render(request, 'exchange/schedule.html', {'context':context})
+        context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
+                   {'schedule': schedule['Wt'], 'name': 'Wtorek'},
+                   {'schedule': schedule['Śr'], 'name': 'Środa'},
+                   {'schedule': schedule['Czw'], 'name': 'Czwartek'},
+                   {'schedule': schedule['Pt'], 'name': 'Piątek'}
+                   ]
+
+    return render(request, 'exchange/schedule.html', {'context': context})
