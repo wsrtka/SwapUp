@@ -215,7 +215,42 @@ def offers(request):
 
 @login_required
 def add_exchange(request):
-    return render(request, 'exchange/add_exchange.html')
+    if request.method == 'POST':
+        form = AddExchangeForm(request.POST)
+
+        if form.is_valid():
+            form_data = form.cleaned_data
+            # try:
+            #     unwanted_exchange = Class.objects.get(
+            #         name=Subject.objects.get(subject_name=form_data['subject_name']),
+            #         teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
+            #         day=form_data['have_day_of_the_week'],
+            #         time=form_data['have_time']
+            #     )
+            # except Class.DoesNotExist:
+            #     messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
+            #
+            #     context = {
+            #         'form': form
+            #     }
+            #
+            #     return render(request, 'exchange/add_exchange.html', context)
+
+            exchange = Exchange.objects.create(
+                name=form_data['name'],
+                semester=form_data['semester']
+            )
+
+            return HttpResponseRedirect('/exchange/manage')
+
+    else:
+        form = AddExchangeForm()
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'exchange/add_exchange.html', context)
 
 
 @login_required
@@ -231,10 +266,6 @@ def add_offer(request):
 
             # pobranie danych z formularza
             form_data = form.cleaned_data
-
-            # walidacja wybranego przedmiotu
-            # todo: sprawdzić, czy dany student faktycznie jest zapisany na te zajęcia
-            # jest to na razie jedyny sposób. Są validatory od Django, ale potrzebujemy jednego pola, które zawrze wszystkie cechy zajęć. Na razie cechy zajęć są rozrzucone po kilku polach w formularzu (dzień, czas, prowadzący)
             try:
                 unwanted_class = Class.objects.get(
                     subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
