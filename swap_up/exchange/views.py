@@ -138,75 +138,52 @@ def upload_csv(request):
 
 @login_required
 def exhange(request, exchange_id):
-    # TODO
-    item1 = {
-        "student": "Jacek Gorm",
-        "subject": "Teoria nicości2",
-        "time": "Pn A, 8:00",
-        "other_times": "Pn B, 9:00, Wt B, 16:15",  # none means any class
-        "teacher": "Zenon Iksiński",
-        "other_teachers": None,  # none means any teacher
-        "comment": None,
-    }
-    item2 = {
-        "student": "Jacek Gorm",
-        "subject": "WDI",
-        "time": "Śr, 10:00",
-        "other_times": "Pn B, 9:00, Wt B, 16:15",
-        "teacher": "Zenon Iksiński",
-        "other_teachers": "Ikakij Korek",
-        "comment": "daję 100zł",
-    }
-    item3 = {
-        "student": "Jacek Gorm",
-        "subject": "Analiza",
-        "time": "Pn B, 8:00",
-        "other_times": None,
-        "teacher": "Zenon Iksiński",
-        "other_teachers": "Ikakij Korek, Szymon Tukor",
-        "comment": "daję 100zł",
-    }
-    exchange1 = {
-        "name": "Semester 1",
-        "id": 1,
-        "items": [item1, item2],
-    }
-    exchange2 = {
-        "name": "Semester 2",
-        "id": 2,
-        "items": [item1, item2, item3],
-    }
-    exchange3 = {
-        "name": "Semester 3",
-        "id": 3,
-        "items": [item1],
-    }
-    exchange4 = {
-        "name": "Semester 4",
-        "id": 4,
-        "items": [item1, item1],
-    }
-    exchange5 = {
-        "name": "Semester 5",
-        "id": 5,
-        "items": [item2],
-    }
-    items = []
     name = ''
-    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
-    for exchange in exchanges:
-        if exchange["id"] == exchange_id:
-            items = exchange["items"]
-            name = exchange["name"]
+    items = []
+    db_exchanges = Exchange.objects.all()
+    for exchange in db_exchanges:
+        if exchange.semester == exchange_id:
+            name = exchange.name
+
+    db_offers = Offer.objects.all()
+
+    for offer in db_offers:
+        # if offer.exchange and offer.exchange.semester == exchange_id:
+        item_dict = {
+            "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
+            "subject": offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else '',
+            "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
+            "other_times": offer.preferred_days,
+            "teacher": f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else '',
+            "other_teachers": ",".join([f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
+            "comment": offer.additional_information if offer.additional_information else None,
+        }
+        items.append(item_dict)
 
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
+
+
+@login_required
+def manage(request):
+    db_exchanges = Exchange.objects.all()
+    print(db_exchanges)
+    exchanges = []
+    for exchange in db_exchanges:
+        exchange_dict = {
+            "name": exchange.name,
+            "id": exchange.semester
+        }
+        print(exchange_dict)
+
+        exchanges.append(exchange_dict)
+
+    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
 
 
 @login_required
 def offers(request):
     current_student = request.user.student
     db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
-    print(db_offers)
     # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
 
     offers = []
@@ -234,69 +211,6 @@ def offers(request):
     offers2 = offers[1::2]
 
     return render(request, 'exchange/offers.html', {'offers1': offers1, 'offers2': offers2})
-
-
-@login_required
-def manage(request):
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 1",
-        semester=1
-    )
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 2",
-        semester=2
-    )
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 2",
-        semester=3
-    )
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 2",
-        semester=4
-    )
-    # db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
-    current_student = request.user.student
-    db_exchanges = Exchange.objects.filter(semester=1)
-    # db_exchanges = set(Exchange.objects)
-    print(db_exchanges)
-    exchanges = []
-    for exchange in db_exchanges:
-        exchange_dict = {}
-        exchange_dict["name"] = f'Semester: {exchange.semester}'
-        exchange_dict["id"] = exchange.semester
-        print(exchange_dict)
-
-    exchange1 = {
-        "name": "Semester 1",
-        "id": "1",
-    }
-    exchange2 = {
-        "name": "Semester 2",
-        "id": "2",
-    }
-    exchange3 = {
-        "name": "Semester 3",
-        "id": "3",
-    }
-    exchange4 = {
-        "name": "Semester 4",
-        "id": "4",
-    }
-    exchange5 = {
-        "name": "Semester 5",
-        "id": "5",
-    }
-    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
-
-    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
 
 
 @login_required

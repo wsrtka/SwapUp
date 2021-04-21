@@ -3,66 +3,72 @@
 {% block content %}
 <div class="container is-max-desktop">
 
-<p class="title is-1"> {{name}} </p>
+    <p class="title is-1"> {{name}} </p>
 
-<table class='table'>
-    <thead>
-    <tr class="is-selected">
-        <th>Subject</th>
-        <th>Advertiser</th>
-        <th>Wanted</th>
-        <th>Comment</th>
-        <th></th>
-    </tr>
-    </thead>
+    <table class='table'>
+        <thead>
+        <tr class="is-selected">
+            <th>Subject</th>
+            <th>Advertiser</th>
+            <th>Wanted</th>
+            <th>Comment</th>
+            <th></th>
+        </tr>
+        </thead>
 
-    <tfoot>
-    <tr>
-        <th>Subject</th>
-        <th>Advertiser</th>
-        <th>Wanted</th>
-        <th>Comment</th>
-        <th></th>
-    </tr>
-    </tfoot>
-    <tbody>
-    {% for item in items %}
-    <tr>
-        <td><strong>{{item.subject}}</strong> {{item.time}}, {{item.teacher}}</td>
-        <td>
-            {% if item.student %}
-            {{item.student}}
-            {% endif %}
-        </td>
-        <td>
-            <strong>
-                {% if item.other_times %}
-                {{item.other_times}}
-                {% else %}
-                any time
+        <tfoot>
+        <tr>
+            <th>Subject</th>
+            <th>Advertiser</th>
+            <th>Wanted</th>
+            <th>Comment</th>
+            <th></th>
+        </tr>
+        </tfoot>
+        <tbody>
+        {% for item in items %}
+        <tr>
+            <td>
+                <strong>{{item.subject}}</strong>
+                <p>{{item.time}} | {{item.teacher}}</p>
+            </td>
+            <td>
+                {% if item.student %}
+                {{item.student}}
                 {% endif %}
-            </strong>,
-            {% if item.other_teachers %}
-            {{item.other_teachers}}
-            {% else %}
-            any teacher
-            {% endif %}
-        </td>
-        <td>
-            {% if item.comment %}
-            {{item.comment}}
-            {% endif %}
-        </td>
-        <td>
-            <button class="button is-success">
-                Swap
-            </button>
-        </td>
+            </td>
+            <td>
+                <strong>
+                    {% if item.other_times %}
+                    {{item.other_times}}
+                    {% else %}
+                    any time
+                    {% endif %}
+                </strong>
+                <p>
+                    {% if item.other_teachers %}
+                    {{item.other_teachers}}
+                    {% else %}
+                    any teacher
+                    {% endif %}
+                </p>
 
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+            </td>
+            <td>
+                {% if item.comment %}
+                {{item.comment}}
+                {% endif %}
+            </td>
+            <td>
+                <button class="button is-success">
+                    Swap
+                </button>
+            </td>
+
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 
 </div>
 {% endblock %}
