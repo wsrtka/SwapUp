@@ -446,7 +446,10 @@ def schedule(request):
 
     week = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']
 
+    context = {}
+
     for c in student.list_of_classes.all():
+        print(c)
         class_dict = {}
 
         subject = c.subject_id
@@ -454,7 +457,7 @@ def schedule(request):
 
         # Tutaj jest wartość, którą buttony z planu zajęć przesyłają fo formularza
         # Powinno być coś w stylu class id
-        class_dict['id'] = 'Passed_Value'
+        class_dict['id'] = 'Passed_Value_' + str(c.day)
 
         class_dict['subject_name'] = str(subject.subject_name)
         class_dict['category'] = str(subject.category)
@@ -487,11 +490,11 @@ def schedule(request):
 
         schedule[str(c.day)].append(class_dict)
 
-        context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
-                   {'schedule': schedule['Wt'], 'name': 'Wtorek'},
-                   {'schedule': schedule['Śr'], 'name': 'Środa'},
-                   {'schedule': schedule['Czw'], 'name': 'Czwartek'},
-                   {'schedule': schedule['Pt'], 'name': 'Piątek'}
-                   ]
+    context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
+                {'schedule': schedule['Wt'], 'name': 'Wtorek'},
+                {'schedule': schedule['Śr'], 'name': 'Środa'},
+                {'schedule': schedule['Czw'], 'name': 'Czwartek'},
+                {'schedule': schedule['Pt'], 'name': 'Piątek'}
+                ]
 
     return render(request, 'exchange/schedule.html', {'context': context})
