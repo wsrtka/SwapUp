@@ -7,12 +7,10 @@
     <h1 class="hero mt-6">Welcome, {{user.username}}!</h1>
 
     <section class="section box">
-        <h3 class="hero">User settings</h3>
+        <h3 class="hero">Account settings</h3>
         <hr>
-        <p>Username: {{ user.username }}</p>
-        <p>First name: {{ user.first_name }}</p>
-        <p>Last Name: {{ user.last_name }}</p>
-        <p>Email: {{ user.email }}</p>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Email:</strong> {{ user.email }}</p>
 
         <button class="button is-danger mt-4">Edit</button>
     </section>
@@ -20,9 +18,11 @@
     <section class="section box">
         <h3 class="hero">Profile settings</h3>
         <hr>
-        <p>Index: {{ user.student.index_number }}</p>
-        <p>Semester: {{ user.student.semester }}</p>
-        <p>Path: {{ user.student.path }}</p>
+        <p><strong>First name:</strong> {{ user.first_name }}</p>
+        <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+        <p><strong>Index:</strong> {{ user.student.index_number }}</p>
+        <p><strong>Semester:</strong> {{ user.student.semester }}</p>
+        <p><strong>Path:</strong> {{ user.student.path }}</p>
 
         <button class="button is-danger mt-4">Edit</button>
     </section>
