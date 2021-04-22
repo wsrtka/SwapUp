@@ -253,20 +253,20 @@ def manage(request):
     exchange = Exchange.objects.create(
         # creation_date=models.DateField(default=date.today),
         # modification_date=models.DateField(auto_now=True),
-        name="Semester 2",
+        name="Semester 3",
         semester=3
     )
     exchange = Exchange.objects.create(
         # creation_date=models.DateField(default=date.today),
         # modification_date=models.DateField(auto_now=True),
-        name="Semester 2",
+        name="Semester 3",
         semester=4
     )
     # db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
     current_student = request.user.student
     db_exchanges = Exchange.objects.filter(semester=1)
     # db_exchanges = set(Exchange.objects)
-    print(db_exchanges)
+    #print(db_exchanges)
     exchanges = []
     for exchange in db_exchanges:
         exchange_dict = {}
@@ -301,7 +301,20 @@ def manage(request):
 
 @login_required
 def add_exchange(request):
-    return render(request, 'exchange/add_exchange.html')
+    form = AddExchangeForm(request.POST or None)
+    if form.is_valid():
+        form_data = form.cleaned_data
+
+        exchange = Exchange(name=form_data['name'], semester=form_data['semester'], creation_date=datetime.now(),
+                            modification_date=None)
+        exchange.save()
+
+        return render(request, 'exchange/manage.html')
+
+    context={
+        'form': form
+    }
+    return render(request, 'exchange/add_exchange.html',context)
 
 
 @login_required
@@ -317,6 +330,7 @@ def add_offer(request):
 
             # pobranie danych z formularza
             form_data = form.cleaned_data
+
 
             # walidacja wybranego przedmiotu
             # todo: sprawdzić, czy dany student faktycznie jest zapisany na te zajęcia

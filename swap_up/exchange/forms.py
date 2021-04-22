@@ -4,18 +4,38 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from .models import *
 
-
-DAY_OF_THE_WEEK_CHOICES = [('Monday', 'Monday'), ('Tuesday','Tuesday'), ('Wednesday','Wednesday'), ('Thursday','Thursday'), ('Friday','Friday')]
+DAY_OF_THE_WEEK_CHOICES = [('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'),
+                           ('Thursday', 'Thursday'), ('Friday', 'Friday')]
 TIME_CHOICES = [('8:00', '8:00 - 9:30'), ('9:35', '9:35 - 11:05'), ('11:15', '11:15 - 12:45'),
- ('12:50', '12:50 - 14:20'), ('14:40', '14:40 - 16:10'), ('16:15', '16:15 - 17:45'), ('17:50', '17:50 - 19:20')]
+                ('12:50', '12:50 - 14:20'), ('14:40', '14:40 - 16:10'), ('16:15', '16:15 - 17:45'),
+                ('17:50', '17:50 - 19:20')]
+NAMES = [('Semester 1', 'Semester 1'), ('Semester 2', 'Semester 2'), ('Semester 3', 'Semester 3'),
+         ('Semester 4', 'Semester 4'), ('Semester 5', 'Semester 5'), ('Semester 6', 'Semester 6'),
+         ('Semester 7', 'Semester 7'), ('Semester 8', 'Semester 8'), ('Semester 1', 'Semester 8'),
+         ('Semester 9', 'Semester 9'), ('Semester 10', 'Semester 10'), ('Semester 11', 'Semester 11'), ]
+SEMESTER = [(1, 'SEM1'), (2, 'SEM2'), (3, 'SEM3'), (4, 'SEM4'), (5, 'SEM5'), (6, 'SEM6'), (7, 'SEM7'), (8, 'SEM8'),
+            (9, 'SEM9'), (10, 'SEM10'), (11, 'SEM11'), ]
 
 
 class UploadFileForm(forms.Form):
     file = forms.FileField()
 
 
+class AddExchangeForm(forms.Form):
+    name = forms.CharField(
+        label="Name",
+        required=True,
+        widget=forms.Select(choices=NAMES)
+    )
+
+    semester = forms.CharField(
+        label="Semester",
+        required=True,
+        widget=forms.Select(choices=SEMESTER)
+    )
+
+
 class AddOfferForm(forms.Form):
-    
     # te pola muszą tu zostać, żeby __init__ je widział
     # to są pola korzystające z danych pobranych z bazy
     subject_name = forms.CharField(label='Subject', max_length=100, required=True)
@@ -23,10 +43,9 @@ class AddOfferForm(forms.Form):
     preferred_teachers = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
 
     def __init__(self, *args, **kwargs):
-
         # pobieranie aktywnego użytkownika
         self.user = kwargs.pop('user', None)
-    
+
         super(AddOfferForm, self).__init__(*args, **kwargs)
 
         # pobieranie możliwości wyboru przedmiotu przez studenta
@@ -55,9 +74,10 @@ class AddOfferForm(forms.Form):
         required=True,
         widget=forms.Select(choices=TIME_CHOICES)
     )
-    comment = forms.CharField(label='Additional info', widget=forms.Textarea(attrs={'size':100}))
+    comment = forms.CharField(label='Additional info', widget=forms.Textarea(attrs={'size': 100}))
 
-    comment = forms.CharField(widget=forms.Textarea, required=False)    
+    comment = forms.CharField(widget=forms.Textarea, required=False)
 
-    want_time = forms.MultipleChoiceField(choices = TIME_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
-    want_day = forms.MultipleChoiceField(choices = DAY_OF_THE_WEEK_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
+    want_time = forms.MultipleChoiceField(choices=TIME_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
+    want_day = forms.MultipleChoiceField(choices=DAY_OF_THE_WEEK_CHOICES, widget=forms.CheckboxSelectMultiple,
+                                         required=False)
