@@ -50,3 +50,15 @@ def update_profile(request):
     }
 
     return render(request, 'users/update_profile.html', context)
+
+
+@login_required
+def delete_profile(request):
+
+    user = request.user
+
+    if request.method == 'POST':
+        user.delete()
+        return redirect('/')        
+
+    return render(request, 'users/user_confirm_delete.html')
