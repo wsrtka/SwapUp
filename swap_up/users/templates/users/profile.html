@@ -2,7 +2,7 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
-<div class="container content">
+<div class="container content mb-6">
 
     <h1 class="hero mt-6">Welcome, {{user.username}}!</h1>
 
@@ -12,8 +12,8 @@
         <p><strong>Email:</strong> {{ user.email }}</p>
         <p><strong>Password:</strong> ********** </p>
 
-        <a class="button is-danger mt-4" href="#">Reset e-mail</a>
-        <a class="button is-danger mt-4" href="#">Reset password</a>
+        <a class="button is-primary is-outlined mt-4" href="#">Reset e-mail</a><br>
+        <a class="button is-primary is-outlined mt-4" href="#">Reset password</a>
     </section>
 
     <section class="section box">
@@ -26,7 +26,13 @@
         <p><strong>Semester:</strong> {{ user.student.semester }}</p>
         <p><strong>Path:</strong> {{ user.student.path }}</p>
 
-        <a class="button is-danger mt-4" href="#">Edit</button>
+        <a class="button is-primary is-outlined mt-4 " href="{% url 'update-profile'%}">Edit</a>
+    </section>
+
+    <section class="section box has-background-danger-light">
+        <h3 class="hero has-text-danger">Danger zone</h3>
+        <hr>
+        <a class="button is-danger mt-4" href="#" onclick="return confirm('Are you sure?');">Delete account</a>
     </section>
 
 </div>
