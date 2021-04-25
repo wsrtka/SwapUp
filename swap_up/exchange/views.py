@@ -266,7 +266,7 @@ def manage(request):
     current_student = request.user.student
     db_exchanges = Exchange.objects.filter(semester=1)
     # db_exchanges = set(Exchange.objects)
-    #print(db_exchanges)
+    # print(db_exchanges)
     exchanges = []
     for exchange in db_exchanges:
         exchange_dict = {}
@@ -311,10 +311,10 @@ def add_exchange(request):
 
         return render(request, 'exchange/manage.html')
 
-    context={
+    context = {
         'form': form
     }
-    return render(request, 'exchange/add_exchange.html',context)
+    return render(request, 'exchange/add_exchange.html', context)
 
 
 @login_required
@@ -330,7 +330,6 @@ def add_offer(request):
 
             # pobranie danych z formularza
             form_data = form.cleaned_data
-
 
             # walidacja wybranego przedmiotu
             # todo: sprawdzić, czy dany student faktycznie jest zapisany na te zajęcia
@@ -509,3 +508,7 @@ def schedule(request):
                    ]
 
     return render(request, 'exchange/schedule.html', {'context': context})
+
+
+def edit_offer(request):
+    return render(request, 'exchange/edit_offer.html')
