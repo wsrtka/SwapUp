@@ -2,108 +2,110 @@
 
 <!DOCTYPE html>
 <html class="has-navbar-fixed-top">
-    <head>
-        {% if title %}
-          <title>SwapUp - {{title}} </title>
-        {% else %}
-          <title>SwapUp</title>
-        {% endif %}
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" type="text/css" href="{% static 'exchange/main.css' %}">
-        <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-    </head>
+<head>
+    {% if title %}
+    <title>SwapUp - {{title}} </title>
+    {% else %}
+    <title>SwapUp</title>
+    {% endif %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="{% static 'exchange/main.css' %}">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet">
+</head>
 
 {% block body %}
 
 <nav class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <a class="navbar-item" href="{% url 'index' %}">
-      <img src="{% static 'exchange/logo-big-rectangle.png' %}" width="65" height="28">
-    </a>
-
-    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-      <span aria-hidden="true"></span>
-    </a>
-  </div>
-
-  <div id="navbarBasic" class="navbar-menu">
-
-    <!-- domyślnie ten div będzie widoczny jedynie dla zalogowanych użytkowników -->
-    <div class="navbar-start">
-      <a class="navbar-item" href="{% url 'user-home' %}">
-        Home
-      </a>
-
-      <a class="navbar-item" href="{% url 'offers' %}">
-        Offers
-      </a>
-
-      <div class="navbar-item has-dropdown is-hoverable">
-        <a class="navbar-link" href="#">
-          Manage
+    <div class="navbar-brand">
+        <a class="navbar-item" href="{% url 'index' %}">
+            <img src="{% static 'exchange/logo-big-rectangle.png' %}" width="65" height="28">
         </a>
 
-        <div class="navbar-dropdown">
-          <a class="navbar-item" href="{% url 'user-offers' %}">
-            Your offers
-          </a>
-          <!-- ten link będzie widoczny tylko dla adminów -->
-          <a class="navbar-item" href="{% url 'manage' %}">
-            Exchange
-          </a>
-          <hr class="navbar-divider">
-          <a class="navbar-item" href="{% url 'profile' %}">
-            Profile
-          </a>
-        </div>
-      </div>
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navbarBasic">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </a>
     </div>
 
-    <div class="navbar-end">
-      <div class="navbar-item">
-        <div class="buttons">
-          {% if user.is_authenticated %}
-            <a class="button is-primary" href="{% url 'logout' %}">
-              Log out
+    <div id="navbarBasic" class="navbar-menu">
+
+        <!-- domyślnie ten div będzie widoczny jedynie dla zalogowanych użytkowników -->
+        <div class="navbar-start">
+            <a class="navbar-item" href="{% url 'user-home' %}">
+                Home
             </a>
-          {% else %}
-            <a class="button is-primary" href="{% url 'register' %}">
-              <strong>Sign up</strong>
+
+            <a class="navbar-item" href="{% url 'offers' %}">
+                Offers
             </a>
-            <a class="button is-light" href="{% url 'login' %}">
-              Log in
-            </a>
-          {% endif %}
+
+            <div class="navbar-item has-dropdown is-hoverable">
+                <a class="navbar-link" href="#">
+                    Manage
+                </a>
+
+                <div class="navbar-dropdown">
+                    <a class="navbar-item" href="{% url 'user-offers' %}">
+                        Your offers
+                    </a>
+                    <!-- ten link będzie widoczny tylko dla adminów -->
+                    {% if request.user.is_superuser %}
+                        <a class="navbar-item" href="{% url 'manage' %}">
+                            Manage Exchanges
+                        </a>
+                    {% endif %}
+                    <hr class="navbar-divider">
+                    <a class="navbar-item" href="{% url 'profile' %}">
+                        Profile
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
+
+        <div class="navbar-end">
+            <div class="navbar-item">
+                <div class="buttons">
+                    {% if user.is_authenticated %}
+                    <a class="button is-primary" href="{% url 'logout' %}">
+                        Log out
+                    </a>
+                    {% else %}
+                    <a class="button is-primary" href="{% url 'register' %}">
+                        <strong>Sign up</strong>
+                    </a>
+                    <a class="button is-light" href="{% url 'login' %}">
+                        Log in
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </nav>
 
 <div class="container content">
 
-  {% if messages %}
-  {% for message in messages %}
-      <article class="message is-{{ message.tags }} mt-6">
+    {% if messages %}
+    {% for message in messages %}
+    <article class="message is-{{ message.tags }} mt-6">
         <div class="message-header">
-          <p>{{ message.tags }}</p>
-          <button class="delete" aria-label="delete"></button>
+            <p>{{ message.tags }}</p>
+            <button class="delete" aria-label="delete"></button>
         </div>
         <div class="message-body">
-          {{ message }}
+            {{ message }}
         </div>
-      </article>
-  {% endfor %}
-  {% endif %}
+    </article>
+    {% endfor %}
+    {% endif %}
 
 </div>
 
-  {% block content %}
-  {% endblock %}
-  
+{% block content %}
+{% endblock %}
+
 <footer class="footer is-hidden-mobile ">
     <div class="content has-text-centered">
         <strong>Swap Up!</strong> is webapp made by WIET students for WIET students. Learn more on <a href="https://github.com/wsrtka/SwapUp">our github page.</a>
