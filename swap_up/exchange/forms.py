@@ -77,3 +77,31 @@ class AddOfferForm(forms.Form):
 
     want_time = forms.MultipleChoiceField(choices=TIME_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
     want_day = forms.MultipleChoiceField(choices=DAY_OF_THE_WEEK_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
+
+
+class editOffer(forms.Form):
+    def __init__(self, *args, **kwargs):
+        # pobieranie aktywnego użytkownika
+        self.offer = kwargs.pop('user', None)
+
+    subject_name = forms.CharField(label='Subject', max_length=100, required=True)
+    teacher = forms.CharField(label='Teacher', max_length=100, required=True)
+    preferred_teachers = forms.MultipleChoiceField(widget=forms.CheckboxSelectMultiple, required=False)
+
+    have_day_of_the_week = forms.CharField(
+        label="Day",
+        required=True,
+        widget=forms.Select(choices=DAY_OF_THE_WEEK_CHOICES)
+    )
+    have_time = forms.CharField(
+        label="Time",
+        required=True,
+        widget=forms.Select(choices=TIME_CHOICES)
+    )
+    comment = forms.CharField(label='Additional info', widget=forms.Textarea(attrs={'size': 100}))
+
+    comment = forms.CharField(widget=forms.Textarea, required=False)
+
+    want_time = forms.MultipleChoiceField(choices=TIME_CHOICES, widget=forms.CheckboxSelectMultiple, required=False)
+    want_day = forms.MultipleChoiceField(choices=DAY_OF_THE_WEEK_CHOICES, widget=forms.CheckboxSelectMultiple,
+                                         required=False)

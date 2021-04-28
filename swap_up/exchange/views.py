@@ -489,7 +489,7 @@ def schedule(request):
     return render(request, 'exchange/schedule.html', {'context': context})
 
 
-def edit_offer(request):
+def edit_offer_admin(request):
 
     db_offers = Offer.objects.filter(state=('N', 'New'))
 
@@ -515,4 +515,61 @@ def edit_offer(request):
 
     offers1 = offers[::2]
     offers2 = offers[1::2]
-    return render(request, 'exchange/edit_offer.html',  {'offers1': offers1, 'offers2': offers2})
+    return render(request, 'exchange/edit_offer_admin.html',  {'offers1': offers1, 'offers2': offers2})
+
+
+@login_required
+def edit_offer(request):
+    if request.method == 'POST':
+
+        form = editOffer(request.POST, offer=request.offer)
+
+        if form.is_valid():
+
+            # pobranie danych z formularza
+            form_data = form.cleaned_data
+            try:
+                unwanted_class = Class.objects.get(
+                    subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
+                    teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
+                    day=form_data['have_day_of_the_week'],
+                    time=form_data['have_time']
+                )
+            except Class.DoesNotExist:
+                messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
+
+                context = {
+                    'form': form
+                }
+
+                return render(request, 'exchange/add_offer.html', context)
+
+            # tworzenie nowej oferty w BD i ustawianie jej atrybutów
+            offer = Offer.objects.create(
+                student=request.user.student,
+                # exchange=Exchange.objects.get(semester=request.user.student.semester),
+                unwanted_class=unwanted_class,
+                additional_information=form_data['comment']
+            )
+
+            offer.preferred_days = form_data['want_day']
+            offer.preferred_times = form_data['want_time']
+
+            teachers = []
+
+            for teacher in form_data['preferred_teachers']:
+                teachers.append(Teacher.objects.get(last_name=teacher))
+
+            # ten atrybut może powstać dopiero po tym, jak stworzony zostanie obiekt Offer
+            offer.preferred_teachers.set(teachers)
+
+            return HttpResponseRedirect('/exchange/my-offers')
+
+    else:
+        form = AddOfferForm(user=request.user)
+
+    context = {
+        'form': form
+    }
+
+    return render(request, 'exchange/add_offer.html', context)
