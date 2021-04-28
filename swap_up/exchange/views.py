@@ -168,7 +168,7 @@ def manage(request):
     # Exchange.objects.all().delete()
     # for i in range(1, 11):
     #     exchange = Exchange.objects.create(
-    #         name="Semester" + str(i),
+    #         name="Semester " + str(i),
     #         semester=i
     #     )
     if request.user.is_superuser:
