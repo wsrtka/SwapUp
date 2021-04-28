@@ -1,84 +1,108 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% load crispy_forms_tags %}
-{% load my_tags %}
-
 <div class="container is-max-desktop">
 
-<div class='box'>
-    <form method="post">
-        {% csrf_token %}
-        <div class="form-row">
-            <p class="title is-3 is-spaced" >What you have:</p>
-        </div>
-        <div class="columns">
-        <div class="column">
-                {{ form.subject_name|as_crispy_field }}
-            </div>
-            <div class="column">
-                {{ form.teacher|as_crispy_field }}
-            </div>
-        </div>
-        <div class='columns'>
-            <div class="column">{{form.have_day_of_the_week|as_crispy_field}}</div>
-            <div class="column">{{form.have_time|as_crispy_field}}</div>
-        </div>
-        <div>
-            {{form.comment|as_crispy_field}}
+
+<section class="box">
+    <div class="columns">
+
+        {% if offers1 %}
+
+        <div id="col1" class="column">
+
+          {% for offer in offers1 %}
+            <div class="card block">
+                <header class="card-header">
+                  <p class="card-header-title">
+                    {{ offer.subject }}
+                  </p>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    <em>{{offer.student}}</em> is giving away:
+                    <hr class="my-2">
+                    {{offer.time}} <br>
+                    With: {{offer.teacher}}
+                    <hr class="my-2">
+                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                      {% if offer.preferred_days %}
+                        <p>Preferred days: {{offer.preferred_days}}</p>
+                      {% endif %}
+                      {% if offer.preferred_times %}
+                        <p>Preferred times: {{offer.preferred_times}}</p>
+                      {% endif %}
+                      {% if offer.preferred_teachers %}
+                        <p>Preferred teachers: {{offer.preferred_teachers}}</p>
+                      {% endif %}
+                    {% else %}
+                      Anything
+                    {% endif %}
+                    <br>
+                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
+                    <!-- <em>23:09, 04/01/2021</em> -->
+                  </div>
+                </div>
+                <footer class="card-footer">
+                  <!-- <a href="#" class="card-footer-item">Comment</a> -->
+                  <a href="#" class="card-footer-item">Edit</a>
+                  <a href="#" class="card-footer-item">Delete</a>
+                </footer>
+              </div>
+          {% endfor %}
+
         </div>
 
-        <div class="form-row">
-            <p class="title is-3 is-spaced mt-3" >What you want:</p>
+        <div id="col2" class="column">
+            {% for offer in offers2 %}
+            <div class="card block">
+                <header class="card-header">
+                  <p class="card-header-title">
+                    {{ offer.subject }}
+                  </p>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    <em>{{offer.student}}</em> is giving away:
+                    <hr class="my-2">
+                    {{offer.time}} <br>
+                    With: {{offer.teacher}}
+                    <hr class="my-2">
+                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                      {% if offer.preferred_days %}
+                        <p>Preferred days: {{offer.preferred_days}}</p>
+                      {% endif %}
+                      {% if offer.preferred_times %}
+                        <p>Preferred days: {{offer.preferred_times}}</p>
+                      {% endif %}
+                      {% if offer.preferred_teachers %}
+                        <p>Preferred days: {{offer.preferred_teachers}}</p>
+                      {% endif %}
+                    {% else %}
+                      Anything
+                    {% endif %}
+                    <br>
+                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
+                    <!-- <em>23:09, 04/01/2021</em> -->
+                  </div>
+                </div>
+                <footer class="card-footer">
+                  <!-- <a href="#" class="card-footer-item">Comment</a> -->
+                  <a href="#" class="card-footer-item">Edit</a>
+                  <a href="#" class="card-footer-item">Delete</a>
+                </footer>
+              </div>
+          {% endfor %}
         </div>
 
-        <label class="label">Preferred times</label>
-        <div class="columns">
-            <div class="column">
-            {% for field in form.want_time %}
-            {% if forloop.counter0|modulo:3 ==  0 and  forloop.counter0 > 0%}</div><div class="column">{% endif %}
-                <label for="{{ field.id_for_label }}" class="col-md-1 control-label">
-                    <span class="checkbox">{{ field.tag }} 
-                    {{ field.choice_label }}
-                    </span>
-                </label><br/>
-            {% endfor %}
-            </div>
+        {% else %}
+
+        <div class='column'>
+          There are no offers available.
         </div>
 
-        <label class="label">Preferred days</label>
-        <div class="columns">
-            <div class="column">
-            {% for field in form.want_day %}
-            {% if forloop.counter0|modulo:2 ==  0 and  forloop.counter0 > 0%}</div><div class="column">{% endif %}
-                <label for="{{ field.id_for_label }}" class="col-md-1 control-label">
-                    <span class="checkbox">{{ field.tag }} 
-                    {{ field.choice_label }}
-                    </span>
-                </label><br/>
-            {% endfor %}
-            </div>
-        </div>
-        
-        <label class="label">Preferred teachers</label>
-        <div class="columns">
-            <div class="column">
-            {% for field in form.preferred_teachers %}
-            {% if forloop.counter0|modulo:2 ==  0 and  forloop.counter0 > 0%}</div><div class="column">{% endif %}
-                <label for="{{ field.id_for_label }}" class="col-md-1 control-label">
-                    <span class="checkbox">{{ field.tag }} 
-                    {{ field.choice_label }}
-                    </span>
-                </label><br/>
-            {% endfor %}
-            </div>
-        </div>
-
-        <button class="button is-primary" type="submit", name="submit", value="submit">Submit</button>	
-
-    </form>
+        {% endif %}
+    </div>
+</section>
 </div>
-
-</div>
-
 {% endblock %}

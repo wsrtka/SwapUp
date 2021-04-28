@@ -487,3 +487,32 @@ def schedule(request):
                 ]
 
     return render(request, 'exchange/schedule.html', {'context': context})
+
+
+def edit_offer(request):
+
+    db_offers = Offer.objects.filter(state=('N', 'New'))
+
+    offers = []
+
+    for offer in db_offers:
+        offer_dict = {}
+        offer_dict[
+            'student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
+        offer_dict[
+            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict[
+            'time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict[
+            'teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict['comment'] = offer.additional_information if offer.additional_information else None
+        offer_dict['preferred_days'] = offer.preferred_days
+        offer_dict['preferred_hours'] = offer.preferred_times
+        offer_dict['preferred_teachers'] = [f'{teacher.first_name} {teacher.last_name}' for teacher in
+                                            offer.preferred_teachers.all()]
+
+        offers.append(offer_dict)
+
+    offers1 = offers[::2]
+    offers2 = offers[1::2]
+    return render(request, 'exchange/edit_offer.html',  {'offers1': offers1, 'offers2': offers2})
