@@ -166,24 +166,33 @@ def exhange(request, exchange_id):
 @login_required
 def manage(request):
     # Exchange.objects.all().delete()
-    for i in range(1, 11):
-        exchange = Exchange.objects.create(
-            name="Semester" + str(i),
-            semester=i
-        )
-    db_exchanges = Exchange.objects.all()
-    print(db_exchanges)
-    exchanges = []
-    for exchange in db_exchanges:
-        exchange_dict = {
-            "name": exchange.name,
-            "id": exchange.semester
-        }
-        print(exchange_dict)
+    # for i in range(1, 11):
+    #     exchange = Exchange.objects.create(
+    #         name="Semester" + str(i),
+    #         semester=i
+    #     )
+    if request.user.is_superuser:
+        db_exchanges = Exchange.objects.all()
+        print(db_exchanges)
+        exchanges = []
+        for exchange in db_exchanges:
+            exchange_dict = {
+                "name": exchange.name,
+                "id": exchange.semester
+            }
+            print(exchange_dict)
 
-        exchanges.append(exchange_dict)
+            exchanges.append(exchange_dict)
 
-    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+        if request.method == 'POST' and request.FILES['myfile']:
+            myfile = request.FILES['myfile']
+            import_schedule_for_year(request.FILES['myfile'])
+
+            return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+
+        return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+    else:
+        return render(request, 'base.html')
 
 
 @login_required
