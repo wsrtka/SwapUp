@@ -4,7 +4,8 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, ButtonHolder, Submit
 from .models import *
 
-DAY_OF_THE_WEEK_CHOICES = [('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'), ('Friday', 'Friday')]
+# DAY_OF_THE_WEEK_CHOICES = [('Monday', 'Monday'), ('Tuesday', 'Tuesday'), ('Wednesday', 'Wednesday'), ('Thursday', 'Thursday'), ('Friday', 'Friday')]
+DAY_OF_THE_WEEK_CHOICES = [('Pn', 'Pn'), ('Wt', 'Wt'), ('Śr', 'Śr'), ('Czw', 'Czw'), ('Pt', 'Pt')]
 TIME_CHOICES = [('8:00', '8:00 - 9:30'), ('9:35', '9:35 - 11:05'), ('11:15', '11:15 - 12:45'),
                 ('12:50', '12:50 - 14:20'), ('14:40', '14:40 - 16:10'), ('16:15', '16:15 - 17:45'), ('17:50', '17:50 - 19:20')]
 
@@ -51,7 +52,12 @@ class AddOfferForm(forms.Form):
         for subject in subjects:
             classes.extend(Class.objects.filter(subject_id=subject))
 
-        teachers = [(c.teacher_id.last_name, c.teacher_id.last_name) for c in classes]
+        teachers_with_duplicates = [(c.teacher_id.last_name, c.teacher_id.last_name) for c in classes]
+        teachers = []
+        for i in teachers_with_duplicates:
+            if i not in teachers:
+                teachers.append(i)
+
         self.fields['teacher'].widget = forms.Select(choices=teachers)
         self.fields['preferred_teachers'].choices = teachers
 
