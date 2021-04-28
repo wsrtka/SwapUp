@@ -3,7 +3,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm
 from .decorators import unauthenticated_user
-
+from exchange.models import Student
 
 @unauthenticated_user
 def register(request):
@@ -11,20 +11,18 @@ def register(request):
     if request.method == 'POST':
         form = UserRegisterForm(request.POST)
         if form.is_valid():
-            # form.save()
 
             user = form.save()
-            user.refresh_from_db()  # load the profile instance created by the signal
-            user.student.index_number = form.cleaned_data.get('index')
-            user.student.semester = form.cleaned_data.get('semester')
             user.save()
-            # raw_password = form.cleaned_data.get('password1')
-            # user = authenticate(username=user.username, password=raw_password)
-            # login(request, user)
-            # return redirect('home')
+            
+            student, created = Student.objects.get_or_create(index_number = form.cleaned_data.get('index'))
 
-
-
+            if created:
+                student.index_number = form.cleaned_data.get('index')
+                
+            student.semester = form.cleaned_data.get('semester')  
+            student.user = user
+            student.save()
 
             username = form.cleaned_data.get('username')
 
