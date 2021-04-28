@@ -165,6 +165,12 @@ def exhange(request, exchange_id):
 
 @login_required
 def manage(request):
+    # Exchange.objects.all().delete()
+    for i in range(1, 11):
+        exchange = Exchange.objects.create(
+            name="Semester" + str(i),
+            semester=i
+        )
     db_exchanges = Exchange.objects.all()
     print(db_exchanges)
     exchanges = []
@@ -285,7 +291,7 @@ def add_offer(request):
             # tworzenie nowej oferty w BD i ustawianie jej atrybutów
             offer = Offer.objects.create(
                 student=request.user.student,
-                # exchange=Exchange.objects.get(semester=request.user.student.semester),
+                exchange=Exchange.objects.get(semester=request.user.student.semester),
                 unwanted_class=unwanted_class,
                 additional_information=form_data['comment']
             )
