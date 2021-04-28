@@ -138,75 +138,52 @@ def upload_csv(request):
 
 @login_required
 def exhange(request, exchange_id):
-    # TODO
-    item1 = {
-        "student": "Jacek Gorm",
-        "subject": "Teoria nicości2",
-        "time": "Pn A, 8:00",
-        "other_times": "Pn B, 9:00, Wt B, 16:15",  # none means any class
-        "teacher": "Zenon Iksiński",
-        "other_teachers": None,  # none means any teacher
-        "comment": None,
-    }
-    item2 = {
-        "student": "Jacek Gorm",
-        "subject": "WDI",
-        "time": "Śr, 10:00",
-        "other_times": "Pn B, 9:00, Wt B, 16:15",
-        "teacher": "Zenon Iksiński",
-        "other_teachers": "Ikakij Korek",
-        "comment": "daję 100zł",
-    }
-    item3 = {
-        "student": "Jacek Gorm",
-        "subject": "Analiza",
-        "time": "Pn B, 8:00",
-        "other_times": None,
-        "teacher": "Zenon Iksiński",
-        "other_teachers": "Ikakij Korek, Szymon Tukor",
-        "comment": "daję 100zł",
-    }
-    exchange1 = {
-        "name": "Semester 1",
-        "id": 1,
-        "items": [item1, item2],
-    }
-    exchange2 = {
-        "name": "Semester 2",
-        "id": 2,
-        "items": [item1, item2, item3],
-    }
-    exchange3 = {
-        "name": "Semester 3",
-        "id": 3,
-        "items": [item1],
-    }
-    exchange4 = {
-        "name": "Semester 4",
-        "id": 4,
-        "items": [item1, item1],
-    }
-    exchange5 = {
-        "name": "Semester 5",
-        "id": 5,
-        "items": [item2],
-    }
-    items = []
     name = ''
-    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
-    for exchange in exchanges:
-        if exchange["id"] == exchange_id:
-            items = exchange["items"]
-            name = exchange["name"]
+    items = []
+    db_exchanges = Exchange.objects.all()
+    for exchange in db_exchanges:
+        if exchange.semester == exchange_id:
+            name = exchange.name
+
+    db_offers = Offer.objects.all()
+
+    for offer in db_offers:
+        # if offer.exchange and offer.exchange.semester == exchange_id:
+        item_dict = {
+            "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
+            "subject": offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else '',
+            "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
+            "other_times": offer.preferred_days,
+            "teacher": f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else '',
+            "other_teachers": ",".join([f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
+            "comment": offer.additional_information if offer.additional_information else None,
+        }
+        items.append(item_dict)
 
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
+
+
+@login_required
+def manage(request):
+    db_exchanges = Exchange.objects.all()
+    print(db_exchanges)
+    exchanges = []
+    for exchange in db_exchanges:
+        exchange_dict = {
+            "name": exchange.name,
+            "id": exchange.semester
+        }
+        print(exchange_dict)
+
+        exchanges.append(exchange_dict)
+
+    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
 
 
 @login_required
 def offers(request):
     current_student = request.user.student
     db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
-    print(db_offers)
     # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
 
     offers = []
@@ -237,84 +214,43 @@ def offers(request):
 
 
 @login_required
-def manage(request):
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 1",
-        semester=1
-    )
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 2",
-        semester=2
-    )
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 3",
-        semester=3
-    )
-    exchange = Exchange.objects.create(
-        # creation_date=models.DateField(default=date.today),
-        # modification_date=models.DateField(auto_now=True),
-        name="Semester 3",
-        semester=4
-    )
-    # db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
-    current_student = request.user.student
-    db_exchanges = Exchange.objects.filter(semester=1)
-    # db_exchanges = set(Exchange.objects)
-    #print(db_exchanges)
-    exchanges = []
-    for exchange in db_exchanges:
-        exchange_dict = {}
-        exchange_dict["name"] = f'Semester: {exchange.semester}'
-        exchange_dict["id"] = exchange.semester
-        print(exchange_dict)
-
-    exchange1 = {
-        "name": "Semester 1",
-        "id": "1",
-    }
-    exchange2 = {
-        "name": "Semester 2",
-        "id": "2",
-    }
-    exchange3 = {
-        "name": "Semester 3",
-        "id": "3",
-    }
-    exchange4 = {
-        "name": "Semester 4",
-        "id": "4",
-    }
-    exchange5 = {
-        "name": "Semester 5",
-        "id": "5",
-    }
-    exchanges = [exchange1, exchange2, exchange3, exchange4, exchange5]
-
-    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
-
-
-@login_required
 def add_exchange(request):
-    form = AddExchangeForm(request.POST or None)
-    if form.is_valid():
-        form_data = form.cleaned_data
+    if request.method == 'POST':
+        form = AddExchangeForm(request.POST)
 
-        exchange = Exchange(name=form_data['name'], semester=form_data['semester'], creation_date=datetime.now(),
-                            modification_date=None)
-        exchange.save()
+        if form.is_valid():
+            form_data = form.cleaned_data
+            # try:
+            #     unwanted_exchange = Class.objects.get(
+            #         name=Subject.objects.get(subject_name=form_data['subject_name']),
+            #         teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
+            #         day=form_data['have_day_of_the_week'],
+            #         time=form_data['have_time']
+            #     )
+            # except Class.DoesNotExist:
+            #     messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
+            #
+            #     context = {
+            #         'form': form
+            #     }
+            #
+            #     return render(request, 'exchange/add_exchange.html', context)
 
-        return render(request, 'exchange/manage.html')
+            exchange = Exchange.objects.create(
+                name=form_data['name'],
+                semester=form_data['semester']
+            )
 
-    context={
+            return HttpResponseRedirect('/exchange/manage')
+
+    else:
+        form = AddExchangeForm()
+
+    context = {
         'form': form
     }
-    return render(request, 'exchange/add_exchange.html',context)
+
+    return render(request, 'exchange/add_exchange.html', context)
 
 
 @login_required
@@ -330,11 +266,6 @@ def add_offer(request):
 
             # pobranie danych z formularza
             form_data = form.cleaned_data
-
-
-            # walidacja wybranego przedmiotu
-            # todo: sprawdzić, czy dany student faktycznie jest zapisany na te zajęcia
-            # jest to na razie jedyny sposób. Są validatory od Django, ale potrzebujemy jednego pola, które zawrze wszystkie cechy zajęć. Na razie cechy zajęć są rozrzucone po kilku polach w formularzu (dzień, czas, prowadzący)
             try:
                 unwanted_class = Class.objects.get(
                     subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
@@ -448,17 +379,20 @@ def user_offers(request):
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 
+from .service import shorten 
+
 @login_required
 def schedule(request):
     current_user = request.user
     student = Student.objects.get(user=current_user)
 
-    # TODO czy na pewno takie tygodnie
     schedule = {
         'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
     }
 
     week = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']
+
+    context = {}
 
     for c in student.list_of_classes.all():
         class_dict = {}
@@ -466,9 +400,11 @@ def schedule(request):
         subject = c.subject_id
         teacher = c.teacher_id
 
+        #TODO
         # Tutaj jest wartość, którą buttony z planu zajęć przesyłają fo formularza
         # Powinno być coś w stylu class id
-        class_dict['id'] = 'Passed_Value'
+        class_dict['id'] = 'Passed_Value_' + str(c.day)
+
 
         class_dict['subject_name'] = str(subject.subject_name)
         class_dict['category'] = str(subject.category)
@@ -477,35 +413,77 @@ def schedule(request):
         class_dict['teacher'] = str(teacher.first_name) + " " + str(teacher.last_name)
         class_dict['room'] = str(c.room)
         class_dict['week'] = str(c.week)
-        print(c.time)
+        class_dict['week'] = str(c.week)
+
+
         hour_start, minute_start, seconds_start = str(c.time).split(':')
         hour_start, minute_start = int(hour_start), int(minute_start)
         hour_end, minute_end = hour_start, minute_start
-
         minute_end += 90
         while minute_end >= 60:
             hour_end += 1
             minute_end -= 60
 
+
+
         class_dict['time'] = str(hour_start) + ":" + "{:02d}".format(minute_start) + " - " + str(
             hour_end) + ":" + "{:02d}".format(minute_end)
 
-        class_dict['week'] = str(c.week)
+        # Template from 7:30 to 20:00 (13 h total)
 
-        # Template from 7:00 to 20:00 (13 h total)
-        time_from = 7
+        #arrange top and bottom position of div in display
+        time_from = 7.5
         time_to = 20
+
 
         class_dict['top'] = 100 * (hour_start + minute_start / 60 - time_from) / (time_to - time_from)
         class_dict['bottom'] = 100 * (time_to - hour_end - minute_end / 60) / (time_to - time_from)
 
-        schedule[str(c.day)].append(class_dict)
 
-        context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
-                   {'schedule': schedule['Wt'], 'name': 'Wtorek'},
-                   {'schedule': schedule['Śr'], 'name': 'Środa'},
-                   {'schedule': schedule['Czw'], 'name': 'Czwartek'},
-                   {'schedule': schedule['Pt'], 'name': 'Piątek'}
-                   ]
+        class_dict['start'] = hour_start + minute_start/60
+        class_dict['end'] = hour_end + minute_end/60
+        #count collisions
+        class_dict['colliders'] = []
+        class_dict['collider_id'] = 0
+        for other_class in schedule[str(c.day)]:
+            if (class_dict['end'] >= other_class['start'] >= class_dict['start']) or ( class_dict['end'] >= other_class['end'] >= class_dict['start']) :
+
+                if other_class not in class_dict['colliders']:
+                    class_dict['colliders'].append(other_class)
+                if class_dict not in other_class['colliders']:
+                    other_class['colliders'].append(class_dict)
+
+                for other_class_collider in other_class['colliders']:
+                    if other_class_collider not in class_dict['colliders']:
+                        class_dict['colliders'].append(other_class_collider)
+                    if class_dict not in other_class_collider['colliders']:
+                        other_class_collider['colliders'].append(class_dict)
+
+                if class_dict in class_dict['colliders']:
+                    class_dict['colliders'].remove(class_dict)
+
+                class_dict['collider_id'] = len(class_dict['colliders'])
+
+        schedule[str(c.day)].append(class_dict)
+    
+    #arrange left and right position based on number of collisions
+    for day in ('Pn', 'Wt', 'Śr', 'Czw', 'Pt'):
+        for class_dict in schedule[day]:
+            n = len(class_dict['colliders']) + 1
+            i = class_dict['collider_id']
+
+            class_dict['width'] = 100/n
+            class_dict['left'] = (i) * (100/n)
+            #truncate text
+            class_dict['short_subject_name'], class_dict['short_time'], class_dict['short_teacher'] = shorten(class_dict['subject_name'],class_dict['time'],class_dict['teacher'],n)
+
+
+
+    context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
+                {'schedule': schedule['Wt'], 'name': 'Wtorek'},
+                {'schedule': schedule['Śr'], 'name': 'Środa'},
+                {'schedule': schedule['Czw'], 'name': 'Czwartek'},
+                {'schedule': schedule['Pt'], 'name': 'Piątek'}
+                ]
 
     return render(request, 'exchange/schedule.html', {'context': context})
