@@ -379,6 +379,8 @@ def user_offers(request):
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 
+from .service import shorten 
+
 @login_required
 def schedule(request):
     current_user = request.user
@@ -437,14 +439,12 @@ def schedule(request):
         class_dict['top'] = 100 * (hour_start + minute_start / 60 - time_from) / (time_to - time_from)
         class_dict['bottom'] = 100 * (time_to - hour_end - minute_end / 60) / (time_to - time_from)
 
-        #arrange left and right position based on number of collisions
 
         class_dict['start'] = hour_start + minute_start/60
         class_dict['end'] = hour_end + minute_end/60
-
+        #count collisions
         class_dict['colliders'] = []
         class_dict['collider_id'] = 0
-
         for other_class in schedule[str(c.day)]:
             if (class_dict['end'] >= other_class['start'] >= class_dict['start']) or ( class_dict['end'] >= other_class['end'] >= class_dict['start']) :
 
@@ -465,7 +465,8 @@ def schedule(request):
                 class_dict['collider_id'] = len(class_dict['colliders'])
 
         schedule[str(c.day)].append(class_dict)
-
+    
+    #arrange left and right position based on number of collisions
     for day in ('Pn', 'Wt', 'Śr', 'Czw', 'Pt'):
         for class_dict in schedule[day]:
             n = len(class_dict['colliders']) + 1
@@ -473,7 +474,10 @@ def schedule(request):
 
             class_dict['width'] = 100/n
             class_dict['left'] = (i) * (100/n)
-            print(class_dict['left'])
+            #truncate text
+            class_dict['short_subject_name'], class_dict['short_time'], class_dict['short_teacher'] = shorten(class_dict['subject_name'],class_dict['time'],class_dict['teacher'],n)
+
+
 
     context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
                 {'schedule': schedule['Wt'], 'name': 'Wtorek'},

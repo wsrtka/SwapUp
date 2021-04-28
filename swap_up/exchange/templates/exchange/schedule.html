@@ -17,7 +17,6 @@
     opacity: 1;
     padding-right: 2%;
     padding-left: 2%;
-
     background: whitesmoke;
     color: inherit;
     border: none;
@@ -25,6 +24,9 @@
     cursor: pointer;
     outline: inherit;
     text-align: inherit;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.116);
 
   }
   .subject_container:hover {
@@ -49,17 +51,17 @@
                 <form action="{% url 'add-offer' %}" method="post">
                     {% csrf_token %}                                                              
                     <button type="submit" name='schedule_button' value={{class.id | safe}} class="subject_container"
-                     onclick="return confirm('You selected {{class.subject_name}}, {{day.name}} {{class.time}}. Are you sure?')"
+                     onclick="return confirm('You selected {{class.subject_name}}, {{day.name}} {{class.time}} with {{class.teacher}}. Are you sure?')"
                       style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%; left: {{class.left |safe}}%; width: {{class.width | safe}}%">
 
                         <div>
 
-                            <div class="is-11"><span>{{class.time}}</span>
+                            <div class="is-11"><span>{{class.short_time}}</span>
                                 {% if class.week %} <span class="tag is-primary" style="float:right">{{class.week}}</span> {% endif %}
                             </div>
 
-                            <div>{{class.subject_name}} </div>
-                            <div>{{class.teacher}} </div>
+                            <div>{{class.short_subject_name}} </div>
+                            <div>{{class.short_teacher}} </div>
                         </div>
 
                     </button>
