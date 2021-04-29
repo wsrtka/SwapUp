@@ -506,4 +506,44 @@ def schedule(request):
 
 
 def dashboard(request):
-    return render(request, 'exchange/dashboard.html')
+
+    latest_offers = Offer.objects.all().exclude(student=request.user.student)
+
+    if len(latest_offers) > 3:
+        latest_offers = latest_offers[:3]
+
+    user_offers = Offer.objects.all().filter(student=request.user.student)
+
+    if len(user_offers) > 3:
+        user_offers = user_offers[:3]
+
+    l_offers = []
+    u_offers = []
+    
+    for offer in latest_offers:
+        offer_dict = {}
+        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
+        offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
+        offer_dict['other_time'] = ''
+        offer_dict['other_teacher'] = ''
+
+        l_offers.append(offer_dict)
+
+    for offer in user_offers:
+        offer_dict = {}
+        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
+        offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
+        offer_dict['other_time'] = ''
+        offer_dict['other_teacher'] = ''
+
+        u_offers.append(offer_dict)
+    
+
+
+    return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
