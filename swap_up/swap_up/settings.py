@@ -134,7 +134,7 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = (
 
 CRISPY_TEMPLATE_PACK = 'bulma'
 
-LOGIN_REDIRECT_URL = 'user-home'
+LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
