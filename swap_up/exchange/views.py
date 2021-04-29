@@ -52,7 +52,7 @@ def import_schedule_for_year(csv_file):
             week = row[6]
             day = row[7]
             time = row[8]
-            student_name = row[9]
+            student_index = row[9]
 
             if subject_name_row != '' and teacher_name != '' and day != '' and time != '':
                 subject, created_subject = Subject.objects.get_or_create(
@@ -62,7 +62,7 @@ def import_schedule_for_year(csv_file):
                 )
 
                 teacher_first_name, teacher_last_name = teacher_name.split()
-                student_first_name, student_last_name = student_name.split()
+                # student_first_name, student_last_name = student_name.split()
 
                 teacher, teacher_created = Teacher.objects.get_or_create(
                     first_name=teacher_first_name,
@@ -70,13 +70,14 @@ def import_schedule_for_year(csv_file):
                 )
 
                 try:
-                    user = User.objects.get(
-                        first_name=student_first_name,
-                        last_name=student_last_name
-                    )
+                    # user = User.objects.get(
+                    #     first_name=student_first_name,
+                    #     last_name=student_last_name
+                    # )
                     try:
-                        student = Student.objects.get(
-                            user=user
+                        student, created = Student.objects.get_or_create(
+                            index_number = student_index,
+                            semester = semester
                         )
 
                         created_class, class_created = Class.objects.get_or_create(
@@ -165,19 +166,34 @@ def exhange(request, exchange_id):
 
 @login_required
 def manage(request):
-    db_exchanges = Exchange.objects.all()
-    print(db_exchanges)
-    exchanges = []
-    for exchange in db_exchanges:
-        exchange_dict = {
-            "name": exchange.name,
-            "id": exchange.semester
-        }
-        print(exchange_dict)
+    # Exchange.objects.all().delete()
+    # for i in range(1, 11):
+    #     exchange = Exchange.objects.create(
+    #         name="Semester " + str(i),
+    #         semester=i
+    #     )
+    if request.user.is_superuser:
+        db_exchanges = Exchange.objects.all()
+        print(db_exchanges)
+        exchanges = []
+        for exchange in db_exchanges:
+            exchange_dict = {
+                "name": exchange.name,
+                "id": exchange.semester
+            }
+            print(exchange_dict)
 
-        exchanges.append(exchange_dict)
+            exchanges.append(exchange_dict)
 
-    return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+        if request.method == 'POST' and request.FILES['myfile']:
+            myfile = request.FILES['myfile']
+            import_schedule_for_year(request.FILES['myfile'])
+
+            return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+
+        return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+    else:
+        return render(request, 'base.html')
 
 
 @login_required
@@ -285,7 +301,7 @@ def add_offer(request):
             # tworzenie nowej oferty w BD i ustawianie jej atrybutów
             offer = Offer.objects.create(
                 student=request.user.student,
-                # exchange=Exchange.objects.get(semester=request.user.student.semester),
+                exchange=Exchange.objects.get(semester=request.user.student.semester),
                 unwanted_class=unwanted_class,
                 additional_information=form_data['comment']
             )

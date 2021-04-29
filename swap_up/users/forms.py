@@ -7,6 +7,8 @@ class UserRegisterForm(UserCreationForm):
     email = forms.EmailField()
     first_name = forms.CharField()
     last_name = forms.CharField()
+    index = forms.IntegerField()
+    semester = forms.IntegerField()
 
     class Meta:
         model = User

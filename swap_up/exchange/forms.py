@@ -41,16 +41,25 @@ class AddOfferForm(forms.Form):
         super(AddOfferForm, self).__init__(*args, **kwargs)
 
         # pobieranie możliwości wyboru przedmiotu przez studenta
-        subjects = Subject.objects.filter(semester=self.user.student.semester)
+        classes = []
+        classes = self.user.student.list_of_classes.all()
+
+        subject_pk = []
+        for c in classes:
+            subject_pk.append(c.subject_id.pk)
+
+        subjects = Subject.objects.filter(pk__in = subject_pk)
+
+        # subjects = Subject.objects.filter(semester=self.user.student.semester)
         subject_choices = [(subject.subject_name, subject.subject_name) for subject in subjects]
         self.fields['subject_name'].widget = forms.Select(choices=subject_choices)
 
         # pobieranie dostępnych nauczycieli dla semestru poprzez znalezienie zajęć dla przedmiotów
         # todo: procedura zbyt skomplikowana i do poprawy przez zmianę modelu
-        classes = []
 
-        for subject in subjects:
-            classes.extend(Class.objects.filter(subject_id=subject))
+
+        # for subject in subjects:
+        #     classes.extend(Class.objects.filter(subject_id=subject))
 
         teachers_with_duplicates = [(c.teacher_id.last_name, c.teacher_id.last_name) for c in classes]
         teachers = []

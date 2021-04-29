@@ -86,7 +86,7 @@ class Class(models.Model):
 
 class Student(models.Model):
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
