@@ -503,3 +503,7 @@ def schedule(request):
                 ]
 
     return render(request, 'exchange/schedule.html', {'context': context})
+
+
+def dashboard(request):
+    return render(request, 'exchange/dashboard.html')
