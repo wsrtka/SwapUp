@@ -505,6 +505,7 @@ def schedule(request):
     return render(request, 'exchange/schedule.html', {'context': context})
 
 
+@login_required()
 def dashboard(request):
 
     latest_offers = Offer.objects.all().exclude(student=request.user.student)
