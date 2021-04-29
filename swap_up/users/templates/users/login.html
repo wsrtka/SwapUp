@@ -13,7 +13,8 @@
                 {{ form|crispy }}
             </fieldset>
     
-            <button type="submit" class="button is-primary mt-5">Sign In</button>
+            <button type="submit" class="button is-primary mt-5 mb-2">Sign In</button> <br>
+            <small><a href="{% url 'password-reset' %}">Forgot password?</a></small>
         </form>
 
         <hr>
