@@ -123,6 +123,59 @@ def download_schedule(request):
     return response
 
 
+def get_classes_student_list(clss):
+
+    students = []
+
+    for student in Student.objects.all():
+            if clss in student.list_of_classes.all():
+                students.append(student)
+
+    return students
+
+
+@login_required
+def download_subject_student_list(request, subject_id):
+    if request.user.is_superuser:
+
+        subject = Subject.objects.get(id = subject_id)
+        classes = Class.objects.filter(subject_id = subject_id)
+
+        filename = subject.subject_name + "list.csv"
+        f = open(filename, 'w') 
+        f.write(subject.subject_name + "\n")
+
+
+
+        for clss in classes:
+            # teacher = Teacher.objects.get(id = clss.teacher_id)
+            teacher = clss.teacher_id
+
+            students = get_classes_student_list(clss)
+
+            for student in students:        
+
+                f.write(str(clss.group_number) + ";" 
+                        + str(clss.day) + ";"
+                        + str(clss.time) + ";"
+                        + str(teacher.first_name) + ";"
+                        + str(teacher.last_name) + ";"
+                        + str(student.index_number)
+                        + "\n"                  
+                    )
+
+        f.close()
+        f = open(filename, 'r')
+        response = HttpResponse(f, content_type='text/csv')
+        # response['Content-Disposition'] = 'attachment; filename= "' + filename + '"'
+        response['Content-Disposition'] = 'attachment; filename=list.csv'
+
+        return response
+    else:
+        return render(request, 'base.html')
+
+
+
 @login_required
 def upload_csv(request):
     if request.user.is_superuser:
