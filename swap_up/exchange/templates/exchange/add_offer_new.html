@@ -1,0 +1,227 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+<style>
+  .day_container{
+   position: relative;
+   background-color:  hsla(204, 86%, 53%, 0.445) ;
+   height: 100vh;
+   max-height:500px;
+   border-radius: 25px;
+
+  }
+  .subject_container{
+    position: absolute;
+    padding-right: 2%;
+    padding-left: 2%;
+    background: whitesmoke;
+    color: inherit;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    text-align: inherit;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.116);
+
+  }
+
+
+
+.subject_container:hover{    
+  background-color: hsla(48, 100%, 67%, 1);
+}
+
+.yellow{    
+  background-color: hsl(48, 86%, 80%);
+}
+
+.yellow:hover{
+    background-color: hsl(141, 53%, 53%);
+}
+
+.green{
+    background-color: hsl(141, 35%, 65%);
+}
+
+.green:hover{
+    background-color: hsl(140, 28%, 79%);;
+}
+</style>
+
+    <div class="columns is-vcentered is-centered">
+        <div class="column is-4">
+            <div class="notification has-text-centered">
+                <p class="title is-2">{{subject_name}}</p>
+                <p class="subtitle is-2">Create new offer</p>
+            </div>
+        </div>
+        <div class="column is-4">
+            <div class="notification is-warning">
+                Mark all the acceptable classes yellow.
+                Users, who don't have any class that is at least acceptable for you <strong> will not be able to see your offer </strong> at all.
+            </div>
+            <div class="notification is-success">                  
+                Mark green all the classes you want at most.
+            </div>
+        </div>
+    </div>
+
+    <div class="columns is-vcentered is-centered">
+        {% for day  in schedule %}
+
+        <div class='column is-2'>
+            <p class="title is-4 has-text-centered">{{day.name}}</p>
+            <div class='day_container'>
+                {% for class in day.schedule %}
+                    {% csrf_token %}                                                              
+                    <button id ='{{class.id | safe}}' name='schedule_button' value={{class.id | safe}} class="subject_container"
+                     onclick="toggle_subject('{{class.id | safe}}')"
+                      style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%; left: {{class.left |safe}}%; width: {{class.width | safe}}%">
+
+                        <div>
+
+                            <div class="is-11"><span>{{class.short_time}}</span>
+                                {% if class.week %} <span class="tag is-info" style="float:right">{{class.week}}</span> {% endif %}
+                            </div>
+
+                            <div>{{class.short_teacher}}, ID: {{class.id}}</div>
+                        </div>
+
+                    </button>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+<script>
+
+    function remove_clicked(id, color_vals){ 
+        var arrayLength = color_vals.length;
+
+        var str_id = id.toString()
+        var new_color_input = ""
+
+        for (var i = 0; i < arrayLength; i++) {
+            if (color_vals[i] != str_id && color_vals[i] != ""){
+                new_color_input += color_vals[i] + ",";
+            }
+        }
+
+        console.log(new_color_input)
+        return new_color_input;
+    }
+
+
+
+    function toggle_subject(id){
+        if (document.getElementById(id).classList.contains('yellow')){
+            document.getElementById(id).classList.replace('yellow', 'green');
+            try {
+            var targetDiv = document.getElementById(id).getElementsByClassName("tag")[0];
+            targetDiv.classList.replace('is-warning', 'is-success');
+            } catch (error) {}
+
+            document.getElementById("green").value += id + ",";
+           
+            var yellow_vals = document.getElementById("yellow").value.split(",");
+            document.getElementById("yellow").value = remove_clicked(id, yellow_vals);
+        }
+        else if (document.getElementById(id).classList.contains('green')){
+            document.getElementById(id).classList.remove('green')
+
+            try {
+            var targetDiv = document.getElementById(id).getElementsByClassName("tag")[0];
+            targetDiv.classList.remove('is-success');
+            } catch (error) {}
+
+
+            var yellow_vals = document.getElementById("green").value.split(",");
+            document.getElementById("green").value = remove_clicked(id, yellow_vals);
+        }
+        else{
+            document.getElementById(id).classList.add('yellow')
+
+            try {
+            var targetDiv = document.getElementById(id).getElementsByClassName("tag")[0];
+            targetDiv.classList.add('is-warning');
+            } catch (error) {}
+            
+            document.getElementById("yellow").value += id;
+            document.getElementById("yellow").value += ",";
+        };
+
+    }
+</script>
+
+
+<div class='container'>
+    <div class='columns is-mobile is-centered'>
+        <div class='column is-4'>
+            <button class="button is-primary"
+                    id='btn'>Click to proceed
+            </button>
+            <div class="modal">
+                <div class="modal-background">                    
+                </div>
+                <div class="modal-content">
+                    <div class='box'>
+                        <header class="modal-card-head">      
+                            <p class="modal-card-title">Your offer</p>
+                            <button class="delete" aria-label="close"></button>
+                        </header>
+                            
+                        <p class='is-family-monospace'>
+                            Additional comment:
+                        </p>
+                            <form method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="yellow" value="" id="yellow">
+                                <input type="hidden" name="green" value="" id="green">
+                                <textarea name="comment" class="textarea" placeholder="e.g. Hello world"></textarea>
+
+                                <footer class="modal-card-foot">
+                                    <button class="button is-primary" type="submit", name="submit", value="submit">Submit</button>
+                                </footer>
+                            </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  
+  <script>
+    // Bulma does not have JavaScript included,
+    // hence custom JavaScript has to be
+    // written to open or close the modal
+    const modal = 
+          document.querySelector('.modal');
+    const btn = 
+          document.querySelector('#btn')
+    const close = 
+          document.querySelector('.delete')
+  
+    btn.addEventListener('click',
+                         function () {
+      modal.style.display = 'block'
+    })
+  
+    close.addEventListener('click',
+                           function () {
+      modal.style.display = 'none'
+    })
+  
+    window.addEventListener('click',
+                            function (event) {
+      if (event.target.className === 
+          'modal-background') {
+        modal.style.display = 'none'
+      }
+    })
+  </script>
+{% endblock %}
