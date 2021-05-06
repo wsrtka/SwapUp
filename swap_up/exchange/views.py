@@ -18,6 +18,7 @@ from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from .service import *
 
+
 class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
 
@@ -76,8 +77,8 @@ def import_schedule_for_year(csv_file):
                     # )
                     try:
                         student, created = Student.objects.get_or_create(
-                            index_number = student_index,
-                            semester = semester
+                            index_number=student_index,
+                            semester=semester
                         )
 
                         created_class, class_created = Class.objects.get_or_create(
@@ -138,7 +139,7 @@ def upload_csv(request):
 
 
 @login_required
-def exhange(request, exchange_id):
+def exchange(request, exchange_id):
     name = ''
     items = []
     db_exchanges = Exchange.objects.all()
@@ -151,12 +152,14 @@ def exhange(request, exchange_id):
     for offer in db_offers:
         # if offer.exchange and offer.exchange.semester == exchange_id:
         item_dict = {
+            "id": f'{offer.id}',
             "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
             "subject": offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else '',
             "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
             "other_times": offer.preferred_days,
             "teacher": f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else '',
-            "other_teachers": ",".join([f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
+            "other_teachers": ",".join(
+                [f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
             "comment": offer.additional_information if offer.additional_information else None,
         }
         items.append(item_dict)
@@ -277,12 +280,12 @@ def add_offer(request):
         subject = unwanted_class.subject_id
         print(subject.subject_name)
 
-        all_classes = Class.objects.filter(subject_id = subject)
-        #Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
+        all_classes = Class.objects.filter(subject_id=subject)
+        # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
         print(all_classes)
 
         schedule = {
-        'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
+            'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
         }
 
         week = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']
@@ -295,15 +298,15 @@ def add_offer(request):
 
         arrange_horizontal_position(schedule)
 
-
         context_schedule = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
-                    {'schedule': schedule['Wt'], 'name': 'Wtorek'},
-                    {'schedule': schedule['Śr'], 'name': 'Środa'},
-                    {'schedule': schedule['Czw'], 'name': 'Czwartek'},
-                    {'schedule': schedule['Pt'], 'name': 'Piątek'}
-                ]
+                            {'schedule': schedule['Wt'], 'name': 'Wtorek'},
+                            {'schedule': schedule['Śr'], 'name': 'Środa'},
+                            {'schedule': schedule['Czw'], 'name': 'Czwartek'},
+                            {'schedule': schedule['Pt'], 'name': 'Piątek'}
+                            ]
 
-        return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule, 'subject_name': subject.subject_name})
+        return render(request, 'exchange/add_offer_new.html',
+                      {'schedule': context_schedule, 'subject_name': subject.subject_name})
 
     elif request.method == 'POST':
         print(request.POST['yellow'])
@@ -311,8 +314,6 @@ def add_offer(request):
         print(request.POST['comment'])
 
     return HttpResponseRedirect('/exchange/my-offers')
-
-
 
 
 @login_required
@@ -323,7 +324,6 @@ def add_offer_old(request):
             unwanted_class = Class.objects.get(id=class_id)
             subject = unwanted_class.subject_id
             print(subject.subject_name)
-
 
         form = AddOfferForm(request.POST, user=request.user)
 
@@ -444,7 +444,6 @@ def user_offers(request):
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 
-
 @login_required
 def schedule(request):
     current_user = request.user
@@ -464,19 +463,17 @@ def schedule(request):
 
     arrange_horizontal_position(schedule)
 
-
     context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
-                {'schedule': schedule['Wt'], 'name': 'Wtorek'},
-                {'schedule': schedule['Śr'], 'name': 'Środa'},
-                {'schedule': schedule['Czw'], 'name': 'Czwartek'},
-                {'schedule': schedule['Pt'], 'name': 'Piątek'}
-                ]
+               {'schedule': schedule['Wt'], 'name': 'Wtorek'},
+               {'schedule': schedule['Śr'], 'name': 'Środa'},
+               {'schedule': schedule['Czw'], 'name': 'Czwartek'},
+               {'schedule': schedule['Pt'], 'name': 'Piątek'}
+               ]
 
     return render(request, 'exchange/schedule.html', {'context': context})
 
 
 def dashboard(request):
-
     latest_offers = Offer.objects.all().exclude(student=request.user.student)
 
     if len(latest_offers) > 3:
@@ -492,11 +489,15 @@ def dashboard(request):
 
     for offer in latest_offers:
         offer_dict = {}
-        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict[
+            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict[
+            'have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict[
+            'have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
         offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
-        offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
+        offer_dict[
+            'other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
         offer_dict['other_time'] = ''
         offer_dict['other_teacher'] = ''
 
@@ -504,22 +505,24 @@ def dashboard(request):
 
     for offer in user_offers:
         offer_dict = {}
-        offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
+        offer_dict[
+            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
+        offer_dict[
+            'have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict[
+            'have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
         offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
-        offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
+        offer_dict[
+            'other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
         offer_dict['other_time'] = ''
         offer_dict['other_teacher'] = ''
 
         u_offers.append(offer_dict)
 
-
-
     return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
 
-def edit_offer_admin(request):
 
+def edit_offer_admin(request):
     db_offers = Offer.objects.filter(state=('N', 'New'))
 
     offers = []
@@ -544,7 +547,7 @@ def edit_offer_admin(request):
 
     offers1 = offers[::2]
     offers2 = offers[1::2]
-    return render(request, 'exchange/edit_offer_admin.html',  {'offers1': offers1, 'offers2': offers2})
+    return render(request, 'exchange/edit_offer_admin.html', {'offers1': offers1, 'offers2': offers2})
 
 
 @login_required
@@ -602,3 +605,15 @@ def edit_offer(request):
     }
 
     return render(request, 'exchange/add_offer.html', context)
+
+
+def delete_offer(request, pk):
+    item = Offer.objects.filter(id=pk)
+
+    if request.method == "POST":
+        print("delete method ________________________________________________")
+        item.delete()
+        return render(request,'exchange/manage.html')
+
+    context = {'item': item}
+    return render(request, 'exchange/delete_offer.html',context)
