@@ -164,8 +164,7 @@ def exhange(request, exchange_id):
 
     if request.GET.get('delete_offer'):
         print(request.GET.get('delete_offer'))
-        # Exchange.objects.filter(semester=int(request.GET.get('DeleteButton'))).delete()
-        # Offer.objects.exchange.filter(semester=int(request.GET.get('DeleteButton'))).delete()
+        # Offer.objects.exchange.filter(id=int(request.GET.get('delete_offer'))).delete()
         # return redirect(str(exchange_id))
 
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})

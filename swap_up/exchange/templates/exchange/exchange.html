@@ -61,7 +61,7 @@
             </td>
             <td>
                 <form action="" method="get">
-                    <button class="button has-background-danger-light has-text-danger" name="delete_offer" value="{{ item.student }}">
+                    <button id="{{item.id}}" onclick="onDelete('{{item.id}}');" class="button has-background-danger-light has-text-danger" name="delete_offer" value="">
                         Delete
                     </button>
                 </form>
@@ -73,4 +73,15 @@
     </table>
 
 </div>
+
+<script>
+    function onDelete(id) {
+        if (confirm('Are you sure')) {
+            document.getElementById(id).value = id;
+        }else{
+            document.getElementById(id).value = "";
+        }
+    }
+</script>
+
 {% endblock %}
