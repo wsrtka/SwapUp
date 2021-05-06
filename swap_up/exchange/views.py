@@ -172,12 +172,12 @@ def exhange(request, exchange_id):
 
 @login_required
 def manage(request):
-    Exchange.objects.all().delete()
-    for i in range(1, 11):
-        exchange = Exchange.objects.create(
-            name="Semester " + str(i),
-            semester=i
-        )
+    # Exchange.objects.all().delete()
+    # for i in range(1, 11):
+    #     exchange = Exchange.objects.create(
+    #         name="Semester " + str(i),
+    #         semester=i
+    #     )
     if request.user.is_superuser:
         db_exchanges = Exchange.objects.all()
         exchanges = []
