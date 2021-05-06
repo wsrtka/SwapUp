@@ -134,8 +134,16 @@ def get_classes_student_list(clss):
     return students
 
 
+def get_classes_free_spots(clss):
+
+    taken_spots = len(get_classes_student_list(clss))
+    return (clss.capacity - taken_spots)
+
+
 @login_required
 def download_subject_student_list(request, subject_id):
+
+    
     if request.user.is_superuser:
 
         subject = Subject.objects.get(id = subject_id)
@@ -148,6 +156,9 @@ def download_subject_student_list(request, subject_id):
 
 
         for clss in classes:
+
+            get_classes_free_spots(clss)
+
             # teacher = Teacher.objects.get(id = clss.teacher_id)
             teacher = clss.teacher_id
 
@@ -331,6 +342,13 @@ def add_offer(request):
         print(subject.subject_name)
 
         all_classes = Class.objects.filter(subject_id = subject)
+        
+        # for class in all_classes: get_classes_free_spots(clss)
+        # if sa wolne miejsca: zaznacz na inny kolor zajecia z wolnymi miejscami
+        # # jesli udalo sie zapisac, wyrendereuj widok SUKCES
+        # # jesli nie: przepraszamy, ktos cie ubiegl
+        # # takie zajecia maja button: zapisz sie w tej chwili 
+
         #Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
         print(all_classes)
 
