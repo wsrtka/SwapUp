@@ -60,9 +60,11 @@
                 {% endif %}
             </td>
             <td>
-                <button class="button has-background-danger-light has-text-danger">
-                    Delete
-                </button>
+                <form action="" method="get">
+                    <button id="{{item.id}}" onclick="onDelete('{{item.id}}');" class="button has-background-danger-light has-text-danger" name="delete_offer" value="">
+                        Delete
+                    </button>
+                </form>
             </td>
 
         </tr>
@@ -71,4 +73,15 @@
     </table>
 
 </div>
+
+<script>
+    function onDelete(id) {
+        if (confirm('Are you sure')) {
+            document.getElementById(id).value = id;
+        }else{
+            document.getElementById(id).value = "";
+        }
+    }
+</script>
+
 {% endblock %}
