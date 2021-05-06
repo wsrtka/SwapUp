@@ -20,7 +20,7 @@
             <div id="file-js-example" class="column file has-name is-success is-fullwidth">
                 <label class="file-label">
                     <input class="file-input" type="file" name="myfile">
-                    <span style="padding-left: 25px; padding-right: 30px;" class="file-cta" >
+                    <span style="padding-left: 25px; padding-right: 30px;" class="file-cta">
                         <span class="material-icons">
                           file_upload
                         </span>
@@ -41,7 +41,7 @@
     </form>
 
     <!--</div>-->
-
+    <!--if(confirm('Are you sure')){console.log('yes')}-->
     <section class="box" style="margin-bottom: 40px;">
         {% for exchange in exchanges %}
         <div class="card block ">
@@ -49,6 +49,9 @@
                 <p class="card-header-title">
                     {{exchange.name}}
                 </p>
+                <form action="" method="get">
+                    <button id="{{exchange.id}}" style=" margin: 15px;" onclick="onClear('{{exchange.id}}');" class="button has-background-danger-light has-text-danger" name="delete_exchange" value="">Clear</button>
+                </form>
                 <a class="button is-dark has-text-primary" style=" margin: 15px;"
                    href="/exchange/manage/{{exchange.id}}">
                     Go
@@ -60,13 +63,21 @@
 </div>
 
 <script>
-  const fileInput = document.querySelector('#file-js-example input[type=file]');
-  fileInput.onchange = () => {
-    if (fileInput.files.length > 0) {
-      const fileName = document.querySelector('#file-js-example .file-name');
-      fileName.textContent = fileInput.files[0].name;
+    function onClear(id) {
+        if (confirm('Are you sure')) {
+            document.getElementById(id).value = id;
+        }else{
+            document.getElementById(id).value = "";
+        }
     }
-  }
+
+    const fileInput = document.querySelector('#file-js-example input[type=file]');
+    fileInput.onchange = () => {
+        if (fileInput.files.length > 0) {
+            const fileName = document.querySelector('#file-js-example .file-name');
+            fileName.textContent = fileInput.files[0].name;
+        }
+    }
 </script>
 
 {% endblock %}

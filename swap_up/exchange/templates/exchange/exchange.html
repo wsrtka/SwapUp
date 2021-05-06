@@ -60,9 +60,11 @@
                 {% endif %}
             </td>
             <td>
-                <button class="button has-background-danger-light has-text-danger">
-                    Delete
-                </button>
+                <form action="" method="get">
+                    <button class="button has-background-danger-light has-text-danger" name="delete_offer" value="{{ item.student }}">
+                        Delete
+                    </button>
+                </form>
             </td>
 
         </tr>

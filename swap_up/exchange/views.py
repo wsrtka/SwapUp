@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 # from django.template import loader
 from django.views.generic import View
 from django.views import generic
@@ -17,6 +17,7 @@ from .models import *
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from .service import *
+
 
 class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
@@ -76,8 +77,8 @@ def import_schedule_for_year(csv_file):
                     # )
                     try:
                         student, created = Student.objects.get_or_create(
-                            index_number = student_index,
-                            semester = semester
+                            index_number=student_index,
+                            semester=semester
                         )
 
                         created_class, class_created = Class.objects.get_or_create(
@@ -161,6 +162,12 @@ def exhange(request, exchange_id):
         }
         items.append(item_dict)
 
+    if request.GET.get('delete_offer'):
+        print(request.GET.get('delete_offer'))
+        # Exchange.objects.filter(semester=int(request.GET.get('DeleteButton'))).delete()
+        # Offer.objects.exchange.filter(semester=int(request.GET.get('DeleteButton'))).delete()
+        # return redirect(str(exchange_id))
+
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
 
 
@@ -174,14 +181,12 @@ def manage(request):
     #     )
     if request.user.is_superuser:
         db_exchanges = Exchange.objects.all()
-        print(db_exchanges)
         exchanges = []
         for exchange in db_exchanges:
             exchange_dict = {
                 "name": exchange.name,
                 "id": exchange.semester
             }
-            print(exchange_dict)
 
             exchanges.append(exchange_dict)
 
@@ -190,6 +195,16 @@ def manage(request):
             import_schedule_for_year(request.FILES['myfile'])
 
             return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+
+        if request.GET.get('delete_exchange'):
+            if request.GET.get('delete_exchange') != '':
+                # print(request.GET.get('delete_exchange'))
+                # Exchange.objects.filter(semester=int(request.GET.get('delete_exchange'))).delete()
+                db_offers = Offer.objects.all()
+                db_offers = [offer for offer in db_offers if offer.exchange is not None and offer.exchange.semester == int(request.GET.get('delete_exchange'))]
+                for offer in db_offers:
+                    offer.delete()
+                return redirect('manage')
 
         return render(request, 'exchange/manage.html', {'exchanges': exchanges})
     else:
@@ -236,22 +251,6 @@ def add_exchange(request):
 
         if form.is_valid():
             form_data = form.cleaned_data
-            # try:
-            #     unwanted_exchange = Class.objects.get(
-            #         name=Subject.objects.get(subject_name=form_data['subject_name']),
-            #         teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
-            #         day=form_data['have_day_of_the_week'],
-            #         time=form_data['have_time']
-            #     )
-            # except Class.DoesNotExist:
-            #     messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
-            #
-            #     context = {
-            #         'form': form
-            #     }
-            #
-            #     return render(request, 'exchange/add_exchange.html', context)
-
             exchange = Exchange.objects.create(
                 name=form_data['name'],
                 semester=form_data['semester']
@@ -277,12 +276,12 @@ def add_offer(request):
         subject = unwanted_class.subject_id
         print(subject.subject_name)
 
-        all_classes = Class.objects.filter(subject_id = subject)
-        #Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
+        all_classes = Class.objects.filter(subject_id=subject)
+        # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
         print(all_classes)
 
         schedule = {
-        'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
+            'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
         }
 
         week = ['Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek']
@@ -295,24 +294,21 @@ def add_offer(request):
 
         arrange_horizontal_position(schedule)
 
-
         context_schedule = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
-                    {'schedule': schedule['Wt'], 'name': 'Wtorek'},
-                    {'schedule': schedule['Śr'], 'name': 'Środa'},
-                    {'schedule': schedule['Czw'], 'name': 'Czwartek'},
-                    {'schedule': schedule['Pt'], 'name': 'Piątek'}
-                ]
+                            {'schedule': schedule['Wt'], 'name': 'Wtorek'},
+                            {'schedule': schedule['Śr'], 'name': 'Środa'},
+                            {'schedule': schedule['Czw'], 'name': 'Czwartek'},
+                            {'schedule': schedule['Pt'], 'name': 'Piątek'}
+                            ]
 
         return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule, 'subject_name': subject.subject_name})
-        
+
     elif request.method == 'POST':
         print(request.POST['yellow'])
         print(request.POST['green'])
         print(request.POST['comment'])
-    
+
     return HttpResponseRedirect('/exchange/my-offers')
-
-
 
 
 @login_required
@@ -323,7 +319,6 @@ def add_offer_old(request):
             unwanted_class = Class.objects.get(id=class_id)
             subject = unwanted_class.subject_id
             print(subject.subject_name)
-
 
         form = AddOfferForm(request.POST, user=request.user)
 
@@ -444,7 +439,6 @@ def user_offers(request):
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 
-
 @login_required
 def schedule(request):
     current_user = request.user
@@ -464,19 +458,17 @@ def schedule(request):
 
     arrange_horizontal_position(schedule)
 
-
     context = [{'schedule': schedule['Pn'], 'name': 'Poniedziałek'},
-                {'schedule': schedule['Wt'], 'name': 'Wtorek'},
-                {'schedule': schedule['Śr'], 'name': 'Środa'},
-                {'schedule': schedule['Czw'], 'name': 'Czwartek'},
-                {'schedule': schedule['Pt'], 'name': 'Piątek'}
-                ]
+               {'schedule': schedule['Wt'], 'name': 'Wtorek'},
+               {'schedule': schedule['Śr'], 'name': 'Środa'},
+               {'schedule': schedule['Czw'], 'name': 'Czwartek'},
+               {'schedule': schedule['Pt'], 'name': 'Piątek'}
+               ]
 
     return render(request, 'exchange/schedule.html', {'context': context})
 
 
 def dashboard(request):
-
     latest_offers = Offer.objects.all().exclude(student=request.user.student)
 
     if len(latest_offers) > 3:
@@ -489,7 +481,7 @@ def dashboard(request):
 
     l_offers = []
     u_offers = []
-    
+
     for offer in latest_offers:
         offer_dict = {}
         offer_dict['subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
@@ -513,7 +505,5 @@ def dashboard(request):
         offer_dict['other_teacher'] = ''
 
         u_offers.append(offer_dict)
-    
-
 
     return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
