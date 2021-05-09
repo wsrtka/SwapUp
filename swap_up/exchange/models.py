@@ -23,8 +23,9 @@ class Semester(models.IntegerChoices):
 
 class Exchange(models.Model):
     
-    creation_date = models.DateField(null=True)
-    modification_date = models.DateField(null=True)
+    creation_time = models.DateTimeField(auto_now_add=True, null=True)
+    modification_time = models.DateTimeField(auto_now_add=True, null=True)
+    end_time = models.DateTimeField(auto_now_add=True, null=True)
     name = models.CharField(max_length=30, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
 
@@ -126,8 +127,8 @@ class Offer(models.Model):
     unwanted_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='unwanted_class', null=True)
     preferred_days = None
     preferred_times = None
-    # to będzie kiedyś, na to teraz sobie nie możemy pozwolić xd
-    # preferred_classes = models.ManyToManyField(Class, related_name='user_preferences')
+    preferred_classes = models.ManyToManyField(Class, related_name='user_green')
+    acceptable_classes = models.ManyToManyField(Class, related_name='user_yellow')
     preferred_teachers = models.ManyToManyField(Teacher)
     additional_information = models.CharField(max_length=100, null=True)
 
