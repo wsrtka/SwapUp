@@ -418,11 +418,15 @@ def accept_offer(request, offer_id):
     a_offer = Offer.objects.get(id=offer_id)
 
     if request.method == "POST":
-        a_offer.other_student = request.user.student
-        a_offer.state = Offer.STATES[1]
-        a_offer.save()
+        if request.user.student == a_offer.student:
+            pass
+        
+        else:
+            a_offer.other_student = request.user.student
+            a_offer.state = Offer.STATES[1]
+            a_offer.save()
 
-        return redirect('offers')
+            return redirect('offers')
 
     try:
         c_term = [c for c in request.user.student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
@@ -431,3 +435,11 @@ def accept_offer(request, offer_id):
         c_term = None
 
     return render(request, 'exchange/accept_offer.html', {"a_offer": a_offer.dictionary(), "c_term": c_term})
+
+
+def decline_offer(request, offer_id):
+    offer = Offer.objects.get(id=offer_id)
+    offer.state = Offer.STATES[0]
+    offer.save()
+
+    return render(request, 'exchange/decline_offer.html')
