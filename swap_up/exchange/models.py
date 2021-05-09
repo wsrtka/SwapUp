@@ -139,13 +139,13 @@ class Offer(models.Model):
     def dictionary(self):
         offer_dict = {}
 
-        offer_dict['student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
-        offer_dict['subject'] = offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else ''
-        offer_dict['time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict['teacher'] = offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else ''
-        offer_dict['comment'] = offer.additional_information if offer.additional_information else None
-        offer_dict['preferred_days'] = offer.preferred_days
-        offer_dict['preferred_hours'] = offer.preferred_times
-        offer_dict['preferred_teachers'] = [teacher.name for teacher in offer.preferred_teachers.all()]
+        offer_dict['student'] = f'{self.student.user.first_name} {self.student.user.last_name}' if self.student.user.first_name and self.student.user.last_name else 'Anonymous'
+        offer_dict['subject'] = self.unwanted_class.subject.subject_name if self.unwanted_class.subject.subject_name else ''
+        offer_dict['time'] = f'{self.unwanted_class.day} {self.unwanted_class.week}, {self.unwanted_class.time}' if self.unwanted_class else ''
+        offer_dict['teacher'] = self.unwanted_class.teacher.name if self.unwanted_class.teacher else ''
+        offer_dict['comment'] = self.additional_information if self.additional_information else None
+        offer_dict['preferred_days'] = self.preferred_days
+        offer_dict['preferred_hours'] = self.preferred_times
+        offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
 
         return offer_dict
