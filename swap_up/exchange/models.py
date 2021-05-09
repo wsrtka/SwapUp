@@ -2,16 +2,14 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-
 PATHS = [
-        ('A', 'Algorythmic path'),
-        ('AA', 'Algorythmic-application path'),
-        ('SD', 'Software development path')
-    ]
+    ('A', 'Algorythmic path'),
+    ('AA', 'Algorythmic-application path'),
+    ('SD', 'Software development path')
+]
 
 
 class Exchange(models.Model):
-
     class Semester(models.IntegerChoices):
         SEM1 = 1
         SEM2 = 2
@@ -23,7 +21,10 @@ class Exchange(models.Model):
         SEM8 = 8
         SEM9 = 9
         SEM10 = 10
-    
+
+    def __str__(self):
+        return self.name
+
     creation_date = models.DateField(null=True)
     modification_date = models.DateField(null=True)
     name = models.CharField(max_length=30, null=True)
@@ -31,7 +32,6 @@ class Exchange(models.Model):
 
 
 class Subject(models.Model):
-
     class Semester(models.IntegerChoices):
         SEM1 = 1
         SEM2 = 2
@@ -43,6 +43,9 @@ class Subject(models.Model):
         SEM8 = 8
         SEM9 = 9
         SEM10 = 10
+
+    # def __str__(self):
+    #     return self.subject_name
 
     subject_name = models.CharField(max_length=30, null=True)
     category = models.CharField(max_length=30, null=True)
@@ -52,7 +55,6 @@ class Subject(models.Model):
 
 
 class Teacher(models.Model):
-
     TITLES = [
         ('inż.', 'inżynier'),
         ('mgr. inż.', 'magister inżynier'),
@@ -60,21 +62,26 @@ class Teacher(models.Model):
         ('dr. inż.', 'doktor inżynier')
     ]
 
+    def __str__(self):
+        return self.last_name
+
     first_name = models.CharField(max_length=30, null=True)
     last_name = models.CharField(max_length=30, null=True)
     title = models.CharField(max_length=30, choices=TITLES, null=True)
 
 
 class Class(models.Model):
-
     WEEK_CHOICES = [
         ('A', 'Week A'),
         ('B', 'Week B')
     ]
-    
+
+    def __str__(self):
+        return self.day
+
     subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
     teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
-    
+
     day = models.CharField(max_length=10, null=True)
     time = models.TimeField(null=True)
     capacity = models.IntegerField(null=True)
@@ -85,6 +92,7 @@ class Class(models.Model):
 
 
 class Student(models.Model):
+
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
 
@@ -100,16 +108,15 @@ class Student(models.Model):
 
 
 class Offer(models.Model):
-
     STATES = [
         ('N', 'New'),
         ('P', 'Pending'),
         ('C', 'Closed')
     ]
 
-
     def __str__(self):
         return self.additional_information
+
     # meta info
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)

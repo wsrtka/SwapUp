@@ -150,19 +150,19 @@ def exchange(request, exchange_id):
     db_offers = Offer.objects.all()
 
     for offer in db_offers:
-        # if offer.exchange and offer.exchange.semester == exchange_id:
-        item_dict = {
-            "id": f'{offer.id}',
-            "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
-            "subject": offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else '',
-            "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
-            "other_times": offer.preferred_days,
-            "teacher": f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else '',
-            "other_teachers": ",".join(
-                [f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
-            "comment": offer.additional_information if offer.additional_information else None,
-        }
-        items.append(item_dict)
+        if offer.exchange and offer.exchange.semester == exchange_id:
+            item_dict = {
+                "id": f'{offer.id}',
+                "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
+                "subject": offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else '',
+                "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
+                "other_times": offer.preferred_days,
+                "teacher": f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else '',
+                "other_teachers": ",".join(
+                    [f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
+                "comment": offer.additional_information if offer.additional_information else None,
+            }
+            items.append(item_dict)
 
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
 
