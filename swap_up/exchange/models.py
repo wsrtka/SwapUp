@@ -35,7 +35,7 @@ class Exchange(models.Model):
 
 class Subject(models.Model):
 
-    subject_name = models.CharField(max_length=30, null=True)
+    name = models.CharField(max_length=30, null=True)
     category = models.CharField(max_length=30, null=True)
     path = models.CharField(max_length=30, choices=PATHS, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
@@ -90,6 +90,17 @@ class Class(models.Model):
     def __str__(self):
         return f'{self.subject}, {self.teacher}, {self.time} {self.day}, {self.room}'
 
+    def dictionary(self):
+        class_dict = {}
+
+        class_dict['subject'] = self.subject.name
+        class_dict['teacher'] = self.teacher.name
+        class_dict['day'] = self.day
+        class_dict['time'] = self.time
+        class_dict['week'] = self.week
+
+        return class_dict
+
 
 class Student(models.Model):
 
@@ -99,8 +110,8 @@ class Student(models.Model):
     semester = models.IntegerField(null=True)
     path = models.CharField(max_length=40, choices=PATHS, null=True)
 
-    list_of_additional_subjects = models.ManyToManyField(Subject)  # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ManyToManyField(Class)  # będą działały więc póki co zostawiam bez
+    list_of_additional_subjects = models.ManyToManyField(Subject)  
+    list_of_classes = models.ManyToManyField(Class)  
 
     def __str__(self):
         return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
@@ -131,7 +142,7 @@ class Offer(models.Model):
     additional_information = models.CharField(max_length=100, null=True)
 
     # "transaction" info
-    other_student = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    other_student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, related_name='wantee')
     other_offer = models.ForeignKey("Offer", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
@@ -141,7 +152,7 @@ class Offer(models.Model):
         offer_dict = {}
 
         offer_dict['student'] = f'{self.student.user.first_name} {self.student.user.last_name}' if self.student.user.first_name and self.student.user.last_name else 'Anonymous'
-        offer_dict['subject'] = self.unwanted_class.subject.subject_name if self.unwanted_class.subject.subject_name else ''
+        offer_dict['subject'] = self.unwanted_class.subject.name if self.unwanted_class.subject.name else ''
         offer_dict['time'] = f'{self.unwanted_class.day} {self.unwanted_class.week}, {self.unwanted_class.time}' if self.unwanted_class else ''
         offer_dict['teacher'] = self.unwanted_class.teacher.name if self.unwanted_class.teacher else ''
         offer_dict['comment'] = self.additional_information if self.additional_information else None

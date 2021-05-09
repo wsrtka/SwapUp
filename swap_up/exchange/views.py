@@ -446,6 +446,22 @@ def dashboard(request):
     return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
 
 
+@login_required()
 def accept_offer(request, offer_id):
-    print(offer_id)
-    return render(request, 'exchange/accept_offer.html')
+
+    a_offer = Offer.objects.get(id=offer_id)
+
+    if request.method == "POST":
+        a_offer.other_student = request.user.student
+        a_offer.state = 'Pending'
+        a_offer.save()
+
+        return redirect('offers')
+
+    try:
+        c_term = [c for c in request.user.student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+        c_term = c_term.dictionary()
+    except IndexError:
+        c_term = None
+
+    return render(request, 'exchange/accept_offer.html', {"a_offer": a_offer.dictionary(), "c_term": c_term})
