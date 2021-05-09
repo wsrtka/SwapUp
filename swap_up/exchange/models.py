@@ -25,7 +25,7 @@ class Exchange(models.Model):
     
     creation_time = models.DateTimeField(auto_now_add=True, null=True)
     modification_time = models.DateTimeField(auto_now_add=True, null=True)
-    end_time = models.DateTimeField(auto_now_add=True, null=True)
+    end_time = models.DateTimeField(null=True)
     name = models.CharField(max_length=30, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
 
