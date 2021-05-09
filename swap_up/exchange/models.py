@@ -138,3 +138,17 @@ class Offer(models.Model):
 
     def __str__(self):
         return f'{self.state} offer from {self.student.user.username}'
+
+    def __dict__(self):
+        offer_dict = {}
+
+        offer_dict['student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
+        offer_dict['subject'] = offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else ''
+        offer_dict['time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
+        offer_dict['teacher'] = offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else ''
+        offer_dict['comment'] = offer.additional_information if offer.additional_information else None
+        offer_dict['preferred_days'] = offer.preferred_days
+        offer_dict['preferred_hours'] = offer.preferred_times
+        offer_dict['preferred_teachers'] = [teacher.name for teacher in offer.preferred_teachers.all()]
+
+        return offer_dict
