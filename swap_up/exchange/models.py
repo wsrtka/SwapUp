@@ -28,6 +28,9 @@ class Exchange(models.Model):
     name = models.CharField(max_length=30, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
 
+    def __str__(self):
+        return f'Exchange of semester {self.semester}'
+
 
 class Subject(models.Model):
 
@@ -36,6 +39,9 @@ class Subject(models.Model):
     path = models.CharField(max_length=30, choices=PATHS, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
     mandatory = models.BooleanField(null=True)
+
+    def __str__(self):
+        return f'{self.subject_name}, s{self.semester}, {self.path}'
 
 
 class Teacher(models.Model):
@@ -49,6 +55,9 @@ class Teacher(models.Model):
 
     name = models.CharField(max_length=30, null=True)
     title = models.CharField(max_length=30, choices=TITLES, null=True)
+
+    def __str__(self):
+        return f'{self.title} {self.name}'
 
 
 class Class(models.Model):
@@ -77,6 +86,9 @@ class Class(models.Model):
     group_number = models.IntegerField(null=True)
     room = models.CharField(max_length=20, null=True)
 
+    def __str__(self):
+        return f'{self.subject}, {self.teacher}, {self.time} {self.day}, {self.room}'
+
 
 class Student(models.Model):
 
@@ -91,6 +103,9 @@ class Student(models.Model):
 
     list_of_additional_subjects = models.ManyToManyField(Subject)  # tutaj nie jestem pewien czy normalne settery
     list_of_classes = models.ManyToManyField(Class)  # będą działały więc póki co zostawiam bez
+
+    def __str__(self):
+        return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
 
 
 class Offer(models.Model):
@@ -118,3 +133,6 @@ class Offer(models.Model):
     # "transaction" info
     other_student = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
     other_offer = models.IntegerField(null=True)
+
+    def __str__(self):
+        return f'{self.state} offer from {self.student.user.username}'
