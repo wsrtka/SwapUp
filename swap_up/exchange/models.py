@@ -42,7 +42,7 @@ class Subject(models.Model):
     mandatory = models.BooleanField(null=True)
 
     def __str__(self):
-        return f'{self.subject_name}, s{self.semester}, {self.path}'
+        return f'{self.name}, s{self.semester}, {self.path}'
 
 
 class Teacher(models.Model):
@@ -136,9 +136,9 @@ class Offer(models.Model):
     unwanted_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='unwanted_class', null=True)
     preferred_days = None
     preferred_times = None
-    preferred_classes = models.ManyToManyField(Class, related_name='user_green')
-    acceptable_classes = models.ManyToManyField(Class, related_name='user_yellow')
-    preferred_teachers = models.ManyToManyField(Teacher)
+    preferred_classes = models.ManyToManyField(Class, related_name='user_green', null=True)
+    acceptable_classes = models.ManyToManyField(Class, related_name='user_yellow', null=True)
+    preferred_teachers = models.ManyToManyField(Teacher, null=True)
     additional_information = models.CharField(max_length=100, null=True)
 
     # "transaction" info
@@ -161,5 +161,15 @@ class Offer(models.Model):
         offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
         offer_dict['id'] = self.id
         offer_dict['date'] = self.add_time
+        offer_dict['state'] = self.state.split('\'')[-2] if self.state else None
+
+        try:
+            term = [c for c in self.other_student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+        except IndexError:
+            term = None
+
+        offer_dict['other_time'] = f'{term.day} {term.time} {term.week}' if term else None
+        offer_dict['other_teacher'] = term.teacher if term else None
+        offer_dict['other_student'] = self.other_student
 
         return offer_dict

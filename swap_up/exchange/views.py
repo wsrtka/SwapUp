@@ -357,40 +357,6 @@ def edit_exchange(request):
 
 @login_required
 def user_offers(request):
-    offer1 = {
-        "subject": "Teoria nicości2",
-        "have_time": "Pn A, 8:00",
-        "have_teacher": "Zenon Iksiński",
-        "state": "new",
-        "other_student": None,
-        "other_time": None,
-        "other_teacher": None
-    }
-
-    offer2 = {
-        "subject": "Teoria nicości",
-        "have_time": "Pn A, 8:00",
-        "have_teacher": "Zenon Iksiński",
-        "state": "pending",
-        "other_student": "Staszek Ciaptak-Gąsiennica",
-        "other_time": "Wt B, 9:35",
-        "other_teacher": None
-    }
-
-    offer3 = {
-        "subject": "Wprowadzenie do teorii nicości",
-        "have_time": "Pn A, 8:00",
-        "have_teacher": "Zenon Iksiński",
-        "state": "closed",
-        "other_student": "Józio Chmura-Mamałyga",
-        "other_time": "Wt B, 9:35",
-        "other_teacher": None
-    }
-
-    # static offers
-    # offers = [offer1, offer2, offer3]
-
-    # dynamic offers
     current_student = request.user.student
     db_offers = Offer.objects.filter(student=current_student.id)
 
@@ -453,7 +419,7 @@ def accept_offer(request, offer_id):
 
     if request.method == "POST":
         a_offer.other_student = request.user.student
-        a_offer.state = 'Pending'
+        a_offer.state = Offer.STATES[1]
         a_offer.save()
 
         return redirect('offers')
