@@ -60,8 +60,7 @@ class Teacher(models.Model):
         ('dr. inż.', 'doktor inżynier')
     ]
 
-    first_name = models.CharField(max_length=30, null=True)
-    last_name = models.CharField(max_length=30, null=True)
+    name = models.CharField(max_length=30, null=True)
     title = models.CharField(max_length=30, choices=TITLES, null=True)
 
 

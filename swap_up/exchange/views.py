@@ -62,12 +62,10 @@ def import_schedule_for_year(csv_file):
                     semester=semester
                 )
 
-                teacher_first_name, teacher_last_name = teacher_name.split()
                 # student_first_name, student_last_name = student_name.split()
 
                 teacher, teacher_created = Teacher.objects.get_or_create(
-                    first_name=teacher_first_name,
-                    last_name=teacher_last_name
+                    name=teacher_name
                 )
 
                 try:
@@ -111,8 +109,7 @@ def download_schedule(request):
         teacher = c.teacher
         f.write(
             str(subject.subject_name) + ";" + str(subject.category)
-            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.first_name) + " " + str(
-                teacher.last_name)
+            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.name)
             + ";" + str(c.room) + ";" + str(c.week) + ";" + str(c.day) + ";" + str(c.time)
             + "\n"
         )
@@ -156,8 +153,8 @@ def exhange(request, exchange_id):
             "subject": offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else '',
             "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
             "other_times": offer.preferred_days,
-            "teacher": f'{offer.unwanted_class.teacher.first_name} {offer.unwanted_class.teacher.last_name}' if offer.unwanted_class.teacher else '',
-            "other_teachers": ",".join([f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
+            "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
+            "other_teachers": ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
             "comment": offer.additional_information if offer.additional_information else None,
         }
         items.append(item_dict)
@@ -228,11 +225,11 @@ def offers(request):
         offer_dict[
             'time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
         offer_dict[
-            'teacher'] = f'{offer.unwanted_class.teacher.first_name} {offer.unwanted_class.teacher.last_name}' if offer.unwanted_class.teacher else ''
+            'teacher'] = offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else ''
         offer_dict['comment'] = offer.additional_information if offer.additional_information else None
         offer_dict['preferred_days'] = offer.preferred_days
         offer_dict['preferred_hours'] = offer.preferred_times
-        offer_dict['preferred_teachers'] = [f'{teacher.first_name} {teacher.last_name}' for teacher in
+        offer_dict['preferred_teachers'] = [teacher.name for teacher in
                                             offer.preferred_teachers.all()]
 
         offers.append(offer_dict)
@@ -486,7 +483,7 @@ def dashboard(request):
         offer_dict = {}
         offer_dict['subject'] = offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else ''
         offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher.first_name} {offer.unwanted_class.teacher.last_name}' if offer.unwanted_class.teacher else ''
+        offer_dict['have_teacher'] = offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else ''
         offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
         offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
         offer_dict['other_time'] = ''
@@ -498,7 +495,7 @@ def dashboard(request):
         offer_dict = {}
         offer_dict['subject'] = offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else ''
         offer_dict['have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict['have_teacher'] = f'{offer.unwanted_class.teacher.first_name} {offer.unwanted_class.teacher.last_name}' if offer.unwanted_class.teacher else ''
+        offer_dict['have_teacher'] = offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else ''
         offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
         offer_dict['other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
         offer_dict['other_time'] = ''
