@@ -46,7 +46,7 @@ class AddOfferForm(forms.Form):
 
         subject_pk = []
         for c in classes:
-            subject_pk.append(c.subject_id.pk)
+            subject_pk.append(c.subject.pk)
 
         subjects = Subject.objects.filter(pk__in = subject_pk)
 
@@ -55,13 +55,11 @@ class AddOfferForm(forms.Form):
         self.fields['subject_name'].widget = forms.Select(choices=subject_choices)
 
         # pobieranie dostępnych nauczycieli dla semestru poprzez znalezienie zajęć dla przedmiotów
-        # todo: procedura zbyt skomplikowana i do poprawy przez zmianę modelu
-
 
         # for subject in subjects:
-        #     classes.extend(Class.objects.filter(subject_id=subject))
+        #     classes.extend(Class.objects.filter(subject=subject))
 
-        teachers_with_duplicates = [(c.teacher_id.last_name, c.teacher_id.last_name) for c in classes]
+        teachers_with_duplicates = [c.teacher.name for c in classes]
         teachers = []
         for i in teachers_with_duplicates:
             if i not in teachers:

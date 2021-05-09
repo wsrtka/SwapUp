@@ -72,8 +72,8 @@ class Class(models.Model):
         ('B', 'Week B')
     ]
     
-    subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
-    teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
     
     day = models.CharField(max_length=10, null=True)
     time = models.TimeField(null=True)
