@@ -9,10 +9,7 @@ PATHS = [
         ('SD', 'Software development path')
     ]
 
-
-class Exchange(models.Model):
-
-    class Semester(models.IntegerChoices):
+class Semester(models.IntegerChoices):
         SEM1 = 1
         SEM2 = 2
         SEM3 = 3
@@ -23,6 +20,8 @@ class Exchange(models.Model):
         SEM8 = 8
         SEM9 = 9
         SEM10 = 10
+
+class Exchange(models.Model):
     
     creation_date = models.DateField(null=True)
     modification_date = models.DateField(null=True)
@@ -31,18 +30,6 @@ class Exchange(models.Model):
 
 
 class Subject(models.Model):
-
-    class Semester(models.IntegerChoices):
-        SEM1 = 1
-        SEM2 = 2
-        SEM3 = 3
-        SEM4 = 4
-        SEM5 = 5
-        SEM6 = 6
-        SEM7 = 7
-        SEM8 = 8
-        SEM9 = 9
-        SEM10 = 10
 
     subject_name = models.CharField(max_length=30, null=True)
     category = models.CharField(max_length=30, null=True)
@@ -70,11 +57,19 @@ class Class(models.Model):
         ('A', 'Week A'),
         ('B', 'Week B')
     ]
+
+    DAY_CHOICES = [
+        ('Pn', 'Poniedziałek'),
+        ('Wt', 'Wtorek'),
+        ('Śr', 'Środa'),
+        ('Czw', 'Czwartek'),
+        ('Pt', 'Piątek')
+    ]
     
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
     
-    day = models.CharField(max_length=10, null=True)
+    day = models.CharField(max_length=10, choices=DAY_CHOICES, null=True)
     time = models.TimeField(null=True)
     capacity = models.IntegerField(null=True)
     week = models.CharField(max_length=1, choices=WEEK_CHOICES, null=True)
