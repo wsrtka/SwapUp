@@ -23,8 +23,8 @@ class Semester(models.IntegerChoices):
 
 class Exchange(models.Model):
     
-    creation_time = models.DateTimeField(auto_now_add=True)
-    modification_time = models.DateTimeField(auto_now=True)
+    creation_time = models.DateTimeField(auto_now_add=True, null=True)
+    modification_time = models.DateTimeField(auto_now=True, null=True)
     end_time = models.DateTimeField(null=True)
     name = models.CharField(max_length=30, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
@@ -115,6 +115,7 @@ class Offer(models.Model):
     ]
 
     # meta info
+    id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)
     state = models.CharField(max_length=10, choices=STATES, default=STATES[0])
@@ -147,5 +148,7 @@ class Offer(models.Model):
         offer_dict['preferred_days'] = self.preferred_days
         offer_dict['preferred_hours'] = self.preferred_times
         offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
+        offer_dict['id'] = self.id
+        offer_dict['date'] = self.add_time
 
         return offer_dict

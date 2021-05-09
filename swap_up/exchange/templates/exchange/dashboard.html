@@ -13,10 +13,10 @@
     <section class="box">
         <h3 class="hero">Latest offers</h3>
 
-        <div class="is-flex-direction-row">
+        <div class="columns">
             {% if l_offers %}
                 {% for offer in l_offers %}
-                <div class="card block">
+                <div class="column card mx-2 mt-2">
                     <header class="card-header">
                     <p class="card-header-title">
                         {{ offer.subject }}

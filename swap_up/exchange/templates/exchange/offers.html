@@ -82,13 +82,12 @@
                       Anything
                     {% endif %}
                     <br>
-                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
-                    <!-- <em>23:09, 04/01/2021</em> -->
+                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
                   </div>
                 </div>
                 <footer class="card-footer">
                   <!-- <a href="#" class="card-footer-item">Comment</a> -->
-                  <a href="#" class="card-footer-item">Accept</a>
+                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
                 </footer>
               </div>
           {% endfor %}
@@ -124,13 +123,12 @@
                       Anything
                     {% endif %}
                     <br>
-                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
-                    <!-- <em>23:09, 04/01/2021</em> -->
+                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
                   </div>
                 </div>
                 <footer class="card-footer">
                   <!-- <a href="#" class="card-footer-item">Comment</a> -->
-                  <a href="#" class="card-footer-item">Accept</a>
+                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
                 </footer>
               </div>
           {% endfor %}

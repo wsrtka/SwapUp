@@ -444,3 +444,8 @@ def dashboard(request):
     u_offers = [o.dictionary() for o in user_offers]
 
     return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+
+
+def accept_offer(request, offer_id):
+    print(offer_id)
+    return render(request, 'exchange/accept_offer.html')
