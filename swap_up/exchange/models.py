@@ -107,6 +107,9 @@ class Offer(models.Model):
         ('C', 'Closed')
     ]
 
+
+    def __str__(self):
+        return self.additional_information
     # meta info
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)

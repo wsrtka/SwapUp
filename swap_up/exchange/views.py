@@ -177,14 +177,14 @@ def manage(request):
     #     )
     if request.user.is_superuser:
         db_exchanges = Exchange.objects.all()
-        print(db_exchanges)
+        #print(db_exchanges)
         exchanges = []
         for exchange in db_exchanges:
             exchange_dict = {
                 "name": exchange.name,
                 "id": exchange.semester
             }
-            print(exchange_dict)
+            #print(exchange_dict)
 
             exchanges.append(exchange_dict)
 
@@ -278,11 +278,11 @@ def add_offer(request):
         class_id = request.POST['schedule_button']
         unwanted_class = Class.objects.get(id=class_id)
         subject = unwanted_class.subject_id
-        print(subject.subject_name)
+        #print(subject.subject_name)
 
         all_classes = Class.objects.filter(subject_id=subject)
         # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
-        print(all_classes)
+        #print(all_classes)
 
         schedule = {
             'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
@@ -323,7 +323,7 @@ def add_offer_old(request):
             class_id = request.POST['schedule_button']
             unwanted_class = Class.objects.get(id=class_id)
             subject = unwanted_class.subject_id
-            print(subject.subject_name)
+            #print(subject.subject_name)
 
         form = AddOfferForm(request.POST, user=request.user)
 
@@ -608,12 +608,10 @@ def edit_offer(request):
 
 
 def delete_offer(request, pk):
-    item = Offer.objects.filter(id=pk)
-
+    offer = Offer.objects.get(id=pk)
     if request.method == "POST":
-        print("delete method ________________________________________________")
-        item.delete()
-        return render(request,'exchange/manage.html')
+        offer.delete()
+        return render(request,'exchange/dashboard.html')
 
-    context = {'item': item}
+    context = {'item': offer}
     return render(request, 'exchange/delete_offer.html',context)
