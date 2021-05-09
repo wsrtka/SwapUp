@@ -120,6 +120,7 @@ class Offer(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)
     state = models.CharField(max_length=10, choices=STATES, default=STATES[0])
+    add_time = models.DateTimeField(auto_now_add=True, null=True)
 
     # offer info
     unwanted_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='unwanted_class', null=True)
@@ -132,7 +133,7 @@ class Offer(models.Model):
 
     # "transaction" info
     other_student = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
-    other_offer = models.IntegerField(null=True)
+    other_offer = models.ForeignKey("Offer", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f'{self.state} offer from {self.student.user.username}'
