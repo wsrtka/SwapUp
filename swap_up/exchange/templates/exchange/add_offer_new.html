@@ -99,10 +99,14 @@
     </div>
 
 <script>
+    //on reload set classes to marked subject again
+    window.onload = function() {
+        document.getElementById("yellow").value = ""
+        document.getElementById("green").value = ""
+    }
 
     function remove_clicked(id, color_vals){ 
         var arrayLength = color_vals.length;
-
         var str_id = id.toString()
         var new_color_input = ""
 
@@ -111,12 +115,9 @@
                 new_color_input += color_vals[i] + ",";
             }
         }
-
         console.log(new_color_input)
         return new_color_input;
     }
-
-
 
     function toggle_subject(id){
         if (document.getElementById(id).classList.contains('yellow')){
@@ -140,8 +141,8 @@
             } catch (error) {}
 
 
-            var yellow_vals = document.getElementById("green").value.split(",");
-            document.getElementById("green").value = remove_clicked(id, yellow_vals);
+            var green_vals = document.getElementById("green").value.split(",");
+            document.getElementById("green").value = remove_clicked(id, green_vals);
         }
         else{
             document.getElementById(id).classList.add('yellow')
@@ -182,6 +183,7 @@
                                 {% csrf_token %}
                                 <input type="hidden" name="yellow" value="" id="yellow">
                                 <input type="hidden" name="green" value="" id="green">
+                                <input type="hidden" name="unwanted_class_id" value={{unwanted_class_id|safe}} id="unwanted_class_id">
                                 <textarea name="comment" class="textarea" placeholder="e.g. Hello world"></textarea>
 
                                 <footer class="modal-card-foot">
@@ -199,6 +201,7 @@
     // Bulma does not have JavaScript included,
     // hence custom JavaScript has to be
     // written to open or close the modal
+
     const modal = 
           document.querySelector('.modal');
     const btn = 

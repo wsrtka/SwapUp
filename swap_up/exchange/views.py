@@ -248,8 +248,7 @@ def add_exchange(request):
 @login_required
 def add_offer(request):
     if request.method == 'POST' and 'schedule_button' in request.POST:
-        class_id = request.POST['schedule_button']
-        unwanted_class = Class.objects.get(id=class_id)
+        unwanted_class = Class.objects.get(id=request.POST['schedule_button'])
         subject = unwanted_class.subject
         print(subject.subject_name)
 
@@ -278,12 +277,38 @@ def add_offer(request):
                             {'schedule': schedule['Pt'], 'name': 'Piątek'}
                             ]
 
-        return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule, 'subject_name': subject.subject_name})
+        return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule, 
+        'subject_name': subject.subject_name, 'unwanted_class_id': request.POST['schedule_button']})
 
     elif request.method == 'POST':
-        print(request.POST['yellow'])
-        print(request.POST['green'])
-        print(request.POST['comment'])
+        unwanted_class = Class.objects.get(id=request.POST['unwanted_class_id'])
+        yellow_ids = request.POST['yellow'][:-1].split(",")
+        green_ids = request.POST['green'][:-1].split(",")
+        print(yellow_ids, green_ids)
+
+        new_offer = Offer.objects.create(
+                student=request.user.student,
+                #TODO
+                exchange=None,
+                unwanted_class=unwanted_class,
+                additional_information=request.POST['comment'],
+                )
+        
+        for green_id in green_ids:
+            green_class = Class.objects.get(
+                id = green_id
+            )
+            new_offer.preferred_classes.add(green_class)
+
+        
+        for yellow_id in yellow_ids:
+            yellow_class = Class.objects.get(
+                id = yellow_id
+            )
+            new_offer.preferred_classes.add(yellow_class)
+
+        
+        print(new_offer)
 
     return HttpResponseRedirect('/exchange/my-offers')
 
@@ -413,6 +438,10 @@ def schedule(request):
     context = {}
 
     for c in student.list_of_classes.all():
+        # c = Class.objects.get(
+        #             id=c_id
+        #             )
+
         class_dict = create_class_dict(c)
         count_collisions(c, class_dict, schedule)
 
