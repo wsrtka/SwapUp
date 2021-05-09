@@ -23,8 +23,8 @@ class Semester(models.IntegerChoices):
 
 class Exchange(models.Model):
     
-    creation_time = models.DateTimeField(auto_now_add=True, null=True)
-    modification_time = models.DateTimeField(auto_now_add=True, null=True)
+    creation_time = models.DateTimeField(auto_now_add=True)
+    modification_time = models.DateTimeField(auto_now=True)
     end_time = models.DateTimeField(null=True)
     name = models.CharField(max_length=30, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
@@ -54,7 +54,7 @@ class Teacher(models.Model):
         ('dr. inż.', 'doktor inżynier')
     ]
 
-    name = models.CharField(max_length=30, null=True)
+    name = models.CharField(max_length=60, null=True)
     title = models.CharField(max_length=30, choices=TITLES, null=True)
 
     def __str__(self):
@@ -98,9 +98,6 @@ class Student(models.Model):
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
     path = models.CharField(max_length=40, choices=PATHS, null=True)
-
-    # list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
-    # list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
 
     list_of_additional_subjects = models.ManyToManyField(Subject)  # tutaj nie jestem pewien czy normalne settery
     list_of_classes = models.ManyToManyField(Class)  # będą działały więc póki co zostawiam bez
