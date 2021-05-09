@@ -139,7 +139,7 @@ class Offer(models.Model):
     def __str__(self):
         return f'{self.state} offer from {self.student.user.username}'
 
-    def __dict__(self):
+    def dictionary(self):
         offer_dict = {}
 
         offer_dict['student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
