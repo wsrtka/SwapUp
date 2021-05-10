@@ -141,8 +141,14 @@ def get_classes_free_spots(clss):
 @login_required
 def download_subject_student_list(request):
 
-    subjects = Subject.objects.all()
-
+    try:
+        subjects = []
+        semester_id = request.user.student.semester
+        subjects = Subject.objects.filter(semester = semester_id)
+        print("Semester " +  str(semester_id) )
+    
+    except Student.DoesNotExist:
+        subjects = Subject.objects.all()
 
     return render(request, 'exchange/download_subject.html', {'subjects': subjects})
 
