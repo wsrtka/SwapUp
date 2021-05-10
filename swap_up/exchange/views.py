@@ -339,7 +339,6 @@ def add_offer(request):
         subject = unwanted_class.subject_id
         print(subject.subject_name)
 
-<<<<<<< HEAD
         all_classes = Class.objects.filter(subject_id = subject)
         
         # for class in all_classes: get_classes_free_spots(clss)
@@ -349,10 +348,8 @@ def add_offer(request):
         # # takie zajecia maja button: zapisz sie w tej chwili 
 
         #Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
-=======
         all_classes = Class.objects.filter(subject_id=subject)
         # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
->>>>>>> origin
         print(all_classes)
 
         schedule = {
