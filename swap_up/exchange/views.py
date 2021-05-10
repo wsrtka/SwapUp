@@ -139,14 +139,16 @@ def get_classes_free_spots(clss):
 
 
 @login_required
-def download_subject(request):
-    return render(request, 'exchange/download_subject.html')
-
-
-@login_required
 def download_subject_student_list(request):
 
-    subject_id = 1
+    subjects = Subject.objects.all()
+
+
+    return render(request, 'exchange/download_subject.html', {'subjects': subjects})
+
+@login_required
+def download_certain_subject_student_list(request, subject_id):
+
     if request.user.is_superuser:
 
         subject = Subject.objects.get(id = subject_id)
@@ -160,11 +162,7 @@ def download_subject_student_list(request):
 
         for clss in classes:
 
-            get_classes_free_spots(clss)
-
-            # teacher = Teacher.objects.get(id = clss.teacher_id)
             teacher = clss.teacher
-
             students = get_classes_student_list(clss)
 
             for student in students:        
