@@ -12,6 +12,7 @@ urlpatterns = [
     path('download/', views.download_schedule, name='download-csv'),
     path('download-subject', views.download_subject_student_list, name='download-subject'),
     path('download-certain-subject/<int:subject_id>', views.download_certain_subject_student_list, name='download-certain-subject'),
+    path('sign-for-class', views.sign_for_class, name = 'sign-for-class'),
     path('schedule/', views.schedule, name='schedule'),
     path('my-offers', views.user_offers, name='user-offers'),
     path('manage/<int:exchange_id>', views.exhange, name='exchange')

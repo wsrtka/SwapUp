@@ -88,7 +88,13 @@
                                 {% if class.week %} <span class="tag is-info" style="float:right">{{class.week}}</span> {% endif %}
                             </div>
 
-                            <div>{{class.short_teacher}}, ID: {{class.id}}</div>
+                            <div>{{class.short_teacher}}, ID: {{class.id}}
+                            
+                                {% if class.id in classes_with_free_spots%}
+                                <a class="button is-danger small right" style = "float: right; max-width: 30px; max-height: 30px;" href="{% url 'sign-for-class' %}"> Sign</a>
+                                {% endif %}
+                            </div>
+
                         </div>
 
                     </button>

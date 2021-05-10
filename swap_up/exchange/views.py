@@ -134,8 +134,11 @@ def get_classes_student_list(clss):
 
 def get_classes_free_spots(clss):
 
-    taken_spots = len(get_classes_student_list(clss))
-    return (clss.capacity - taken_spots)
+    if clss.capacity != None:
+        taken_spots = len(get_classes_student_list(clss))
+        return (clss.capacity - taken_spots)
+    else:
+        return 0
 
 
 @login_required
@@ -317,6 +320,10 @@ def add_exchange(request):
     return render(request, 'exchange/add_exchange.html', context)
 
 
+def sign_for_class(request):
+    
+    return render(request, 'exchange/success.html')
+
 @login_required
 def add_offer(request):
     if request.method == 'POST' and 'schedule_button' in request.POST:
@@ -325,8 +332,14 @@ def add_offer(request):
         print(subject.subject_name)
 
         all_classes = Class.objects.filter(subject_id = subject)
-        
-        # for class in all_classes: get_classes_free_spots(clss)
+        classes_with_free_spots = []
+
+        for clss in all_classes: 
+            spots = get_classes_free_spots(clss)
+            if spots > 0:
+                classes_with_free_spots.append( str(clss.id) )
+
+
         # if sa wolne miejsca: zaznacz na inny kolor zajecia z wolnymi miejscami
         # # jesli udalo sie zapisac, wyrendereuj widok SUKCES
         # # jesli nie: przepraszamy, ktos cie ubiegl
@@ -360,7 +373,8 @@ def add_offer(request):
                             ]
 
         return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule, 
-        'subject_name': subject.subject_name, 'unwanted_class_id': request.POST['schedule_button']})
+        'subject_name': subject.subject_name, 'unwanted_class_id': request.POST['schedule_button'], 
+        'classes_with_free_spots': classes_with_free_spots})
 
     elif request.method == 'POST':
         unwanted_class = Class.objects.get(id=request.POST['unwanted_class_id'])
