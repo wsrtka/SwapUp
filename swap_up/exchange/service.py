@@ -1,3 +1,4 @@
+from .models import *
 """Skracanie nazw"""
 
 def shorten_subject_name(name, level):
@@ -70,8 +71,12 @@ def shorten(subject, time, teacher, level):
 def create_class_dict(c):
         class_dict = {}
 
-        subject = c.subject_id
-        teacher = c.teacher_id
+        subject = Subject.objects.get(
+            id = c.subject_id
+        )
+        teacher = Teacher.objects.get(
+            id = c.teacher_id
+        )
 
         class_dict['id'] = str(c.id)
 
@@ -79,7 +84,7 @@ def create_class_dict(c):
         class_dict['subject_name'] = str(subject.subject_name)
         class_dict['category'] = str(subject.category)
         class_dict['capacity'] = str(c.capacity)
-        class_dict['teacher'] = str(teacher.first_name) + " " + str(teacher.last_name)
+        class_dict['teacher'] = str(teacher.name)
         class_dict['room'] = str(c.room)
         class_dict['week'] = str(c.week)
         class_dict['week'] = str(c.week)
