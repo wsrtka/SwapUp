@@ -533,17 +533,26 @@ def schedule(request):
 @login_required()
 def dashboard(request):
 
-    latest_offers = Offer.objects.all().exclude(student=request.user.student)
+    try:
 
-    if len(latest_offers) > 3:
-        latest_offers = latest_offers[:3]
+        latest_offers = Offer.objects.all().exclude(student=request.user.student)
 
-    user_offers = Offer.objects.all().filter(student=request.user.student)
+        if len(latest_offers) > 3:
+            latest_offers = latest_offers[:3]
 
-    if len(user_offers) > 3:
-        user_offers = user_offers[:3]
+        user_offers = Offer.objects.all().filter(student=request.user.student)
 
-    l_offers = [o.dictionary() for o in latest_offers]
-    u_offers = [o.dictionary() for o in user_offers]
+        if len(user_offers) > 3:
+            user_offers = user_offers[:3]
 
-    return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+        l_offers = [o.dictionary() for o in latest_offers]
+        u_offers = [o.dictionary() for o in user_offers]
+
+
+    except:
+        l_offers = []
+        u_offers = []
+        
+
+    finally:
+            return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
