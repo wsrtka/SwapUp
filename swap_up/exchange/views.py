@@ -139,9 +139,14 @@ def get_classes_free_spots(clss):
 
 
 @login_required
-def download_subject_student_list(request, subject_id):
+def download_subject(request):
+    return render(request, 'exchange/download_subject.html')
 
-    
+
+@login_required
+def download_subject_student_list(request):
+
+    subject_id = 1
     if request.user.is_superuser:
 
         subject = Subject.objects.get(id = subject_id)
@@ -552,7 +557,7 @@ def dashboard(request):
     except:
         l_offers = []
         u_offers = []
-        
+
 
     finally:
             return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
