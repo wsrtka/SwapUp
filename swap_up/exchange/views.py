@@ -158,7 +158,7 @@ def download_subject_student_list(request, subject_id):
             get_classes_free_spots(clss)
 
             # teacher = Teacher.objects.get(id = clss.teacher_id)
-            teacher = clss.teacher_id
+            teacher = clss.teacher
 
             students = get_classes_student_list(clss)
 
@@ -167,8 +167,7 @@ def download_subject_student_list(request, subject_id):
                 f.write(str(clss.group_number) + ";" 
                         + str(clss.day) + ";"
                         + str(clss.time) + ";"
-                        + str(teacher.first_name) + ";"
-                        + str(teacher.last_name) + ";"
+                        + str(teacher.name) + ";"
                         + str(student.index_number)
                         + "\n"                  
                     )
@@ -533,6 +532,7 @@ def schedule(request):
 
 @login_required()
 def dashboard(request):
+
     latest_offers = Offer.objects.all().exclude(student=request.user.student)
 
     if len(latest_offers) > 3:
