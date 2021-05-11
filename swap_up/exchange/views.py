@@ -320,9 +320,21 @@ def add_exchange(request):
     return render(request, 'exchange/add_exchange.html', context)
 
 
-def sign_for_class(request):
-    
-    return render(request, 'exchange/success.html')
+def sign_for_class(request, unwanted_class_id, wanted_class_id):
+
+    student = request.user.student
+    unwanted = Class.objects.get(id = unwanted_class_id)
+    wanted = Class.objects.get(id = wanted_class_id)
+
+    spots_in_wanted = get_classes_free_spots(wanted)
+    if spots_in_wanted > 0:
+        student.list_of_classes.remove(unwanted)
+        student.list_of_classes.add(wanted)
+        student.save()
+        return render(request, 'exchange/success.html')
+
+    else:
+        return render(request, 'exchange/failure.html')
 
 @login_required
 def add_offer(request):

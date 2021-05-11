@@ -91,7 +91,7 @@
                             <div>{{class.short_teacher}}, ID: {{class.id}}
                             
                                 {% if class.id in classes_with_free_spots%}
-                                <a class="button is-danger small right" style = "float: right; max-width: 30px; max-height: 30px;" href="{% url 'sign-for-class' %}"> Sign</a>
+                                <a class="button is-danger small right" style = "float: right; max-width: 30px; max-height: 30px;" href="{% url 'sign-for-class' unwanted_class_id=unwanted_class_id wanted_class_id=class.id %}"> Sign</a>
                                 {% endif %}
                             </div>
 
