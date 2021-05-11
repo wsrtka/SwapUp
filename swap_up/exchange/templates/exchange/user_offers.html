@@ -7,7 +7,7 @@
 
     <h1 class="hero">Your offers</h1>
 
-    <a class="button is-primary block" href="{% url 'add-offer' %}">Add new offer</a>
+    <a class="button is-primary block" href="{% url 'schedule' %}">Add new offer</a>
 
     {% if offers %}
 
@@ -21,19 +21,10 @@
             </tr>
         </thead>
 
-        <!-- <tfoot>
-            <tr>
-                <th>What you have</th>
-                <th>What you are offered</th>
-                <th>You can swap with</th>
-                <th></th>
-            </tr>
-        </tfoot> -->
-
         <tbody>
             {% for offer in offers %}
         <tr>
-            <td><strong>{{offer.subject}}</strong> {{offer.have_time}}, {{offer.have_teacher}}</td>
+            <td><strong>{{offer.subject}}</strong>
             <td> {% if offer.other_student %}
                 <strong>{{offer.subject}}</strong> {{offer.other_time}}, {{offer.other_teacher}}
                 {% endif %}
