@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 # from django.template import loader
 from django.views.generic import View
 from django.views import generic
@@ -164,6 +164,11 @@ def exchange(request, exchange_id):
             }
             items.append(item_dict)
 
+    if request.GET.get('delete_offer'):
+        offer = Offer.objects.get(id=request.GET.get('delete_offer'))
+        offer.delete()
+        return redirect('/exchange/manage/{}'.format(exchange_id))
+
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
 
 
@@ -177,22 +182,29 @@ def manage(request):
     #     )
     if request.user.is_superuser:
         db_exchanges = Exchange.objects.all()
-        #print(db_exchanges)
+        # print(db_exchanges)
         exchanges = []
         for exchange in db_exchanges:
             exchange_dict = {
                 "name": exchange.name,
                 "id": exchange.semester
             }
-            #print(exchange_dict)
+            # print(exchange_dict)
 
             exchanges.append(exchange_dict)
 
         if request.method == 'POST' and request.FILES['myfile']:
             myfile = request.FILES['myfile']
             import_schedule_for_year(request.FILES['myfile'])
-
             return render(request, 'exchange/manage.html', {'exchanges': exchanges})
+
+        if request.GET.get('delete_exchange'):
+            if request.GET.get('delete_exchange') != '':
+                db_offers = Offer.objects.all()
+                db_offers = [offer for offer in db_offers if offer.exchange is not None and offer.exchange.semester == int(request.GET.get('delete_exchange'))]
+                for offer in db_offers:
+                    offer.delete()
+                return redirect('manage')
 
         return render(request, 'exchange/manage.html', {'exchanges': exchanges})
     else:
@@ -278,11 +290,11 @@ def add_offer(request):
         class_id = request.POST['schedule_button']
         unwanted_class = Class.objects.get(id=class_id)
         subject = unwanted_class.subject_id
-        #print(subject.subject_name)
+        # print(subject.subject_name)
 
         all_classes = Class.objects.filter(subject_id=subject)
         # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
-        #print(all_classes)
+        # print(all_classes)
 
         schedule = {
             'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
@@ -323,7 +335,7 @@ def add_offer_old(request):
             class_id = request.POST['schedule_button']
             unwanted_class = Class.objects.get(id=class_id)
             subject = unwanted_class.subject_id
-            #print(subject.subject_name)
+            # print(subject.subject_name)
 
         form = AddOfferForm(request.POST, user=request.user)
 
@@ -611,7 +623,7 @@ def delete_offer(request, pk):
     offer = Offer.objects.get(id=pk)
     if request.method == "POST":
         offer.delete()
-        return render(request,'exchange/dashboard.html')
+        return render(request, 'exchange/dashboard.html')
 
     context = {'item': offer}
-    return render(request, 'exchange/delete_offer.html',context)
+    return render(request, 'exchange/delete_offer.html', context)
