@@ -50,6 +50,9 @@
                     <a class="navbar-item" href="{% url 'user-offers' %}">
                         Your offers
                     </a>
+                    <a class="navbar-item" href="{% url 'schedule' %}">
+                        Your schedule
+                    </a>
                     <!-- ten link będzie widoczny tylko dla adminów -->
                     {% if request.user.is_superuser %}
                         <a class="navbar-item" href="{% url 'manage' %}">

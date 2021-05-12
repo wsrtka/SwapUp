@@ -339,6 +339,7 @@ def sign_for_class(request, unwanted_class_id, wanted_class_id):
 @login_required
 def add_offer(request):
     if request.method == 'POST' and 'schedule_button' in request.POST:
+        print(request.POST['schedule_button'])
         unwanted_class = Class.objects.get(id=request.POST['schedule_button'])
         subject = unwanted_class.subject
         print(subject.subject_name)
@@ -389,10 +390,14 @@ def add_offer(request):
         'classes_with_free_spots': classes_with_free_spots})
 
     elif request.method == 'POST':
+        print(request.POST['unwanted_class_id'])
         unwanted_class = Class.objects.get(id=request.POST['unwanted_class_id'])
-        yellow_ids = request.POST['yellow'][:-1].split(",")
-        green_ids = request.POST['green'][:-1].split(",")
-        print(yellow_ids, green_ids)
+
+        yellow_ids, green_ids = [], []
+        for color_ids, color_name in (( yellow_ids, 'yellow'), ( green_ids, 'green')):
+            if request.POST[color_name] != "":
+                color_ids = request.POST['yellow'][:-1].split(",")
+
 
         new_offer = Offer.objects.create(
                 student=request.user.student,
@@ -400,7 +405,9 @@ def add_offer(request):
                 exchange=None,
                 unwanted_class=unwanted_class,
                 additional_information=request.POST['comment'],
+                state='New'
                 )
+
         
         for green_id in green_ids:
             green_class = Class.objects.get(
@@ -413,74 +420,13 @@ def add_offer(request):
             yellow_class = Class.objects.get(
                 id = yellow_id
             )
-            new_offer.preferred_classes.add(yellow_class)
+            new_offer.acceptable_classes.add(yellow_class)
 
         
-        print(new_offer)
 
     return HttpResponseRedirect('/exchange/my-offers')
 
 
-@login_required
-def add_offer_old(request):
-    if request.method == 'POST':
-        if 'schedule_button' in request.POST:
-            class_id = request.POST['schedule_button']
-            unwanted_class = Class.objects.get(id=class_id)
-            subject = unwanted_class.subject
-            print(subject.subject_name)
-
-        form = AddOfferForm(request.POST, user=request.user)
-
-        if form.is_valid():
-
-            # pobranie danych z formularza
-            form_data = form.cleaned_data
-            try:
-                unwanted_class = Class.objects.get(
-                    subject=Subject.objects.get(subject_name=form_data['subject_name']),
-                    teacher=Teacher.objects.get(last_name=form_data['teacher']),
-                    day=form_data['have_day_of_the_week'],
-                    time=form_data['have_time']
-                )
-            except Class.DoesNotExist:
-                messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
-
-                context = {
-                    'form': form
-                }
-
-                return render(request, 'exchange/add_offer.html', context)
-
-            # tworzenie nowej oferty w BD i ustawianie jej atrybutów
-            offer = Offer.objects.create(
-                student=request.user.student,
-                exchange=Exchange.objects.get(semester=request.user.student.semester),
-                unwanted_class=unwanted_class,
-                additional_information=form_data['comment']
-            )
-
-            offer.preferred_days = form_data['want_day']
-            offer.preferred_times = form_data['want_time']
-
-            teachers = []
-
-            for teacher in form_data['preferred_teachers']:
-                teachers.append(Teacher.objects.get(last_name=teacher))
-
-            # ten atrybut może powstać dopiero po tym, jak stworzony zostanie obiekt Offer
-            offer.preferred_teachers.set(teachers)
-
-            return HttpResponseRedirect('/exchange/my-offers')
-
-    else:
-        form = AddOfferForm(user=request.user)
-
-    context = {
-        'form': form
-    }
-
-    return render(request, 'exchange/add_offer.html', context)
 
 
 @login_required

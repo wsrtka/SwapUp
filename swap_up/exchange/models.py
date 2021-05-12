@@ -144,6 +144,7 @@ class Offer(models.Model):
         offer_dict['time'] = f'{self.unwanted_class.day} {self.unwanted_class.week}, {self.unwanted_class.time}' if self.unwanted_class else ''
         offer_dict['teacher'] = self.unwanted_class.teacher.name if self.unwanted_class.teacher else ''
         offer_dict['comment'] = self.additional_information if self.additional_information else None
+        offer_dict['state'] = self.state if self.state else 'Closed'
         offer_dict['preferred_days'] = self.preferred_days
         offer_dict['preferred_hours'] = self.preferred_times
         offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
