@@ -222,22 +222,23 @@ def exhange(request, exchange_id):
     db_offers = Offer.objects.all()
 
     for offer in db_offers:
-        # if offer.exchange and offer.exchange.semester == exchange_id:
-        item_dict = {
-            "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
-            "subject": offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else '',
-            "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
-            "other_times": offer.preferred_days,
-            "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
-            "other_teachers": ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
-            "comment": offer.additional_information if offer.additional_information else None,
-        }
-        items.append(item_dict)
+        if offer.exchange and offer.exchange.semester == exchange_id:
+            item_dict = {
+                "id": f'{offer.id}',
+                "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
+                "subject": offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else '',
+                "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
+                "other_times": offer.preferred_days,
+                "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
+                "other_teachers": ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
+                "comment": offer.additional_information if offer.additional_information else None,
+            }
+            items.append(item_dict)
 
     if request.GET.get('delete_offer'):
-        print(request.GET.get('delete_offer'))
-        # Offer.objects.exchange.filter(id=int(request.GET.get('delete_offer'))).delete()
-        # return redirect(str(exchange`_id`))
+        offer = Offer.objects.get(id=request.GET.get('delete_offer'))
+        offer.delete()
+        return redirect('/exchange/manage/{}'.format(exchange_id))
 
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
 
@@ -269,10 +270,10 @@ def manage(request):
 
         if request.GET.get('delete_exchange'):
             if request.GET.get('delete_exchange') != '':
-                # print(request.GET.get('delete_exchange'))
-                # Exchange.objects.filter(semester=int(request.GET.get('delete_exchange'))).delete()
                 db_offers = Offer.objects.all()
-                db_offers = [offer for offer in db_offers if offer.exchange is not None and offer.exchange.semester == int(request.GET.get('delete_exchange'))]
+                db_offers = [offer for offer in db_offers if
+                             offer.exchange is not None and offer.exchange.semester == int(
+                                 request.GET.get('delete_exchange'))]
                 for offer in db_offers:
                     offer.delete()
                 return redirect('manage')
@@ -537,3 +538,18 @@ def dashboard(request):
 
     finally:
             return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+
+
+def delete_offer(request, pk):
+    item = Offer.objects.filter(id=pk)
+
+    offer = Offer.objects.get(id=pk)
+    if request.method == "POST":
+        item.delete()
+        return render(request,'exchange/manage.html')
+        offer.delete()
+        return render(request,'exchange/dashboard.html')
+
+    context = {'item': item}
+    context = {'item': offer}
+    return render(request, 'exchange/delete_offer.html',context)
