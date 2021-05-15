@@ -354,6 +354,7 @@ def add_offer(request):
                 classes_with_free_spots.append( str(clss.id) )
 
 
+
         # if sa wolne miejsca: zaznacz na inny kolor zajecia z wolnymi miejscami
         # # jesli udalo sie zapisac, wyrendereuj widok SUKCES
         # # jesli nie: przepraszamy, ktos cie ubiegl
