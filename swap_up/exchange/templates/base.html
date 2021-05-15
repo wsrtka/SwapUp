@@ -50,6 +50,9 @@
                     <a class="navbar-item" href="{% url 'user-offers' %}">
                         Your offers
                     </a>
+                    <a class="navbar-item" href="{% url 'schedule' %}">
+                        Your schedule
+                    </a>
                     <!-- ten link będzie widoczny tylko dla adminów -->
                     {% if request.user.is_superuser %}
                         <a class="navbar-item" href="{% url 'manage' %}">
@@ -62,6 +65,23 @@
                     </a>
                 </div>
             </div>
+
+            {% if request.user.is_superuser %}
+            <a class="navbar-item" href="{% url 'upload-csv' %}">
+                Upload schedule for the semester
+            </a>
+            {% endif %}
+
+            {% if request.user.is_superuser %}
+            <a class="navbar-item" href="{% url 'download-subject' %}">
+                Download subject's students list
+            </a>
+            {% endif %}
+
+            <a class="navbar-item" href="{% url 'download-csv' %}">
+                Download your schedule
+            </a>
+
         </div>
 
         <div class="navbar-end">

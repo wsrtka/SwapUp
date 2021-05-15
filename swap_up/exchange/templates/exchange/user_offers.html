@@ -3,7 +3,7 @@
 {% block content %}
 <div class="container is-max-desktop">
 
-<div class='box mt-6'>
+<div class='content box mt-6'>
 
     <h1 class="hero">Your offers</h1>
 
@@ -25,7 +25,7 @@
         <tbody>
             {% for offer in offers %}
         <tr>
-            <td><strong>{{offer.subject}}</strong> {{offer.have_time}}, {{offer.have_teacher}}</td>
+            <td><strong>{{offer.subject}}</strong>
             <td> {% if offer.other_student %}
                 <strong>{{offer.subject}}</strong> {{offer.other_time}}, {{offer.other_teacher}}
                 {% endif %}

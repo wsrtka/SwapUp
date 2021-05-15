@@ -3,14 +3,16 @@
 {% block content %}
 <div class="container is-max-desktop">
 
-    <div class="confirm">
+        <div class="confirm">
 
     </div>
 
     <div style="padding-top: 20px; padding-bottom: 20px;">
         <h1 class="title is-3 is-spaced">Manage Exchanges</h1>
     </div>
+    <div class="confirm">
 
+    </div>
     <!--<a class="button is-primary" href="{% url 'add-exchange' %}"-->
     <!--   style=" margin: 15px; height: 50px; width: 500px; font-size: 20px;">-->
     <!--    Add Exchange-->
@@ -32,7 +34,7 @@
                             Select file
                         </span>
                     </span>
-                    <span style="width: 200px" class="file-name">
+                    <span style="width: 300px" class="file-name">
                         No file chosen
                     </span>
                 </label>
@@ -45,7 +47,7 @@
     </form>
 
     <!--</div>-->
-
+    <!--if(confirm('Are you sure')){console.log('yes')}-->
     <section class="box" style="margin-bottom: 40px;">
         {% for exchange in exchanges %}
         <div class="card block ">
@@ -54,9 +56,7 @@
                     {{exchange.name}}
                 </p>
                 <form action="" method="get">
-                    <button id="{{exchange.id}}" style="margin: 15px;" onclick="onClear('{{exchange.id}}');" class="button has-background-danger-light has-text-danger" name="delete_exchange" value="">
-                        Clear
-                    </button>
+                    <button id="{{exchange.id}}" style=" margin: 15px;" onclick="onClear('{{exchange.id}}');" class="button has-background-danger-light has-text-danger" name="delete_exchange" value="">Clear</button>
                 </form>
                 <a class="button is-dark has-text-primary" style=" margin: 15px;"
                    href="/exchange/manage/{{exchange.id}}">

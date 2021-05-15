@@ -62,12 +62,10 @@ def import_schedule_for_year(csv_file):
                     semester=semester
                 )
 
-                teacher_first_name, teacher_last_name = teacher_name.split()
                 # student_first_name, student_last_name = student_name.split()
 
                 teacher, teacher_created = Teacher.objects.get_or_create(
-                    first_name=teacher_first_name,
-                    last_name=teacher_last_name
+                    name=teacher_name
                 )
 
                 try:
@@ -82,11 +80,11 @@ def import_schedule_for_year(csv_file):
                         )
 
                         created_class, class_created = Class.objects.get_or_create(
-                            subject_id=subject,
+                            subject=subject,
                             day=day,
                             time=time,
                             group_number=group_number,
-                            teacher_id=teacher,
+                            teacher=teacher,
                             capacity=term_capacity,
                             week=week
                         )
@@ -107,12 +105,11 @@ def download_schedule(request):
     f = open('schedule.csv', 'w')
 
     for c in student.list_of_classes.all():
-        subject = c.subject_id
-        teacher = c.teacher_id
+        subject = c.subject
+        teacher = c.teacher
         f.write(
             str(subject.subject_name) + ";" + str(subject.category)
-            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.first_name) + " " + str(
-                teacher.last_name)
+            + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.name)
             + ";" + str(c.room) + ";" + str(c.week) + ";" + str(c.day) + ";" + str(c.time)
             + "\n"
         )
@@ -122,6 +119,81 @@ def download_schedule(request):
     response = HttpResponse(f, content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename=schedule.csv'
     return response
+
+
+def get_classes_student_list(clss):
+
+    students = []
+
+    for student in Student.objects.all():
+            if clss in student.list_of_classes.all():
+                students.append(student)
+
+    return students
+
+
+def get_classes_free_spots(clss):
+
+    if clss.capacity != None:
+        taken_spots = len(get_classes_student_list(clss))
+        return (clss.capacity - taken_spots)
+    else:
+        return 0
+
+
+@login_required
+def download_subject_student_list(request):
+
+    try:
+        subjects = []
+        semester_id = request.user.student.semester
+        subjects = Subject.objects.filter(semester = semester_id)
+        print("Semester " +  str(semester_id) )
+    
+    except Student.DoesNotExist:
+        subjects = Subject.objects.all()
+
+    return render(request, 'exchange/download_subject.html', {'subjects': subjects})
+
+@login_required
+def download_certain_subject_student_list(request, subject_id):
+
+    if request.user.is_superuser:
+
+        subject = Subject.objects.get(id = subject_id)
+        classes = Class.objects.filter(subject_id = subject_id)
+
+        filename = subject.subject_name + "list.csv"
+        f = open(filename, 'w') 
+        f.write(subject.subject_name + "\n")
+
+
+
+        for clss in classes:
+
+            teacher = clss.teacher
+            students = get_classes_student_list(clss)
+
+            for student in students:        
+
+                f.write(str(clss.group_number) + ";" 
+                        + str(clss.day) + ";"
+                        + str(clss.time) + ";"
+                        + str(teacher.name) + ";"
+                        + str(student.index_number)
+                        + "\n"                  
+                    )
+
+        f.close()
+        f = open(filename, 'r')
+        response = HttpResponse(f, content_type='text/csv')
+        # response['Content-Disposition'] = 'attachment; filename= "' + filename + '"'
+        response['Content-Disposition'] = 'attachment; filename=list.csv'
+
+        return response
+    else:
+        return render(request, 'base.html')
+
 
 
 @login_required
@@ -139,7 +211,7 @@ def upload_csv(request):
 
 
 @login_required
-def exchange(request, exchange_id):
+def exhange(request, exchange_id):
     name = ''
     items = []
     db_exchanges = Exchange.objects.all()
@@ -154,12 +226,11 @@ def exchange(request, exchange_id):
             item_dict = {
                 "id": f'{offer.id}',
                 "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
-                "subject": offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else '',
+                "subject": offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else '',
                 "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
                 "other_times": offer.preferred_days,
-                "teacher": f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else '',
-                "other_teachers": ",".join(
-                    [f'{teacher.first_name} {teacher.last_name}' for teacher in offer.preferred_teachers.all()]),
+                "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
+                "other_teachers": ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
                 "comment": offer.additional_information if offer.additional_information else None,
             }
             items.append(item_dict)
@@ -182,26 +253,27 @@ def manage(request):
     #     )
     if request.user.is_superuser:
         db_exchanges = Exchange.objects.all()
-        # print(db_exchanges)
         exchanges = []
         for exchange in db_exchanges:
             exchange_dict = {
                 "name": exchange.name,
                 "id": exchange.semester
             }
-            # print(exchange_dict)
 
             exchanges.append(exchange_dict)
 
         if request.method == 'POST' and request.FILES['myfile']:
             myfile = request.FILES['myfile']
             import_schedule_for_year(request.FILES['myfile'])
+
             return render(request, 'exchange/manage.html', {'exchanges': exchanges})
 
         if request.GET.get('delete_exchange'):
             if request.GET.get('delete_exchange') != '':
                 db_offers = Offer.objects.all()
-                db_offers = [offer for offer in db_offers if offer.exchange is not None and offer.exchange.semester == int(request.GET.get('delete_exchange'))]
+                db_offers = [offer for offer in db_offers if
+                             offer.exchange is not None and offer.exchange.semester == int(
+                                 request.GET.get('delete_exchange'))]
                 for offer in db_offers:
                     offer.delete()
                 return redirect('manage')
@@ -214,29 +286,10 @@ def manage(request):
 @login_required
 def offers(request):
     current_student = request.user.student
-    db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student_id=current_student.id)
+    db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student=current_student.id)
     # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
 
-    offers = []
-
-    # niestety tak jest najwygodniej przekazać parametry do kontekstu template'a
-    for offer in db_offers:
-        offer_dict = {}
-        offer_dict[
-            'student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
-        offer_dict[
-            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict[
-            'time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict[
-            'teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
-        offer_dict['comment'] = offer.additional_information if offer.additional_information else None
-        offer_dict['preferred_days'] = offer.preferred_days
-        offer_dict['preferred_hours'] = offer.preferred_times
-        offer_dict['preferred_teachers'] = [f'{teacher.first_name} {teacher.last_name}' for teacher in
-                                            offer.preferred_teachers.all()]
-
-        offers.append(offer_dict)
+    offers = [o.dictionary() for o in db_offers]
 
     offers1 = offers[::2]
     offers2 = offers[1::2]
@@ -251,22 +304,6 @@ def add_exchange(request):
 
         if form.is_valid():
             form_data = form.cleaned_data
-            # try:
-            #     unwanted_exchange = Class.objects.get(
-            #         name=Subject.objects.get(subject_name=form_data['subject_name']),
-            #         teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
-            #         day=form_data['have_day_of_the_week'],
-            #         time=form_data['have_time']
-            #     )
-            # except Class.DoesNotExist:
-            #     messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
-            #
-            #     context = {
-            #         'form': form
-            #     }
-            #
-            #     return render(request, 'exchange/add_exchange.html', context)
-
             exchange = Exchange.objects.create(
                 name=form_data['name'],
                 semester=form_data['semester']
@@ -284,17 +321,49 @@ def add_exchange(request):
     return render(request, 'exchange/add_exchange.html', context)
 
 
+def sign_for_class(request, unwanted_class_id, wanted_class_id):
+
+    student = request.user.student
+    unwanted = Class.objects.get(id = unwanted_class_id)
+    wanted = Class.objects.get(id = wanted_class_id)
+
+    spots_in_wanted = get_classes_free_spots(wanted)
+    if spots_in_wanted > 0:
+        student.list_of_classes.remove(unwanted)
+        student.list_of_classes.add(wanted)
+        student.save()
+        return render(request, 'exchange/success.html')
+
+    else:
+        return render(request, 'exchange/failure.html')
+
 @login_required
 def add_offer(request):
     if request.method == 'POST' and 'schedule_button' in request.POST:
-        class_id = request.POST['schedule_button']
-        unwanted_class = Class.objects.get(id=class_id)
-        subject = unwanted_class.subject_id
-        # print(subject.subject_name)
+        print(request.POST['schedule_button'])
+        unwanted_class = Class.objects.get(id=request.POST['schedule_button'])
+        subject = unwanted_class.subject
+        print(subject.subject_name)
 
+        all_classes = Class.objects.filter(subject_id = subject)
+        classes_with_free_spots = []
+
+        for clss in all_classes: 
+            spots = get_classes_free_spots(clss)
+            if spots > 0:
+                classes_with_free_spots.append( str(clss.id) )
+
+
+        # if sa wolne miejsca: zaznacz na inny kolor zajecia z wolnymi miejscami
+        # # jesli udalo sie zapisac, wyrendereuj widok SUKCES
+        # # jesli nie: przepraszamy, ktos cie ubiegl
+        # # takie zajecia maja button: zapisz sie w tej chwili 
+
+        #Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
         all_classes = Class.objects.filter(subject_id=subject)
+        all_classes = Class.objects.filter(subject=subject)
         # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
-        # print(all_classes)
+        print(all_classes)
 
         schedule = {
             'Pn': [], 'Wt': [], 'Śr': [], 'Czw': [], 'Pt': []
@@ -317,77 +386,48 @@ def add_offer(request):
                             {'schedule': schedule['Pt'], 'name': 'Piątek'}
                             ]
 
-        return render(request, 'exchange/add_offer_new.html',
-                      {'schedule': context_schedule, 'subject_name': subject.subject_name})
+        return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule, 
+        'subject_name': subject.subject_name, 'unwanted_class_id': request.POST['schedule_button'], 
+        'classes_with_free_spots': classes_with_free_spots})
 
     elif request.method == 'POST':
-        print(request.POST['yellow'])
-        print(request.POST['green'])
-        print(request.POST['comment'])
+        print(request.POST['unwanted_class_id'])
+        unwanted_class = Class.objects.get(id=request.POST['unwanted_class_id'])
+
+        yellow_ids, green_ids = [], []
+        for color_ids, color_name in (( yellow_ids, 'yellow'), ( green_ids, 'green')):
+            if request.POST[color_name] != "":
+                color_ids = request.POST['yellow'][:-1].split(",")
+
+
+        new_offer = Offer.objects.create(
+                student=request.user.student,
+                #TODO
+                exchange=None,
+                unwanted_class=unwanted_class,
+                additional_information=request.POST['comment'],
+                state='New'
+                )
+
+        
+        for green_id in green_ids:
+            green_class = Class.objects.get(
+                id = green_id
+            )
+            new_offer.preferred_classes.add(green_class)
+
+        
+        for yellow_id in yellow_ids:
+            yellow_class = Class.objects.get(
+                id = yellow_id
+            )
+            new_offer.acceptable_classes.add(yellow_class)
+
+        
 
     return HttpResponseRedirect('/exchange/my-offers')
 
 
-@login_required
-def add_offer_old(request):
-    if request.method == 'POST':
-        if 'schedule_button' in request.POST:
-            class_id = request.POST['schedule_button']
-            unwanted_class = Class.objects.get(id=class_id)
-            subject = unwanted_class.subject_id
-            # print(subject.subject_name)
-
-        form = AddOfferForm(request.POST, user=request.user)
-
-        if form.is_valid():
-
-            # pobranie danych z formularza
-            form_data = form.cleaned_data
-            try:
-                unwanted_class = Class.objects.get(
-                    subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
-                    teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
-                    day=form_data['have_day_of_the_week'],
-                    time=form_data['have_time']
-                )
-            except Class.DoesNotExist:
-                messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
-
-                context = {
-                    'form': form
-                }
-
-                return render(request, 'exchange/add_offer.html', context)
-
-            # tworzenie nowej oferty w BD i ustawianie jej atrybutów
-            offer = Offer.objects.create(
-                student=request.user.student,
-                exchange=Exchange.objects.get(semester=request.user.student.semester),
-                unwanted_class=unwanted_class,
-                additional_information=form_data['comment']
-            )
-
-            offer.preferred_days = form_data['want_day']
-            offer.preferred_times = form_data['want_time']
-
-            teachers = []
-
-            for teacher in form_data['preferred_teachers']:
-                teachers.append(Teacher.objects.get(last_name=teacher))
-
-            # ten atrybut może powstać dopiero po tym, jak stworzony zostanie obiekt Offer
-            offer.preferred_teachers.set(teachers)
-
-            return HttpResponseRedirect('/exchange/my-offers')
-
-    else:
-        form = AddOfferForm(user=request.user)
-
-    context = {
-        'form': form
-    }
-
-    return render(request, 'exchange/add_offer.html', context)
 
 
 @login_required
@@ -432,26 +472,9 @@ def user_offers(request):
 
     # dynamic offers
     current_student = request.user.student
-    db_offers = Offer.objects.filter(student_id=current_student.id)
+    db_offers = Offer.objects.filter(student=current_student.id)
 
-    offers = []
-
-    # niestety tak jest najwygodniej przekazać parametry do kontekstu template'a
-    for offer in db_offers:
-        offer_dict = {}
-        offer_dict[
-            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict[
-            'have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict[
-            'have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
-        offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
-        offer_dict[
-            'other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
-        offer_dict['other_time'] = ''
-        offer_dict['other_teacher'] = ''
-
-        offers.append(offer_dict)
+    offers = [o.dictionary() for o in db_offers]
 
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
@@ -470,6 +493,10 @@ def schedule(request):
     context = {}
 
     for c in student.list_of_classes.all():
+        # c = Class.objects.get(
+        #             id=c_id
+        #             )
+
         class_dict = create_class_dict(c)
         count_collisions(c, class_dict, schedule)
 
@@ -485,145 +512,44 @@ def schedule(request):
     return render(request, 'exchange/schedule.html', {'context': context})
 
 
+@login_required()
 def dashboard(request):
-    latest_offers = Offer.objects.all().exclude(student=request.user.student)
 
-    if len(latest_offers) > 3:
-        latest_offers = latest_offers[:3]
+    try:
 
-    user_offers = Offer.objects.all().filter(student=request.user.student)
+        latest_offers = Offer.objects.all().exclude(student=request.user.student)
 
-    if len(user_offers) > 3:
-        user_offers = user_offers[:3]
+        if len(latest_offers) > 3:
+            latest_offers = latest_offers[:3]
 
-    l_offers = []
-    u_offers = []
+        user_offers = Offer.objects.all().filter(student=request.user.student)
 
-    for offer in latest_offers:
-        offer_dict = {}
-        offer_dict[
-            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict[
-            'have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict[
-            'have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
-        offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
-        offer_dict[
-            'other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
-        offer_dict['other_time'] = ''
-        offer_dict['other_teacher'] = ''
+        if len(user_offers) > 3:
+            user_offers = user_offers[:3]
 
-        l_offers.append(offer_dict)
-
-    for offer in user_offers:
-        offer_dict = {}
-        offer_dict[
-            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict[
-            'have_time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict[
-            'have_teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
-        offer_dict['state'] = offer.state.split('\'')[3] if offer.state else ''
-        offer_dict[
-            'other_student'] = f'{offer.other_student.user.first_name} {offer.other_student.user.last_name}' if offer.other_student else ''
-        offer_dict['other_time'] = ''
-        offer_dict['other_teacher'] = ''
-
-        u_offers.append(offer_dict)
-
-    return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+        l_offers = [o.dictionary() for o in latest_offers]
+        u_offers = [o.dictionary() for o in user_offers]
 
 
-def edit_offer_admin(request):
-    db_offers = Offer.objects.filter(state=('N', 'New'))
-
-    offers = []
-
-    for offer in db_offers:
-        offer_dict = {}
-        offer_dict[
-            'student'] = f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous'
-        offer_dict[
-            'subject'] = offer.unwanted_class.subject_id.subject_name if offer.unwanted_class.subject_id.subject_name else ''
-        offer_dict[
-            'time'] = f'{offer.unwanted_class.day} {offer.unwanted_class.week}, {offer.unwanted_class.time}' if offer.unwanted_class else ''
-        offer_dict[
-            'teacher'] = f'{offer.unwanted_class.teacher_id.first_name} {offer.unwanted_class.teacher_id.last_name}' if offer.unwanted_class.teacher_id else ''
-        offer_dict['comment'] = offer.additional_information if offer.additional_information else None
-        offer_dict['preferred_days'] = offer.preferred_days
-        offer_dict['preferred_hours'] = offer.preferred_times
-        offer_dict['preferred_teachers'] = [f'{teacher.first_name} {teacher.last_name}' for teacher in
-                                            offer.preferred_teachers.all()]
-
-        offers.append(offer_dict)
-
-    offers1 = offers[::2]
-    offers2 = offers[1::2]
-    return render(request, 'exchange/edit_offer_admin.html', {'offers1': offers1, 'offers2': offers2})
+    except:
+        l_offers = []
+        u_offers = []
 
 
-@login_required
-def edit_offer(request):
-    if request.method == 'POST':
-
-        form = editOffer(request.POST, offer=request.offer)
-
-        if form.is_valid():
-
-            # pobranie danych z formularza
-            form_data = form.cleaned_data
-            try:
-                unwanted_class = Class.objects.get(
-                    subject_id=Subject.objects.get(subject_name=form_data['subject_name']),
-                    teacher_id=Teacher.objects.get(last_name=form_data['teacher']),
-                    day=form_data['have_day_of_the_week'],
-                    time=form_data['have_time']
-                )
-            except Class.DoesNotExist:
-                messages.error(request, 'Invalid class: you are trying to exchange a class that does not exist!')
-
-                context = {
-                    'form': form
-                }
-
-                return render(request, 'exchange/add_offer.html', context)
-
-            # tworzenie nowej oferty w BD i ustawianie jej atrybutów
-            offer = Offer.objects.create(
-                student=request.user.student,
-                # exchange=Exchange.objects.get(semester=request.user.student.semester),
-                unwanted_class=unwanted_class,
-                additional_information=form_data['comment']
-            )
-
-            offer.preferred_days = form_data['want_day']
-            offer.preferred_times = form_data['want_time']
-
-            teachers = []
-
-            for teacher in form_data['preferred_teachers']:
-                teachers.append(Teacher.objects.get(last_name=teacher))
-
-            # ten atrybut może powstać dopiero po tym, jak stworzony zostanie obiekt Offer
-            offer.preferred_teachers.set(teachers)
-
-            return HttpResponseRedirect('/exchange/my-offers')
-
-    else:
-        form = AddOfferForm(user=request.user)
-
-    context = {
-        'form': form
-    }
-
-    return render(request, 'exchange/add_offer.html', context)
+    finally:
+            return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
 
 
 def delete_offer(request, pk):
+    item = Offer.objects.filter(id=pk)
+
     offer = Offer.objects.get(id=pk)
     if request.method == "POST":
+        item.delete()
+        return render(request,'exchange/manage.html')
         offer.delete()
-        return render(request, 'exchange/dashboard.html')
+        return render(request,'exchange/dashboard.html')
 
+    context = {'item': item}
     context = {'item': offer}
-    return render(request, 'exchange/delete_offer.html', context)
+    return render(request, 'exchange/delete_offer.html',context)
