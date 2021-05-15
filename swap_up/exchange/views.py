@@ -510,12 +510,3 @@ def dashboard(request):
     finally:
         return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
 
-
-# def delete_offer(request, pk):
-#     offer = Offer.objects.get(id=pk)
-#     if request.method == "POST":
-#         offer.delete()
-#         return render(request, 'exchange/manage.html')
-#
-#     context = {'item': offer}
-#     return render(request, 'exchange/delete_offer.html', context)
