@@ -61,26 +61,20 @@
                 {% endif %}
                 {% if offer.state == "New" %}
                 Waiting for offers
+
                 {% endif %}
-                <a class="button edit" href="{% url 'edit-offer' %}"
-                   style=" margin: 15px; height: 10px; width: 50px; font-size: 20px;">
-                    Edit
-                </a>
-                <a class="button delete" href="{% url 'edit-offer-admin' %}"
-                   style=" margin: 15px; height: 10px; width: 50px; font-size: 15px;">
-                    Delete
-                </a>
+
             </td>
-            <form action="" method="get">
-                <button id="{{item.id}}" onclick="onDelete('{{item.id}}');" class="button has-background-danger-light has-text-danger" name="delete_offer" value="">
-                    Delete
-                </button>
-            </form>
+            <td>
+                <form action="" method="get">
+                    <button id="{{offer.id}}" onclick="onDelete('{{offer.id}}');" class="button has-background-danger-light has-text-danger" name="delete_user_offer" value="">
+                        Delete
+                    </button>
+                </form>
+            </td>
         </tr>
             {% endfor %}
-
-        
-        </tbody>
+            </tbody>
     </table>
 
     {% else %}
@@ -91,4 +85,13 @@
 
 </div>
 </div>
+<script>
+    function onDelete(id) {
+        if (confirm('Are you sure you want to delete this offer ' + id + "?")) {
+            document.getElementById(id).value = id;
+        }else{
+            document.getElementById(id).value = "";
+        }
+    }
+</script>
 {% endblock %}

@@ -15,5 +15,5 @@ urlpatterns = [
     path('sign-for-class/<int:unwanted_class_id>/<int:wanted_class_id>', views.sign_for_class, name = 'sign-for-class'),
     path('schedule/', views.schedule, name='schedule'),
     path('my-offers', views.user_offers, name='user-offers'),
-    path('manage/<int:exchange_id>', views.exhange, name='exchange'),
+    path('manage/<int:exchange_id>', views.exchange, name='exchange'),
 ]
