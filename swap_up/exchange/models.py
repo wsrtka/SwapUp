@@ -102,8 +102,8 @@ class Student(models.Model):
     list_of_additional_subjects = models.ManyToManyField(Subject)  # tutaj nie jestem pewien czy normalne settery
     list_of_classes = models.ManyToManyField(Class)  # będą działały więc póki co zostawiam bez
 
-    def __str__(self):
-        return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
+    # def __str__(self):
+    #     return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
 
 
 class Offer(models.Model):
