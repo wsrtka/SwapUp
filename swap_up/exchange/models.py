@@ -99,11 +99,11 @@ class Student(models.Model):
     semester = models.IntegerField(null=True)
     path = models.CharField(max_length=40, choices=PATHS, null=True)
 
-    list_of_additional_subjects = models.ManyToManyField(Subject)  # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ManyToManyField(Class)  # będą działały więc póki co zostawiam bez
+    list_of_additional_subjects = models.ManyToManyField(Subject)
+    list_of_classes = models.ManyToManyField(Class)
 
-    def __str__(self):
-        return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
+    # def __str__(self):
+    #     return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
 
 
 class Offer(models.Model):
