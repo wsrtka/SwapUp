@@ -43,20 +43,26 @@
                 {% endif %}
                 {% if offer.state == "Pending" %}
 
-                <button class="button is-success">
-                    <span class="icon is-large">
-                        <span class="material-icons">
-                            check_circle
+                <form action="{% url 'accept-offer' offer.id %}" method="POST">
+                    {% csrf_token%}
+                    <button type="submit" class="button is-success">
+                        <span class="icon is-large">
+                            <span class="material-icons">
+                                check_circle
+                            </span>
                         </span>
-                    </span>
-                </button>
-                <button class="button is-danger">
-                    <span class="icon is-large">
-                        <span class="material-icons">
-                            highlight_off
+                    </button>
+                </form>
+                <form action="{% url 'decline-offer' offer.id %}" method="POST">
+                    {% csrf_token%}
+                    <button type="submit" class="button is-danger">
+                        <span class="icon is-large">
+                            <span class="material-icons">
+                                highlight_off
+                            </span>
                         </span>
-                    </span>
-                </button>
+                    </button>
+                </form>
 
                 {% endif %}
                 {% if offer.state == "New" %}

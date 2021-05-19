@@ -279,7 +279,7 @@ def manage(request):
 @login_required
 def offers(request):
     current_student = request.user.student
-    db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student=current_student.id)
+    db_offers = Offer.objects.filter(state=Offer.STATES[0][0]).exclude(student=current_student.id)
     # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
 
     offers = [o.dictionary() for o in db_offers]
@@ -509,3 +509,73 @@ def dashboard(request):
     finally:
         return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
 
+    return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+
+
+@login_required()
+def accept_offer(request, offer_id):
+    # ta funkcja jest dosyć specyficzna bo obsługuje trzy requesty: 
+    # 1. na wyświetlenie stronki "czy na pewno chcesz brać ofertę"
+    # 2. na zaakceptowanie przez zainteresowanego studenta wymiany
+    # 3. na ostateczne zaakceptowanie przez wystawiającego
+
+    a_offer = Offer.objects.get(id=offer_id)
+
+    if request.method == "POST":
+        # opcja 3.
+        if request.user.student == a_offer.student:
+            # wyszukiwanie nowego terminu dla wystawiającego
+            try:
+                c_term = [c for c in a_offer.other_student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+            except IndexError:
+                c_term = None
+
+            # jeśli go nie znaleziono, to nic się nie dzieje
+            if c_term:
+                # przypisanie nowych terminóœ
+                a_offer.other_student.list_of_classes.add(a_offer.unwanted_class)
+                request.user.student.list_of_classes.add(c_term)
+
+                # usunięcie starych terminów z planu godzin studentów
+                request.user.student.list_of_classes.remove(a_offer.unwanted_class)
+                a_offer.other_student.list_of_classes.remove(c_term)
+
+                a_offer.state = Offer.STATES[2]
+
+                request.user.student.save()
+                a_offer.other_student.save()
+                a_offer.save()
+
+                messages.success(request, 'You have successfully traded your term!')
+
+            else:
+                messages.error(request, 'We could not find the other student\'s class, make sure he attends the subject.')
+
+            return redirect('offers')
+        
+        # opcja 2.
+        else:
+            a_offer.other_student = request.user.student
+            a_offer.state = Offer.STATES[1]
+            a_offer.save()
+
+            messages.success(request, 'You have accepted the offer! Now wait for exchange confirmation from your fellow student.')
+
+            return redirect('offers')
+
+    # opcja 1.
+    try:
+        c_term = [c for c in request.user.student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+        c_term = c_term.dictionary()
+    except IndexError:
+        c_term = None
+
+    return render(request, 'exchange/accept_offer.html', {"a_offer": a_offer.dictionary(), "c_term": c_term})
+
+
+def decline_offer(request, offer_id):
+    offer = Offer.objects.get(id=offer_id)
+    offer.state = Offer.STATES[0]
+    offer.save()
+
+    return render(request, 'exchange/decline_offer.html')

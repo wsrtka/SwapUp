@@ -23,8 +23,8 @@ class Semester(models.IntegerChoices):
 
 class Exchange(models.Model):
     
-    creation_time = models.DateTimeField(auto_now_add=True)
-    modification_time = models.DateTimeField(auto_now=True)
+    creation_time = models.DateTimeField(auto_now_add=True, null=True)
+    modification_time = models.DateTimeField(auto_now=True, null=True)
     end_time = models.DateTimeField(null=True)
     name = models.CharField(max_length=30, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
@@ -35,14 +35,14 @@ class Exchange(models.Model):
 
 class Subject(models.Model):
 
-    subject_name = models.CharField(max_length=30, null=True)
+    name = models.CharField(max_length=30, null=True)
     category = models.CharField(max_length=30, null=True)
     path = models.CharField(max_length=30, choices=PATHS, null=True)
     semester = models.IntegerField(choices=Semester.choices, null=True)
     mandatory = models.BooleanField(null=True)
 
     def __str__(self):
-        return f'{self.subject_name}, s{self.semester}, {self.path}'
+        return f'{self.name}, s{self.semester}, {self.path}'
 
 
 class Teacher(models.Model):
@@ -90,6 +90,17 @@ class Class(models.Model):
     def __str__(self):
         return f'{self.subject}, {self.teacher}, {self.time} {self.day}, {self.room}'
 
+    def dictionary(self):
+        class_dict = {}
+
+        class_dict['subject'] = self.subject.name
+        class_dict['teacher'] = self.teacher.name
+        class_dict['day'] = self.day
+        class_dict['time'] = self.time
+        class_dict['week'] = self.week
+
+        return class_dict
+
 
 class Student(models.Model):
 
@@ -115,6 +126,7 @@ class Offer(models.Model):
     ]
 
     # meta info
+    id = models.AutoField(primary_key=True)
     student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
     exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)
     state = models.CharField(max_length=10, choices=STATES, default=STATES[0])
@@ -124,13 +136,13 @@ class Offer(models.Model):
     unwanted_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='unwanted_class', null=True)
     preferred_days = None
     preferred_times = None
-    preferred_classes = models.ManyToManyField(Class, related_name='user_green')
-    acceptable_classes = models.ManyToManyField(Class, related_name='user_yellow')
-    preferred_teachers = models.ManyToManyField(Teacher)
+    preferred_classes = models.ManyToManyField(Class, related_name='user_green', null=True)
+    acceptable_classes = models.ManyToManyField(Class, related_name='user_yellow', null=True)
+    preferred_teachers = models.ManyToManyField(Teacher, null=True)
     additional_information = models.CharField(max_length=100, null=True)
 
     # "transaction" info
-    other_student = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    other_student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, related_name='wantee')
     other_offer = models.ForeignKey("Offer", on_delete=models.CASCADE, null=True)
 
     def __str__(self):
@@ -140,7 +152,7 @@ class Offer(models.Model):
         offer_dict = {}
 
         offer_dict['student'] = f'{self.student.user.first_name} {self.student.user.last_name}' if self.student.user.first_name and self.student.user.last_name else 'Anonymous'
-        offer_dict['subject'] = self.unwanted_class.subject.subject_name if self.unwanted_class.subject.subject_name else ''
+        offer_dict['subject'] = self.unwanted_class.subject.name if self.unwanted_class.subject.name else ''
         offer_dict['time'] = f'{self.unwanted_class.day} {self.unwanted_class.week}, {self.unwanted_class.time}' if self.unwanted_class else ''
         offer_dict['teacher'] = self.unwanted_class.teacher.name if self.unwanted_class.teacher else ''
         offer_dict['comment'] = self.additional_information if self.additional_information else None
@@ -148,5 +160,17 @@ class Offer(models.Model):
         offer_dict['preferred_days'] = self.preferred_days
         offer_dict['preferred_hours'] = self.preferred_times
         offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
+        offer_dict['id'] = self.id
+        offer_dict['date'] = self.add_time
+        offer_dict['state'] = self.state.split('\'')[-2] if len(self.state) > 1 else None
+
+        try:
+            term = [c for c in self.other_student.list_of_classes.all() if c.subject == self.unwanted_class.subject][0]
+        except IndexError:
+            term = None
+
+        offer_dict['other_time'] = f'{term.day} {term.time} {term.week}' if term else None
+        offer_dict['other_teacher'] = term.teacher if term else None
+        offer_dict['other_student'] = self.other_student
 
         return offer_dict
