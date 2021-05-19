@@ -221,9 +221,12 @@ def exchange(request, exchange_id):
                 "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
                 "subject": offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else '',
                 "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
-                "other_times": offer.preferred_days,
+                'preferred_days': f'{offer.preferred_days}',
+                'preferred_hours': f'{offer.preferred_times}',
+                'preferred_classes': f'{offer.preferred_classes}',
+                'preferred_teachers': ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
+                'acceptable_classes': f'{offer.acceptable_classes}',
                 "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
-                "other_teachers": ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
                 "comment": offer.additional_information if offer.additional_information else None,
             }
             items.append(item_dict)
@@ -346,7 +349,6 @@ def add_offer(request):
             if spots > 0:
                 classes_with_free_spots.append(str(clss.id))
 
-
         # if sa wolne miejsca: zaznacz na inny kolor zajecia z wolnymi miejscami
         # # jesli udalo sie zapisac, wyrendereuj widok SUKCES
         # # jesli nie: przepraszamy, ktos cie ubiegl
@@ -423,15 +425,14 @@ def edit_exchange(request):
     return render(request, 'exchange/edit_exchange.html')
 
 
-
 @login_required
 def user_offers(request):
     # dynamic offers
     current_student = request.user.student
     db_offers = Offer.objects.filter(student=current_student.id)
-    offers1=[]
+    offers1 = []
     for offer in db_offers:
-        item_dict={
+        item_dict = {
             "id": f'{offer.id}',
             "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
             "subject": offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else '',
@@ -508,4 +509,3 @@ def dashboard(request):
 
     finally:
         return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
-
