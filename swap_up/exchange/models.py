@@ -161,10 +161,10 @@ class Offer(models.Model):
         offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
         offer_dict['id'] = self.id
         offer_dict['date'] = self.add_time
-        offer_dict['state'] = self.state.split('\'')[-2] if self.state else None
+        offer_dict['state'] = self.state.split('\'')[-2] if len(self.state) > 1 else None
 
         try:
-            term = [c for c in self.other_student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+            term = [c for c in self.other_student.list_of_classes.all() if c.subject == self.unwanted_class.subject][0]
         except IndexError:
             term = None
 
