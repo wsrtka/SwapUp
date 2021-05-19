@@ -446,9 +446,7 @@ def user_offers(request):
     if request.GET.get('delete_user_offer'):
         offer = Offer.objects.get(id=request.GET.get('delete_user_offer'))
         offer.delete()
-        #TODO
-        #jak zrobić żeby wracało na strone z user_offers ale odswieżało strone
-        return render(request,"exchange/user_offers.html", {'offers': offers1})
+        return redirect("/exchange/my-offers")
     return render(request, 'exchange/user_offers.html', {'offers': offers1})
 
 
