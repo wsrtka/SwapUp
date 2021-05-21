@@ -110,11 +110,14 @@ class Student(models.Model):
     semester = models.IntegerField(null=True)
     path = models.CharField(max_length=40, choices=PATHS, null=True)
 
-    list_of_additional_subjects = models.ManyToManyField(Subject)
-    list_of_classes = models.ManyToManyField(Class)
+    list_of_additional_subjects = models.ManyToManyField(Subject, blank=True)
+    list_of_classes = models.ManyToManyField(Class, blank=True)
 
-    # def __str__(self):
-    #     return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
+    def __str__(self):
+        if self.user:
+            return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
+        else:
+            return f'Student without user, {self.index_number}, s{self.semester}'
 
 
 class Offer(models.Model):
@@ -162,11 +165,14 @@ class Offer(models.Model):
         offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
         offer_dict['id'] = self.id
         offer_dict['date'] = self.add_time
-        offer_dict['state'] = self.state.split('\'')[-2] if len(self.state) > 1 else None
+        offer_dict['state'] = self.state if self.state else None
+
+        print(self.state)
+        print("eloleelo")
 
         try:
             term = [c for c in self.other_student.list_of_classes.all() if c.subject == self.unwanted_class.subject][0]
-        except IndexError:
+        except:
             term = None
 
         offer_dict['other_time'] = f'{term.day} {term.time} {term.week}' if term else None

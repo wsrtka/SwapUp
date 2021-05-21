@@ -81,7 +81,7 @@ def create_class_dict(c):
         class_dict['id'] = str(c.id)
 
 
-        class_dict['subject_name'] = str(subject.subject_name)
+        class_dict['subject_name'] = str(subject.name)
         class_dict['category'] = str(subject.category)
         class_dict['capacity'] = str(c.capacity)
         class_dict['teacher'] = str(teacher.name)

@@ -41,7 +41,7 @@
                 Closed
 
                 {% endif %}
-                {% if offer.state == "Pending" %}
+                {% if offer.state == "P" %}
 
                 <form action="{% url 'accept-offer' offer.id %}" method="POST">
                     {% csrf_token%}
