@@ -3,10 +3,16 @@
 {% block content %}
 <div class="container is-max-desktop">
 
+        <div class="confirm">
+
+    </div>
+
     <div style="padding-top: 20px; padding-bottom: 20px;">
         <h1 class="title is-3 is-spaced">Manage Exchanges</h1>
     </div>
+    <div class="confirm">
 
+    </div>
     <!--<a class="button is-primary" href="{% url 'add-exchange' %}"-->
     <!--   style=" margin: 15px; height: 50px; width: 500px; font-size: 20px;">-->
     <!--    Add Exchange-->
@@ -64,9 +70,9 @@
 
 <script>
     function onClear(id) {
-        if (confirm('Are you sure')) {
+        if (confirm("Are you sure you want to delete Semester " + id + "?")) {
             document.getElementById(id).value = id;
-        }else{
+        } else {
             document.getElementById(id).value = "";
         }
     }

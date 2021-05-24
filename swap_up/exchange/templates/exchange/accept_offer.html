@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+{% load my_tags %}
+
+<div class='container content box'>
+    <h1 class="hero">Accept offer</h1>
+    You are about to accept the following offer: <br>
+    {{a_offer.subject}} with {{a_offer.teacher}} on {{a_offer.time}}. Additional comments: {{a_offer.comment}}
+
+    <br>
+    Currently, you have:
+    {% if c_term %}
+        {{c_term.subject}} with {{c_term.teacher}} on {{c_term.day}} {{c_term.week}} {{c_term.time}}.
+    {% else %}
+        nothing.
+    {% endif %}
+
+    <br>
+    Are you sure you want to accept this trade?
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+        <button class='button is-primary is-outlined' type='submit'>Yes!</button> <a href="{% url 'offers' %}" class='button is-primary'>Go back</a>
+    </form>
+</div>
+
+{% endblock %}

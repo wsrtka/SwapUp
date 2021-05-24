@@ -7,48 +7,8 @@
     <h1 class="hero">Available offers</h1>
     <p>Want to add your own offer? <a href="{% url 'add-offer' %}">Click here!</a></p>
 </section>
-
 <section class="box">
     <div class="columns">
-      <!-- ↓↓↓ Wykomentowana sekcja z filtrami ↓↓↓ -->
-        <!-- <div id="sidebar" class="column is-one-quarter">
-            <nav class="panel">
-                <p class="panel-heading">
-                  Search offers
-                </p>
-                <p class="panel-tabs">
-                  <a class="is-active">Subjects</a>
-                  <a>Teachers</a>
-                  <a>Paths</a>
-                  <a>Days</a>
-                  <a>Hours</a>
-                </p>
-                <a class="panel-block is-active">
-                  Subject 1
-                </a>
-                <a class="panel-block">
-                  Subject 2
-                </a>
-                <a class="panel-block">
-                    Subject 3
-                  </a>
-                  <a class="panel-block">
-                    Subject 4
-                  </a>
-                  <a class="panel-block">
-                    Subject 5
-                  </a>
-                <label class="panel-block">
-                  <input type="checkbox">
-                  remember me
-                </label>
-                <div class="panel-block">
-                  <button class="button is-link is-outlined is-fullwidth">
-                    Reset all filters
-                  </button>
-                </div>
-              </nav>
-        </div> -->
 
         {% if offers1 %}
         
@@ -82,13 +42,12 @@
                       Anything
                     {% endif %}
                     <br>
-                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
-                    <!-- <em>23:09, 04/01/2021</em> -->
+                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
                   </div>
                 </div>
                 <footer class="card-footer">
                   <!-- <a href="#" class="card-footer-item">Comment</a> -->
-                  <a href="#" class="card-footer-item">Accept</a>
+                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
                 </footer>
               </div>
           {% endfor %}
@@ -124,13 +83,12 @@
                       Anything
                     {% endif %}
                     <br>
-                    <!-- todo: miejsce na wypisanie czasu dodania oferty -->
-                    <!-- <em>23:09, 04/01/2021</em> -->
+                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
                   </div>
                 </div>
                 <footer class="card-footer">
                   <!-- <a href="#" class="card-footer-item">Comment</a> -->
-                  <a href="#" class="card-footer-item">Accept</a>
+                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
                 </footer>
               </div>
           {% endfor %}

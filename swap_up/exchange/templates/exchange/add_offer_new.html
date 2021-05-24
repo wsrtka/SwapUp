@@ -29,6 +29,7 @@
 
   }
 
+
 .subject_container:hover{    
   background-color: hsla(48, 100%, 67%, 1);
 }
@@ -72,21 +73,31 @@
             </div>
 
             <div class="columns is-vcentered is-centered">
-                <div class="column is-half">
+                <div class="column  is-two-fifths ">
                 <div class="notification is-success">                  
                     Mark green all the classes you want at most.
                 </div>
                 </div>
 
-                <div class="column is-half">
-                <div class="notification is-info">                  
-                    If there are free places in a group try to apply immediatly.
-                </div>
+                <div class="column">
+                    <div class="notification is-info">   
+                    <div class = "columns is-gapless">               
+                        <div class = "column is-10">
+                            If there are free places in a group you will see a button to sign up immediatly.
+                        </div>            
+                        <div class = "column">
+                            <a class=" button is-danger is-fullwidth"> 
+                                Sign up
+                            </a> 
+                        </div>
+                    </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- interactive schedule -->
     <div class="columns is-vcentered is-centered">
         {% for day  in schedule %}
 
@@ -95,32 +106,8 @@
 
                     <div class='day_container'>
                         {% for class in day.schedule %}
-                        {% if class.id != unwanted_class_id %}
-                            <!-- button -->
-                            <button id ='{{class.id | safe}}' name='schedule_button' value={{class.id | safe}} class="subject_container"
-                            onclick="toggle_subject('{{class.id | safe}}')"
-                            style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%; left: {{class.left |safe}}%; width: {{class.width | safe}}%">
 
-                                <div>
-
-
-
-                        </div>
-                                    <div class="is-11"><span>{{class.short_time}}</span>
-                                        {% if class.week %} <span class="tag is-info" style="float:right">{{class.week}}</span> {% endif %}
-                                    </div>
-
-                                    <div>{{class.short_teacher}}, ID: {{class.id}}
-                            
-                                        {% if class.id in classes_with_free_spots%}
-                                        <a class="button is-danger small right" style = "float: right; max-width: 20px; max-height: 20px;" href="{% url 'sign-for-class' unwanted_class_id=unwanted_class_id wanted_class_id=class.id %}"> Sign</a>
-                                        {% endif %}
-                                    </div>
-
-                                </div>
-                            </button>
-
-                        {% else %} 
+                        {% if class.id == unwanted_class_id %}
                             <!-- unwanted class -->
                             <div id ='{{class.id | safe}}' class="unwanted subject_container"
                             style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%; left: {{class.left |safe}}%; width: {{class.width | safe}}%">
@@ -133,6 +120,33 @@
                                     <div>{{class.short_teacher}}, ID: {{class.id}}</div>
                                 </div>
                             </div>
+
+                        {% else%} 
+                            <!-- button -->
+                            <button id ='{{class.id | safe}}' name='schedule_button' value={{class.id | safe}} class="subject_container"
+                            onclick="toggle_subject('{{class.id | safe}}')"
+                            style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%; left: {{class.left |safe}}%; width: {{class.width | safe}}%">
+
+                                <div class = "columns is-gapless ">
+                                    <div class="column is-half">
+                                        <span>{{class.short_time}}</span> <br/>
+                                        <span>{{class.short_teacher}}, ID: {{class.id}}</span>
+                                    </div>
+                                    <div class="column  is-align-self-center">
+                                        {% if  class.id in classes_with_free_spots %}
+                                        <a class=" button is-danger is-fullwidth "
+                                        href="{% url 'sign-for-class' unwanted_class_id=unwanted_class_id wanted_class_id=class.id %}"> 
+                                            Sign up
+                                        </a>
+                                        {%endif%}
+                                    </div>
+                                    <div class="column is-1">
+                                        {% if class.week %} <span class="tag is-info" style="float:right">{{class.week}}</span> {% endif %}
+                                    </div>
+                                </div>
+
+                            </button>
+
 
                         {% endif %}
                         {% endfor %}

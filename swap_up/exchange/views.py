@@ -57,7 +57,7 @@ def import_schedule_for_year(csv_file):
 
             if subject_name_row != '' and teacher_name != '' and day != '' and time != '':
                 subject, created_subject = Subject.objects.get_or_create(
-                    subject_name=subject_name_row,
+                    name=subject_name_row,
                     category=term_type,
                     semester=semester
                 )
@@ -108,7 +108,7 @@ def download_schedule(request):
         subject = c.subject
         teacher = c.teacher
         f.write(
-            str(subject.subject_name) + ";" + str(subject.category)
+            str(subject.name) + ";" + str(subject.category)
             + ";" + str(c.capacity) + ";" + str(c.group_number) + ";" + str(teacher.name)
             + ";" + str(c.room) + ";" + str(c.week) + ";" + str(c.day) + ";" + str(c.time)
             + "\n"
@@ -122,18 +122,16 @@ def download_schedule(request):
 
 
 def get_classes_student_list(clss):
-
     students = []
 
     for student in Student.objects.all():
-            if clss in student.list_of_classes.all():
-                students.append(student)
+        if clss in student.list_of_classes.all():
+            students.append(student)
 
     return students
 
 
 def get_classes_free_spots(clss):
-
     if clss.capacity != None:
         taken_spots = len(get_classes_student_list(clss))
         return (clss.capacity - taken_spots)
@@ -143,46 +141,42 @@ def get_classes_free_spots(clss):
 
 @login_required
 def download_subject_student_list(request):
-
     try:
         subjects = []
         semester_id = request.user.student.semester
-        subjects = Subject.objects.filter(semester = semester_id)
-        print("Semester " +  str(semester_id) )
-    
+        subjects = Subject.objects.filter(semester=semester_id)
+        print("Semester " + str(semester_id))
+
     except Student.DoesNotExist:
         subjects = Subject.objects.all()
 
     return render(request, 'exchange/download_subject.html', {'subjects': subjects})
 
+
 @login_required
 def download_certain_subject_student_list(request, subject_id):
-
     if request.user.is_superuser:
 
-        subject = Subject.objects.get(id = subject_id)
-        classes = Class.objects.filter(subject_id = subject_id)
+        subject = Subject.objects.get(id=subject_id)
+        classes = Class.objects.filter(subject_id=subject_id)
 
-        filename = subject.subject_name + "list.csv"
-        f = open(filename, 'w') 
-        f.write(subject.subject_name + "\n")
-
-
+        filename = subject.name + "list.csv"
+        f = open(filename, 'w')
+        f.write(subject.name + "\n")
 
         for clss in classes:
 
             teacher = clss.teacher
             students = get_classes_student_list(clss)
 
-            for student in students:        
-
-                f.write(str(clss.group_number) + ";" 
+            for student in students:
+                f.write(str(clss.group_number) + ";"
                         + str(clss.day) + ";"
                         + str(clss.time) + ";"
                         + str(teacher.name) + ";"
                         + str(student.index_number)
-                        + "\n"                  
-                    )
+                        + "\n"
+                        )
 
         f.close()
         f = open(filename, 'r')
@@ -193,7 +187,6 @@ def download_certain_subject_student_list(request, subject_id):
         return response
     else:
         return render(request, 'base.html')
-
 
 
 @login_required
@@ -211,7 +204,7 @@ def upload_csv(request):
 
 
 @login_required
-def exhange(request, exchange_id):
+def exchange(request, exchange_id):
     name = ''
     items = []
     db_exchanges = Exchange.objects.all()
@@ -222,22 +215,26 @@ def exhange(request, exchange_id):
     db_offers = Offer.objects.all()
 
     for offer in db_offers:
-        # if offer.exchange and offer.exchange.semester == exchange_id:
-        item_dict = {
-            "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
-            "subject": offer.unwanted_class.subject.subject_name if offer.unwanted_class.subject.subject_name else '',
-            "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
-            "other_times": offer.preferred_days,
-            "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
-            "other_teachers": ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
-            "comment": offer.additional_information if offer.additional_information else None,
-        }
-        items.append(item_dict)
+        if offer.exchange and offer.exchange.semester == exchange_id:
+            item_dict = {
+                "id": f'{offer.id}',
+                "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
+                "subject": offer.unwanted_class.subject.name if offer.unwanted_class.subject.name else '',
+                "time": f'{offer.unwanted_class.day} {offer.unwanted_class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
+                'preferred_days': f'{offer.preferred_days}',
+                'preferred_hours': f'{offer.preferred_times}',
+                'preferred_classes': f'{offer.preferred_classes}',
+                'preferred_teachers': ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
+                'acceptable_classes': f'{offer.acceptable_classes}',
+                "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
+                "comment": offer.additional_information if offer.additional_information else None,
+            }
+            items.append(item_dict)
 
     if request.GET.get('delete_offer'):
-        print(request.GET.get('delete_offer'))
-        # Offer.objects.exchange.filter(id=int(request.GET.get('delete_offer'))).delete()
-        # return redirect(str(exchange`_id`))
+        offer = Offer.objects.get(id=request.GET.get('delete_offer'))
+        offer.delete()
+        return redirect('/exchange/manage/{}'.format(exchange_id))
 
     return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
 
@@ -269,10 +266,10 @@ def manage(request):
 
         if request.GET.get('delete_exchange'):
             if request.GET.get('delete_exchange') != '':
-                # print(request.GET.get('delete_exchange'))
-                # Exchange.objects.filter(semester=int(request.GET.get('delete_exchange'))).delete()
                 db_offers = Offer.objects.all()
-                db_offers = [offer for offer in db_offers if offer.exchange is not None and offer.exchange.semester == int(request.GET.get('delete_exchange'))]
+                db_offers = [offer for offer in db_offers if
+                             offer.exchange is not None and offer.exchange.semester == int(
+                                 request.GET.get('delete_exchange'))]
                 for offer in db_offers:
                     offer.delete()
                 return redirect('manage')
@@ -285,10 +282,12 @@ def manage(request):
 @login_required
 def offers(request):
     current_student = request.user.student
-    db_offers = Offer.objects.filter(state=('N', 'New')).exclude(student=current_student.id)
+    print(Offer.STATES[0])
+    db_offers = Offer.objects.filter(state=Offer.STATES[0][1]).exclude(student=current_student.id)
     # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
 
     offers = [o.dictionary() for o in db_offers]
+    print(offers)
 
     offers1 = offers[::2]
     offers2 = offers[1::2]
@@ -321,10 +320,9 @@ def add_exchange(request):
 
 
 def sign_for_class(request, unwanted_class_id, wanted_class_id):
-
     student = request.user.student
-    unwanted = Class.objects.get(id = unwanted_class_id)
-    wanted = Class.objects.get(id = wanted_class_id)
+    unwanted = Class.objects.get(id=unwanted_class_id)
+    wanted = Class.objects.get(id=wanted_class_id)
 
     spots_in_wanted = get_classes_free_spots(wanted)
     if spots_in_wanted > 0:
@@ -336,29 +334,29 @@ def sign_for_class(request, unwanted_class_id, wanted_class_id):
     else:
         return render(request, 'exchange/failure.html')
 
+
 @login_required
 def add_offer(request):
     if request.method == 'POST' and 'schedule_button' in request.POST:
         print(request.POST['schedule_button'])
         unwanted_class = Class.objects.get(id=request.POST['schedule_button'])
         subject = unwanted_class.subject
-        print(subject.subject_name)
+        print(subject.name)
 
-        all_classes = Class.objects.filter(subject_id = subject)
+        all_classes = Class.objects.filter(subject_id=subject)
         classes_with_free_spots = []
 
-        for clss in all_classes: 
+        for clss in all_classes:
             spots = get_classes_free_spots(clss)
             if spots > 0:
-                classes_with_free_spots.append( str(clss.id) )
-
+                classes_with_free_spots.append(str(clss.id))
 
         # if sa wolne miejsca: zaznacz na inny kolor zajecia z wolnymi miejscami
         # # jesli udalo sie zapisac, wyrendereuj widok SUKCES
         # # jesli nie: przepraszamy, ktos cie ubiegl
         # # takie zajecia maja button: zapisz sie w tej chwili 
 
-        #Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
+        # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
         all_classes = Class.objects.filter(subject_id=subject)
         all_classes = Class.objects.filter(subject=subject)
         # Tutaj dla tych wszystkich przedmiotów wyliczam dane do wyświetlenia
@@ -385,48 +383,43 @@ def add_offer(request):
                             {'schedule': schedule['Pt'], 'name': 'Piątek'}
                             ]
 
-        return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule, 
-        'subject_name': subject.subject_name, 'unwanted_class_id': request.POST['schedule_button'], 
-        'classes_with_free_spots': classes_with_free_spots})
+        return render(request, 'exchange/add_offer_new.html', {'schedule': context_schedule,
+                                                               'subject_name': subject.name,
+                                                               'unwanted_class_id': request.POST['schedule_button'],
+                                                               'classes_with_free_spots': classes_with_free_spots})
 
     elif request.method == 'POST':
         print(request.POST['unwanted_class_id'])
         unwanted_class = Class.objects.get(id=request.POST['unwanted_class_id'])
+        student = request.user.student
 
         yellow_ids, green_ids = [], []
-        for color_ids, color_name in (( yellow_ids, 'yellow'), ( green_ids, 'green')):
+        for color_ids, color_name in ((yellow_ids, 'yellow'), (green_ids, 'green')):
             if request.POST[color_name] != "":
                 color_ids = request.POST['yellow'][:-1].split(",")
 
-
         new_offer = Offer.objects.create(
-                student=request.user.student,
-                #TODO
-                exchange=None,
-                unwanted_class=unwanted_class,
-                additional_information=request.POST['comment'],
-                state='New'
-                )
+            student=request.user.student,
+            # TODO
+            exchange=Exchange.objects.get(semester=student.semester),
+            unwanted_class=unwanted_class,
+            additional_information=request.POST['comment'],
+            state='New'
+        )
 
-        
         for green_id in green_ids:
             green_class = Class.objects.get(
-                id = green_id
+                id=green_id
             )
             new_offer.preferred_classes.add(green_class)
 
-        
         for yellow_id in yellow_ids:
             yellow_class = Class.objects.get(
-                id = yellow_id
+                id=yellow_id
             )
             new_offer.acceptable_classes.add(yellow_class)
 
-        
-
     return HttpResponseRedirect('/exchange/my-offers')
-
-
 
 
 @login_required
@@ -436,45 +429,28 @@ def edit_exchange(request):
 
 @login_required
 def user_offers(request):
-    offer1 = {
-        "subject": "Teoria nicości2",
-        "have_time": "Pn A, 8:00",
-        "have_teacher": "Zenon Iksiński",
-        "state": "new",
-        "other_student": None,
-        "other_time": None,
-        "other_teacher": None
-    }
-
-    offer2 = {
-        "subject": "Teoria nicości",
-        "have_time": "Pn A, 8:00",
-        "have_teacher": "Zenon Iksiński",
-        "state": "pending",
-        "other_student": "Staszek Ciaptak-Gąsiennica",
-        "other_time": "Wt B, 9:35",
-        "other_teacher": None
-    }
-
-    offer3 = {
-        "subject": "Wprowadzenie do teorii nicości",
-        "have_time": "Pn A, 8:00",
-        "have_teacher": "Zenon Iksiński",
-        "state": "closed",
-        "other_student": "Józio Chmura-Mamałyga",
-        "other_time": "Wt B, 9:35",
-        "other_teacher": None
-    }
-
-    # static offers
-    # offers = [offer1, offer2, offer3]
-
     # dynamic offers
     current_student = request.user.student
     db_offers = Offer.objects.filter(student=current_student.id)
-
     offers = [o.dictionary() for o in db_offers]
+    # offers1=[]
+    # for offer in db_offers:
+    #     item_dict={
+    #         "id": f'{offer.id}',
+    #         "student": f'{offer.student.user.first_name} {offer.student.user.last_name}' if offer.student.user.first_name and offer.student.user.last_name else 'Anonymous',
+    #         "subject": offer.unwanted_class.subject.name if offer.unwanted_class.subject.name else '',
+    #         "time": f'{offer.unwanted_class.day} {offer.unwanted_`class.week} | {offer.unwanted_class.time}' if offer.unwanted_class else '',
+    #         "other_times": offer.preferred_days,
+    #         "teacher": offer.unwanted_class.teacher.name if offer.unwanted_class.teacher else '',
+    #         "other_teachers": ",".join([teacher.name for teacher in offer.preferred_teachers.all()]),
+    #         "comment": offer.additional_information if offer.additional_information else None,
+    #     }
+    #     offers1.append(item_dict)
 
+    if request.GET.get('delete_user_offer'):
+        offer = Offer.objects.get(id=request.GET.get('delete_user_offer'))
+        offer.delete()
+        return redirect("/exchange/my-offers")
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
 
@@ -513,27 +489,86 @@ def schedule(request):
 
 @login_required()
 def dashboard(request):
+    latest_offers = Offer.objects.all().exclude(student=request.user.student)
 
+    if len(latest_offers) > 3:
+        latest_offers = latest_offers[:3]
+
+    user_offers = Offer.objects.all().filter(student=request.user.student)
+
+    if len(user_offers) > 3:
+        user_offers = user_offers[:3]
+
+    l_offers = [o.dictionary() for o in latest_offers]
+    u_offers = [o.dictionary() for o in user_offers]
+
+    return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+
+
+@login_required()
+def accept_offer(request, offer_id):
+    # ta funkcja jest dosyć specyficzna bo obsługuje trzy requesty: 
+    # 1. na wyświetlenie stronki "czy na pewno chcesz brać ofertę"
+    # 2. na zaakceptowanie przez zainteresowanego studenta wymiany
+    # 3. na ostateczne zaakceptowanie przez wystawiającego
+
+    a_offer = Offer.objects.get(id=offer_id)
+
+    if request.method == "POST":
+        # opcja 3.
+        if request.user.student == a_offer.student:
+            # wyszukiwanie nowego terminu dla wystawiającego
+            try:
+                c_term = [c for c in a_offer.other_student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+            except IndexError:
+                c_term = None
+
+            # jeśli go nie znaleziono, to nic się nie dzieje
+            if c_term:
+                # przypisanie nowych terminóœ
+                a_offer.other_student.list_of_classes.add(a_offer.unwanted_class)
+                request.user.student.list_of_classes.add(c_term)
+
+                # usunięcie starych terminów z planu godzin studentów
+                request.user.student.list_of_classes.remove(a_offer.unwanted_class)
+                a_offer.other_student.list_of_classes.remove(c_term)
+
+                a_offer.state = Offer.STATES[2]
+
+                request.user.student.save()
+                a_offer.other_student.save()
+                a_offer.save()
+
+                messages.success(request, 'You have successfully traded your term!')
+
+            else:
+                messages.error(request, 'We could not find the other student\'s class, make sure he attends the subject.')
+
+            return redirect('offers')
+        
+        # opcja 2.
+        else:
+            a_offer.other_student = request.user.student
+            a_offer.state = Offer.STATES[1]
+            a_offer.save()
+
+            messages.success(request, 'You have accepted the offer! Now wait for exchange confirmation from your fellow student.')
+
+            return redirect('offers')
+
+    # opcja 1.
     try:
+        c_term = [c for c in request.user.student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+        c_term = c_term.dictionary()
+    except IndexError:
+        c_term = None
 
-        latest_offers = Offer.objects.all().exclude(student=request.user.student)
-
-        if len(latest_offers) > 3:
-            latest_offers = latest_offers[:3]
-
-        user_offers = Offer.objects.all().filter(student=request.user.student)
-
-        if len(user_offers) > 3:
-            user_offers = user_offers[:3]
-
-        l_offers = [o.dictionary() for o in latest_offers]
-        u_offers = [o.dictionary() for o in user_offers]
+    return render(request, 'exchange/accept_offer.html', {"a_offer": a_offer.dictionary(), "c_term": c_term})
 
 
-    except:
-        l_offers = []
-        u_offers = []
+def decline_offer(request, offer_id):
+    offer = Offer.objects.get(id=offer_id)
+    offer.state = Offer.STATES[0]
+    offer.save()
 
-
-    finally:
-            return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+    return render(request, 'exchange/decline_offer.html')

@@ -39,20 +39,26 @@
             </td>
             <td>
                 <strong>
-                    {% if item.other_times %}
-                    {{item.other_times}}
+                    {% if item.preferred_days != "None" %}
+                    {{item.preferred_days}}
                     {% else %}
-                    any time
+                    any day
+                    {% endif %}
+                </strong>|
+                <strong>
+                    {% if item.preferred_hours != "None"%}
+                    {{item.preferred_hours}}
+                    {% else %}
+                    any hour
                     {% endif %}
                 </strong>
                 <p>
-                    {% if item.other_teachers %}
-                    {{item.other_teachers}}
+                    {% if item.preferred_teachers %}
+                    {{item.preferred_teachers}}
                     {% else %}
                     any teacher
                     {% endif %}
                 </p>
-
             </td>
             <td>
                 {% if item.comment %}
@@ -66,17 +72,16 @@
                     </button>
                 </form>
             </td>
-
         </tr>
-        {% endfor %}
-        </tbody>
+            {% endfor %}
+            </tbody>
     </table>
 
 </div>
 
 <script>
     function onDelete(id) {
-        if (confirm('Are you sure')) {
+        if (confirm('Are you sure you want to delete this offer?')) {
             document.getElementById(id).value = id;
         }else{
             document.getElementById(id).value = "";
