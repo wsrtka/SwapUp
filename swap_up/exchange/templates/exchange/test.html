@@ -103,20 +103,11 @@
 
                                 <div>
 
-
-
-                        </div>
                                     <div class="is-11"><span>{{class.short_time}}</span>
                                         {% if class.week %} <span class="tag is-info" style="float:right">{{class.week}}</span> {% endif %}
                                     </div>
 
                                     <div>{{class.short_teacher}}, ID: {{class.id}}
-                            
-                                        {% if class.id in classes_with_free_spots%}
-                                        <a class="button is-danger small right" style = "float: right; max-width: 20px; max-height: 20px;" href="{% url 'sign-for-class' unwanted_class_id=unwanted_class_id wanted_class_id=class.id %}"> Sign</a>
-                                        {% endif %}
-                                    </div>
-
                                 </div>
                             </button>
 
