@@ -11,6 +11,7 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'swap_up.settings')
+# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'swap_up.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'swap_up.swap_up.settings')
 
 application = get_wsgi_application()

@@ -81,10 +81,13 @@ WSGI_APPLICATION = 'swap_up.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': str(BASE_DIR / 'db.sqlite3'),
+        'NAME': 'd2jou9550oing7',
+        'HOST': 'ec2-35-170-85-206.compute-1.amazonaws.com',
+        'PORT': 5432,
+        'USER': 'vwuprjblclmhys',
+        'PASSWORD': 'aa0ab78656f7be996ccf17de1024ef9e2767ed12e593d9f3a07f857f7f91ab2f'
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
