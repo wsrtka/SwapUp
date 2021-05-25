@@ -128,8 +128,8 @@ USE_TZ = True
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
-STATIC_URL = '/static/'
-STATIC_URL = os.path.join(BASE_DIR, 'staticfiles')
+# STATIC_URL = '/static/'
+STATIC_URL = os.path.join(BASE_DIR, 'staticfiles/')
 
 
 # Settings for crispy forms (better form rendering)
