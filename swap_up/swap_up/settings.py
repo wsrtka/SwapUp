@@ -131,7 +131,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # STATIC_URL = '/static/'
 STATIC_URL = os.path.join(BASE_DIR, 'staticfiles/')
 
-
 # Settings for crispy forms (better form rendering)
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = (
