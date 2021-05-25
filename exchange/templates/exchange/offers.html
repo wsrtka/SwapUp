@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container is-max-desktop">
+
+<section class="content box mt-6 py-5">
+    <h1 class="hero">Available offers</h1>
+    <p>Want to add your own offer? <a href="{% url 'add-offer' %}">Click here!</a></p>
+</section>
+<section class="box">
+    <div class="columns">
+
+        {% if offers1 %}
+        
+        <div id="col1" class="column">
+
+          {% for offer in offers1 %}
+            <div class="card block">
+                <header class="card-header">
+                  <p class="card-header-title">
+                    {{ offer.subject }}
+                  </p>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    <em>{{offer.student}}</em> is giving away:
+                    <hr class="my-2">
+                    {{offer.time}} <br>
+                    With: {{offer.teacher}}
+                    <hr class="my-2">
+                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                      {% if offer.preferred_days %}
+                        <p>Preferred days: {{offer.preferred_days}}</p>
+                      {% endif %}
+                      {% if offer.preferred_times %}
+                        <p>Preferred times: {{offer.preferred_times}}</p>
+                      {% endif %}
+                      {% if offer.preferred_teachers %}
+                        <p>Preferred teachers: {{offer.preferred_teachers}}</p>
+                      {% endif %}
+                    {% else %}
+                      Anything
+                    {% endif %}
+                    <br>
+                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
+                  </div>
+                </div>
+                <footer class="card-footer">
+                  <!-- <a href="#" class="card-footer-item">Comment</a> -->
+                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
+                </footer>
+              </div>
+          {% endfor %}
+
+        </div>
+
+        <div id="col2" class="column">
+            {% for offer in offers2 %}
+            <div class="card block">
+                <header class="card-header">
+                  <p class="card-header-title">
+                    {{ offer.subject }}
+                  </p>
+                </header>
+                <div class="card-content">
+                  <div class="content">
+                    <em>{{offer.student}}</em> is giving away:
+                    <hr class="my-2">
+                    {{offer.time}} <br>
+                    With: {{offer.teacher}}
+                    <hr class="my-2">
+                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                      {% if offer.preferred_days %}
+                        <p>Preferred days: {{offer.preferred_days}}</p>
+                      {% endif %}
+                      {% if offer.preferred_times %}
+                        <p>Preferred days: {{offer.preferred_times}}</p>
+                      {% endif %}
+                      {% if offer.preferred_teachers %}
+                        <p>Preferred days: {{offer.preferred_teachers}}</p>
+                      {% endif %}
+                    {% else %}
+                      Anything
+                    {% endif %}
+                    <br>
+                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
+                  </div>
+                </div>
+                <footer class="card-footer">
+                  <!-- <a href="#" class="card-footer-item">Comment</a> -->
+                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
+                </footer>
+              </div>
+          {% endfor %}
+        </div>
+
+        {% else %}
+
+        <div class='column'>
+          There are no offers available.
+        </div>
+
+        {% endif %}
+    </div>
+</section>
+</div>
+{% endblock %}

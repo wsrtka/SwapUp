@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% for subject in subjects %}
+<div style="display: inline-block; text-align: center">
+    <a class="button is-primary mt-5" href="{% url 'download-certain-subject' subject_id=subject.id %}">Download list for {{subject.subject_name}} </a>
+</div>
+{% endfor %}
+
+
+{% endblock %}

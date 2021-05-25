@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% load crispy_forms_tags %}
+{% load my_tags %}
+
+<div class="container is-max-desktop">
+    <div class='box'>
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <p class="title is-3 is-spaced">Add Exchange</p>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    {{ form.name|as_crispy_field }}
+                </div>
+                <div class="column">
+                    {{ form.semester|as_crispy_field }}
+                </div>
+            </div>
+            <button class="button is-primary" type="submit" , name="submit" , value="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

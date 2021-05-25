@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="container content box mb-6" enctype="multipart/form-data">
+    <form method="POST">
+        {% csrf_token %}
+        
+        <fieldset>
+            <legend class="title">Edit profile</legend>
+            {{ u_form|crispy }}
+            {{ p_form|crispy }}
+        </fieldset>
+
+        <button type="submit" class="button is-primary mt-5">Edit</button>
+    </form>
+</div>
+
+{% endblock %}

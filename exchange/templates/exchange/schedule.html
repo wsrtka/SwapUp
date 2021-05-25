@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% load static %}
+<style>
+  .day_container{
+   position: relative;
+   background-color:  hsl(171, 40%, 70%) ;
+   height: 100vh;
+   max-height:700px;
+   border-radius: 25px;
+
+  }
+  .subject_container{
+    position: absolute;
+    opacity: 1;
+    padding-right: 2%;
+    padding-left: 2%;
+    background: whitesmoke;
+    color: inherit;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    outline: inherit;
+    text-align: inherit;
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.116);
+
+  }
+  .subject_container:hover {
+  background-color: hsl(48, 100%, 67%);
+}
+
+</style>
+
+    <!-- Desktop-->
+
+    <div class="columns is-vcentered is-centered">
+        {% for day  in context %}
+
+        <div class='column is-2'>
+            <p class="title is-2 has-text-centered">{{day.name}}</p>
+            <div class='day_container'>
+                {% for class in day.schedule %}
+                    <button name='schedule_button_old' value={{class.id | safe}} class="subject_container"
+                     onclick="showModal( {{class.id | safe}}, 'You selected {{class.subject_name}}, {{day.name}} {{class.time}} with {{class.teacher}}. Are you sure?')"
+                      style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%; left: {{class.left |safe}}%; width: {{class.width | safe}}%">
+
+                        <div>
+
+                            <div class="is-11"><span>{{class.short_time}}</span>
+                                {% if class.week %} <span class="tag is-primary" style="float:right">{{class.week}}</span> {% endif %}
+                            </div>
+
+                            <div>{{class.short_subject_name}} </div>
+                            <div>{{class.short_teacher}} </div>
+                        </div>
+
+                    </button>
+
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+<!--confirm modal-->
+
+<div class='container'>
+    <div class='columns is-mobile is-centered'>
+        <div class='column is-4'>
+
+            <div class="modal">
+                <div class="modal-background">                    
+                </div>
+                <div class="modal-content">
+                    <div class='box'>
+                        <header class="modal-card-head">      
+                            <p class="modal-card-title">You want to swap</p>
+                            <button class="delete" aria-label="close"></button>
+                        </header>
+                            
+                        <p class='is-family-monospace' id='modal-text'>
+                            Analiza 7 etc
+                        </p>
+                        <form action="{% url 'add-offer' %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="schedule_button" value="0" id="schedule_button">
+                            <footer class="modal-card-foot ">
+                                <button class="button is-primary ", id="submit", type="submit", name="submit", value="submit">Proceed</button>
+                            </footer>
+                            </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  
+  <script>
+    // Bulma does not have JavaScript included,
+    // hence custom JavaScript has to be
+    // written to open or close the modal
+
+    const modal = 
+          document.querySelector('.modal');
+    const close = 
+          document.querySelector('.delete')
+  
+
+  
+    close.addEventListener('click',
+                           function () {
+      modal.style.display = 'none'
+    })
+  
+    window.addEventListener('click',
+                            function (event) {
+      if (event.target.className === 
+          'modal-background') {
+        modal.style.display = 'none'
+      }
+    })
+
+
+    function showModal(id, text){
+    document.getElementById("modal-text").innerHTML = text;
+    document.getElementById("schedule_button").value = id;
+      modal.style.display = 'block';
+
+    }
+  </script>
+
+
+
+{% endblock %}
