@@ -55,12 +55,9 @@
                 <p class="card-header-title">
                     {{exchange.name}}
                 </p>
-                <form action="" method="get">
-                    <button id="{{exchange.id}}" style=" margin: 15px;" onclick="onClear('{{exchange.id}}');" class="button has-background-danger-light has-text-danger" name="delete_exchange" value="">Clear</button>
-                </form>
                 <a class="button is-dark has-text-primary" style=" margin: 15px;"
                    href="/exchange/manage/{{exchange.id}}">
-                    Go
+                    Manage
                 </a>
             </header>
         </div>
@@ -69,14 +66,6 @@
 </div>
 
 <script>
-    function onClear(id) {
-        if (confirm("Are you sure you want to delete Semester " + id + "?")) {
-            document.getElementById(id).value = id;
-        } else {
-            document.getElementById(id).value = "";
-        }
-    }
-
     const fileInput = document.querySelector('#file-js-example input[type=file]');
     fileInput.onchange = () => {
         if (fileInput.files.length > 0) {

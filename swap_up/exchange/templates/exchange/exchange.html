@@ -4,7 +4,6 @@
 <div class="container is-max-desktop">
 
     <p class="title is-1"> {{name}} </p>
-
     <table class='table'>
         <thead>
         <tr class="is-selected">
@@ -12,8 +11,13 @@
             <th>Advertiser</th>
             <th>Wanted</th>
             <th>Comment</th>
-            <th></th>
+            <th>
+                <form action="" method="get">
+                    <button id="{{semester}}" style=" margin: 15px;" onclick="onClear('{{semester}}');" class="button has-background-danger-light has-text-danger" name="delete_exchange" value="">Clear</button>
+                </form>
+            </th>
         </tr>
+        <tr></tr>
         </thead>
 
         <tfoot>
@@ -22,7 +26,8 @@
             <th>Advertiser</th>
             <th>Wanted</th>
             <th>Comment</th>
-            <th></th>
+            <th>
+            </th>
         </tr>
         </tfoot>
         <tbody>
@@ -87,6 +92,14 @@
             document.getElementById(id).value = "";
         }
     }
-</script>
 
+    function onClear(id) {
+        if (confirm("Are you sure you want to delete Semester " + id + "?")) {
+            document.getElementById(id).value = id;
+        } else {
+            document.getElementById(id).value = "";
+        }
+    }
+
+</script>
 {% endblock %}

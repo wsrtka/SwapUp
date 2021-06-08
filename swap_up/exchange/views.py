@@ -211,9 +211,9 @@ def exchange(request, exchange_id):
     for exchange in db_exchanges:
         if exchange.semester == exchange_id:
             name = exchange.name
+            semester = exchange.semester
 
     db_offers = Offer.objects.all()
-
     for offer in db_offers:
         if offer.exchange and offer.exchange.semester == exchange_id:
             item_dict = {
@@ -231,12 +231,21 @@ def exchange(request, exchange_id):
             }
             items.append(item_dict)
 
+    if request.GET.get('delete_exchange'):
+        db_offers = Offer.objects.all()
+        db_offers = [offer for offer in db_offers if
+                     offer.exchange is not None and offer.exchange.semester == int(
+                         request.GET.get('delete_exchange'))]
+        for offer in db_offers:
+            offer.delete()
+        return redirect('/exchange/manage/{}'.format(exchange_id))
+
     if request.GET.get('delete_offer'):
         offer = Offer.objects.get(id=request.GET.get('delete_offer'))
         offer.delete()
         return redirect('/exchange/manage/{}'.format(exchange_id))
 
-    return render(request, 'exchange/exchange.html', {'items': items, 'name': name})
+    return render(request, 'exchange/exchange.html', {'items': items, 'name': name, 'semester': semester})
 
 
 @login_required
@@ -263,16 +272,6 @@ def manage(request):
             import_schedule_for_year(request.FILES['myfile'])
 
             return render(request, 'exchange/manage.html', {'exchanges': exchanges})
-
-        if request.GET.get('delete_exchange'):
-            if request.GET.get('delete_exchange') != '':
-                db_offers = Offer.objects.all()
-                db_offers = [offer for offer in db_offers if
-                             offer.exchange is not None and offer.exchange.semester == int(
-                                 request.GET.get('delete_exchange'))]
-                for offer in db_offers:
-                    offer.delete()
-                return redirect('manage')
 
         return render(request, 'exchange/manage.html', {'exchanges': exchanges})
     else:
@@ -519,7 +518,9 @@ def accept_offer(request, offer_id):
         if request.user.student == a_offer.student:
             # wyszukiwanie nowego terminu dla wystawiającego
             try:
-                c_term = [c for c in a_offer.other_student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+                c_term = \
+                [c for c in a_offer.other_student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][
+                    0]
             except IndexError:
                 c_term = None
 
@@ -542,23 +543,26 @@ def accept_offer(request, offer_id):
                 messages.success(request, 'You have successfully traded your term!')
 
             else:
-                messages.error(request, 'We could not find the other student\'s class, make sure he attends the subject.')
+                messages.error(request,
+                               'We could not find the other student\'s class, make sure he attends the subject.')
 
             return redirect('offers')
-        
+
         # opcja 2.
         else:
             a_offer.other_student = request.user.student
             a_offer.state = Offer.STATES[1]
             a_offer.save()
 
-            messages.success(request, 'You have accepted the offer! Now wait for exchange confirmation from your fellow student.')
+            messages.success(request,
+                             'You have accepted the offer! Now wait for exchange confirmation from your fellow student.')
 
             return redirect('offers')
 
     # opcja 1.
     try:
-        c_term = [c for c in request.user.student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][0]
+        c_term = [c for c in request.user.student.list_of_classes.all() if c.subject == a_offer.unwanted_class.subject][
+            0]
         c_term = c_term.dictionary()
     except IndexError:
         c_term = None
