@@ -309,7 +309,7 @@ def offers(request):
 
     offers = [o.dictionary() for o in db_offers]
     for o in offers:
-        o['preferred_teachers'] = ",".join([teacher.name for teacher in o['preferred_teachers']])
+        o['preferred_teachers'] = ",".join([teacher for teacher in o['preferred_teachers']])
     print(offers)
 
     offers1 = offers[::2]
@@ -540,7 +540,14 @@ def dashboard(request):
 
     l_offers = [o.dictionary() for o in latest_offers]
     u_offers = [o.dictionary() for o in user_offers]
-    
+
+    for o in l_offers:
+        o['preferred_teachers'] = ",".join([teacher for teacher in o['preferred_teachers']])
+
+    for o in l_offers:
+        o['u_offers'] = ",".join([teacher for teacher in o['preferred_teachers']])
+
+
     exchange_closed = Exchange.objects.get(semester=request.user.student.semester).end_time
 
     print(exchange_closed)
