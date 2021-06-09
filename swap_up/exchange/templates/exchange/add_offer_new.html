@@ -117,7 +117,7 @@
                                         {% if class.week %} <span class="tag is-info" style="float:right">{{class.week}}</span> {% endif %}
                                     </div>
 
-                                    <div>{{class.short_teacher}}, ID: {{class.id}}</div>
+                                    <div>{{class.short_teacher}}</div>
                                 </div>
                             </div>
 
@@ -128,19 +128,20 @@
                             style="top: {{class.top | safe}}%; bottom: {{class.bottom | safe }}%; left: {{class.left |safe}}%; width: {{class.width | safe}}%">
 
                                 <div class = "columns is-gapless ">
-                                    <div class="column is-half">
-                                        <span>{{class.short_time}}</span> <br/>
-                                        <span>{{class.short_teacher}}, ID: {{class.id}}</span>
+                                    <div class="column">
+                                        {% if class.colliders|length == 0 %} <span>{{class.short_time}}</span> <br/> {%endif %}
+                                        <span>{{class.short_teacher}}</span>
                                     </div>
                                     <div class="column  is-align-self-center">
                                         {% if  class.id in classes_with_free_spots %}
                                         <a class=" button is-danger is-fullwidth "
-                                        href="{% url 'sign-for-class' unwanted_class_id=unwanted_class_id wanted_class_id=class.id %}"> 
+                                        onClick = 'showModal("You want to apply for free places for {{class.short_teacher}}, {{class.short_time}} class",
+                                            "{% url 'sign-for-class' unwanted_class_id=unwanted_class_id wanted_class_id=class.id %}")'> 
                                             Sign up
                                         </a>
                                         {%endif%}
                                     </div>
-                                    <div class="column is-1">
+                                    <div style="z-index: 10" class="column is-1">
                                         {% if class.week %} <span class="tag is-info" style="float:right">{{class.week}}</span> {% endif %}
                                     </div>
                                 </div>
@@ -171,12 +172,23 @@
     //
     function handle_verification(){
         if (verify_form()){
-            document.getElementById("submit").disabled = false;
+            // document.getElementById("submit").disabled = false;
             document.getElementById("message").hidden = true;
         }
         else{
-            document.getElementById("submit").disabled = true;
-            document.getElementById("message").hidden = false;
+
+            // document.getElementById("submit").disabled = true;
+            document.getElementById("message").hidden = false;            
+            //jeżeli użytkownik nic nie wybrał udaj, że zaznaczył wszystko na zielono
+
+            document.getElementById("yellow").value = "";
+            var all_subjects = document.getElementsByClassName("subject_container");
+
+            document.getElementById("green").value = "";
+            for (var i = 0; i < all_subjects.length; i++) {               
+                document.getElementById("green").value += all_subjects[i].id;
+                document.getElementById("green").value += ",";
+            }
         }
     }
     //remove selected object from the list it belonged to
@@ -243,14 +255,14 @@
             <button class="button is-primary"
                     id='btn'>Click to proceed
             </button>
-            <div class="modal">
+            <div class="modal modal1">
                 <div class="modal-background">                    
                 </div>
                 <div class="modal-content">
                     <div class='box'>
                         <header class="modal-card-head">      
                             <p class="modal-card-title">Your offer</p>
-                            <button class="delete" aria-label="close"></button>
+                            <button class="delete delete1" aria-label="close"></button>
                         </header>
                             
                         <p class='is-family-monospace'>
@@ -264,8 +276,8 @@
                                 <textarea name="comment" class="textarea" placeholder="e.g. Hello world"></textarea>
 
                                 <footer class="modal-card-foot">
-                                    <button class="button is-primary", id="submit", disabled=True, type="submit", name="submit", value="submit">Submit</button>
-                                    <label class='is-family-monospace' id='message'>You must select at least one class</label>
+                                    <button class="button is-primary", id="submit" type="submit", name="submit", value="submit">Submit</button>
+                                    <label class='is-family-monospace' id='message'>You selected nothing, we assume you literary want ANY other subject</label>
                                 </footer>
                             </form>
                     </div>
@@ -281,11 +293,11 @@
     // written to open or close the modal
 
     const modal = 
-          document.querySelector('.modal');
+          document.querySelector('.modal1');
     const btn = 
           document.querySelector('#btn')
     const close = 
-          document.querySelector('.delete')
+          document.querySelector('.delete1')
   
     btn.addEventListener('click',
                          function () {
@@ -304,5 +316,71 @@
         modal.style.display = 'none'
       }
     })
+  </script>
+
+  
+<!--confirm modal-->
+
+<div  class='container'>
+    <div class='columns is-mobile is-centered'>
+        <div class='column is-4'>
+            <div class="modal modal2">
+                <div class="modal-background">                    
+                    <div class="modal-content">
+                        <div class='box'>
+                            <header class="modal-card-head">      
+                                <p class="modal-card-title">Confirm</p>
+                                <button class="delete delete2" aria-label="close"></button>
+                            </header>
+                            <p class='is-family-monospace' id='modal-text'>
+                                Analiza 7 etc
+                            </p>
+                            <footer class="modal-card-foot ">
+
+                            <a class=" button is-primary " id="second-modal-btn"
+                            href = ""> 
+                                Sign up
+                            </a>
+                            </footer>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  
+  <script>
+    // Bulma does not have JavaScript included,
+    // hence custom JavaScript has to be
+    // written to open or close the modal
+
+    const modal2 = 
+          document.querySelector('.modal2');
+    modal2.style.display = 'none'
+    const close2 = 
+          document.querySelector('.delete2')
+
+    close2.addEventListener('click',
+                           function () {
+      modal2.style.display = 'none'
+    })
+  
+  
+    window.addEventListener('click',
+                            function (event) {
+      if (event.target.className === 
+          'modal-background') {
+        modal2.style.display = 'none'
+      }
+    })
+
+
+    function showModal(text, href){
+    document.getElementById("modal-text").innerHTML = text;
+    document.getElementById("second-modal-btn").href = href;
+    modal2.style.display = 'block';
+
+    }
   </script>
 {% endblock %}

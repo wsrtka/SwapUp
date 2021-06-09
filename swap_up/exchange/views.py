@@ -417,7 +417,7 @@ def add_offer(request):
                 id=yellow_id
             )
             new_offer.acceptable_classes.add(yellow_class)
-
+    request.session['new_offer_id'] = new_offer.id
     return HttpResponseRedirect('/exchange/my-offers')
 
 
@@ -450,7 +450,13 @@ def user_offers(request):
         offer = Offer.objects.get(id=request.GET.get('delete_user_offer'))
         offer.delete()
         return redirect("/exchange/my-offers")
-    return render(request, 'exchange/user_offers.html', {'offers': offers})
+
+    #W request.session może być id nowododanej oferty, nowe oferty powinny być oznaczone
+    if 'new_offer_id' in request.session:
+        new_offer_id = request.session['new_offer_id'] 
+        request.session['new_offer_id'] = None
+        return render(request, 'exchange/user_offers.html', {'offers': offers, 'new_offer_id': new_offer_id})    
+    return render(request, 'exchange/user_offers.html', {'offers': offers, 'new_offer_id': None})
 
 
 @login_required

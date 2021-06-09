@@ -6,7 +6,6 @@
 <div class='content box mt-6'>
 
     <h1 class="hero">Your offers</h1>
-
     <a class="button is-primary block" href="{% url 'schedule' %}">Add new offer</a>
 
     {% if offers %}
@@ -24,7 +23,7 @@
 
         <tbody>
             {% for offer in offers %}
-        <tr>
+        <tr {% if offer.id == new_offer_id %} style="background-color:#FFDD57" {%endif%}>
             <td><strong>{{offer.subject}}</strong>
             <td> {% if offer.other_student %}
                 <strong>{{offer.subject}}</strong> {{offer.other_time}}, {{offer.other_teacher}}
@@ -73,7 +72,7 @@
             </td>
             <td>
                 <form action="" method="get">
-                    <button id="{{offer.id}}" onclick="onDelete('{{offer.id}}');" class="button has-background-danger-light has-text-danger" name="delete_user_offer" value="">
+                    <button id="{{offer.id}}" onclick="onDelete('{{offer.id}}');" class="button is-danger is-outlined" name="delete_user_offer" value="">
                         Delete
                     </button>
                 </form>
