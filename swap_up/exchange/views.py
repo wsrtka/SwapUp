@@ -545,7 +545,7 @@ def dashboard(request):
         o['preferred_teachers'] = ",".join([teacher for teacher in o['preferred_teachers']])
 
     for o in u_offers:
-        o['u_offers'] = ",".join([teacher for teacher in o['preferred_teachers']])
+        o['preferred_teachers'] = ",".join([teacher for teacher in o['preferred_teachers']])
 
 
     exchange_closed = Exchange.objects.get(semester=request.user.student.semester).end_time
