@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container is-max-desktop">
+
+<div class='content box mt-6'>
+
+    <h1 class="hero">Your offers</h1>
+    <a class="button is-primary block" href="{% url 'schedule' %}">Add new offer</a>
+
+    {% if offers %}
+
+    <table class='table is-striped is-hoverable is-fullwidth'>
+        <thead>
+        <tr class="has-background-primary">
+                <th class="has-text-primary-light">What you have</th>
+                <th class="has-text-primary-light">What you are offered</th>
+                <th class="has-text-primary-light">You can swap with</th>
+                <th class="has-text-primary-light">You can swap with</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for offer in offers %}
+        <tr {% if offer.id == new_offer_id %} style="background-color:#FFDD57" {%endif%}>
+            <td><strong>{{offer.subject}}</strong>
+            <td> {% if offer.other_student %}
+                <strong>{{offer.subject}}</strong> {{offer.other_time}}, {{offer.other_teacher}}
+                {% endif %}
+            </td>
+            <td>
+                {% if offer.other_student %}
+                {{offer.other_student}}
+                {% endif %}
+            </td>
+            <td>
+                {% if offer.state == "C" %}
+
+                Closed
+
+                {% endif %}
+                {% if offer.state == "P" %}
+
+                <form action="{% url 'accept-offer' offer.id %}" method="POST">
+                    {% csrf_token%}
+                    <button type="submit" class="button is-success">
+                        <span class="icon is-large">
+                            <span class="material-icons">
+                                check_circle
+                            </span>
+                        </span>
+                    </button>
+                </form>
+                <form action="{% url 'decline-offer' offer.id %}" method="POST">
+                    {% csrf_token%}
+                    <button type="submit" class="button is-danger">
+                        <span class="icon is-large">
+                            <span class="material-icons">
+                                highlight_off
+                            </span>
+                        </span>
+                    </button>
+                </form>
+
+                {% endif %}
+                {% if offer.state == "N" %}
+                Waiting for offers
+
+                {% endif %}
+                {{offer.state}}
+            </td>
+            <td>
+                <form action="" method="get">
+                    <button id="{{offer.id}}" onclick="onDelete('{{offer.id}}');" class="button has-background-danger-light has-text-danger" name="delete_user_offer" value="">
+                        Archive
+                    </button>
+                </form>
+            </td>
+        </tr>
+            {% endfor %}
+            </tbody>
+    </table>
+
+    {% else %}
+
+    <p>You have no offers.</p>
+
+    {% endif %}
+
+</div>
+</div>
+<script>
+    function onDelete(id) {
+        if (confirm('Are you sure you want to archive this offer ' + id + "? You cannot revert this decision.")) {
+            document.getElementById(id).value = id;
+        }else{
+            document.getElementById(id).value = "";
+        }
+    }
+</script>
+{% endblock %}

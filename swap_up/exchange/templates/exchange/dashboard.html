@@ -1,0 +1,145 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container content">
+    <h1 class="hero">Dashboard</h1>
+
+    <section class="box">
+        <h3 class="hero">Exchange info</h3>
+        <p id="countdown"></p>
+    </section>
+
+    <script>
+        var countDownDate = new Date({{ date|date:"U"}} * 1000).getTime();
+
+        // Update the count down every 1 second
+        var x = setInterval(function() {
+
+        // Get today's date and time
+        var now = new Date().getTime();
+
+        // Find the distance between now and the count down date
+        var distance = countDownDate - now;
+
+        // Time calculations for days, hours, minutes and seconds
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Display the result in the element with id="demo"
+        document.getElementById("countdown").innerHTML = "This exchange ends in: " + days + " days, " + hours + " hours, "
+        + minutes + " minutes and " + seconds + " seconds.";
+
+        // If the count down is finished, write some text
+        if (distance < 0) {
+            clearInterval(x);
+            document.getElementById("countdown").innerHTML = "The exchange has closed!";
+        }
+        }, 1000);
+    </script>
+
+    <section class="box">
+        <h3 class="hero">Latest offers</h3>
+
+        <div class="columns">
+            {% if l_offers %}
+                {% for offer in l_offers %}
+                <div class="column card mx-2 mt-2">
+                    <header class="card-header">
+                    <p class="card-header-title">
+                        {{ offer.subject }}
+                    </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <em>{{offer.student}}</em> is giving away:
+                            <hr class="my-2">
+                            {{offer.time}} <br>
+                            With: {{offer.teacher}}
+                            <hr class="my-2">
+                            {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                                {% if offer.preferred_days %}
+                                    <p>Preferred days: {{offer.preferred_days}}</p>
+                                {% endif %}
+                                {% if offer.preferred_times %}
+                                    <p>Preferred times: {{offer.preferred_times}}</p>
+                                {% endif %}
+                                {% if offer.preferred_teachers %}
+                                    <p>Preferred teachers: {{offer.preferred_teachers}}</p>
+                                {% endif %}
+                            {% else %}
+                                Anything
+                            {% endif %}
+                            <br>
+                            <!-- todo: miejsce na wypisanie czasu dodania oferty -->
+                            <!-- <em>23:09, 04/01/2021</em> -->
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+          {% else %}
+              <p>No offers available at the moment.</p>
+          {% endif %}
+        </div>
+    
+        <hr>
+
+        <a href="{% url 'offers' %}" class="button is-primary">Browse all offers.</a>
+
+    </section>
+
+    <section class="box">
+        <h3 class="hero">Your offers</h3>
+
+        <div class="is-flex is-flex-direction-row">
+            {% if u_offers %}
+                {% for offer in u_offers %}
+                <div class="card mx-2">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            {{ offer.subject }}
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div class="content">
+                            <em>{{offer.student}}</em> is giving away:
+                            <hr class="my-2">
+                            {{offer.time}} <br>
+                            With: {{offer.teacher}}
+                            <hr class="my-2">
+                            {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                                {% if offer.preferred_days %}
+                                    <p>Preferred days: {{offer.preferred_days}}</p>
+                                {% endif %}
+                                {% if offer.preferred_times %}
+                                    <p>Preferred times: {{offer.preferred_times}}</p>
+                                {% endif %}
+                                {% if offer.preferred_teachers %}
+                                    <p>Preferred teachers: {{offer.preferred_teachers}}</p>
+                                {% endif %}
+                            {% else %}
+                            Anything
+                            {% endif %}
+                            <br>
+                            <!-- todo: miejsce na wypisanie czasu dodania oferty -->
+                            <!-- <em>23:09, 04/01/2021</em> -->
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>You have no public offers at the moment.</p>
+            {% endif %}
+        </div>
+
+        <hr>
+
+        <a href="{% url 'user-offers' %}" class="button is-primary">See all of your offers.</a>
+        
+    </section>
+
+</div>
+
+{% endblock %}

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -80,7 +81,7 @@ WSGI_APPLICATION = 'swap_up.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': str(BASE_DIR / 'db.sqlite3'),
     }
 }
 
@@ -133,5 +134,12 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = (
 
 CRISPY_TEMPLATE_PACK = 'bulma'
 
-LOGIN_REDIRECT_URL = 'user-home'
+LOGIN_REDIRECT_URL = 'dashboard'
 LOGIN_URL = 'login'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('SWAPUP_MAIL_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('SWAPUP_MAIL_PASS')

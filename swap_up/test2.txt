@@ -1,0 +1,4 @@
+6
+Pracownia projektowa 1;L;15;1;Kamil Piętak;Zdalnie;A;Wt;09:35;52450
+Pracownia projektowa 1;L;15;1;Kamil Piętak;Zdalnie;A;Czw;09:35;1000
+

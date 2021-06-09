@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container is-max-desktop">
+
+        <div class="confirm">
+
+    </div>
+
+    <div style="padding-top: 20px; padding-bottom: 20px;">
+        <h1 class="title is-3 is-spaced">Manage Exchanges</h1>
+    </div>
+    <div class="confirm">
+
+    </div>
+    <!--<a class="button is-primary" href="{% url 'add-exchange' %}"-->
+    <!--   style=" margin: 15px; height: 50px; width: 500px; font-size: 20px;">-->
+    <!--    Add Exchange-->
+    <!--</a>-->
+
+    <!--    <div class="card is-vcentered is-align-self-center">-->
+    <form method="post" enctype="multipart/form-data" style="padding-bottom: 20px;">
+        {% csrf_token %}
+
+        <div class="columns">
+            <div id="file-js-example" class="column file has-name is-success is-fullwidth">
+                <label class="file-label">
+                    <input class="file-input" type="file" name="myfile">
+                    <span style="padding-left: 25px; padding-right: 30px;" class="file-cta">
+                        <span class="material-icons">
+                          file_upload
+                        </span>
+                        <span class="file-label">
+                            Select file
+                        </span>
+                    </span>
+                    <span style="width: 300px" class="file-name">
+                        No file chosen
+                    </span>
+                </label>
+            </div>
+            <div class="column">
+                <button style="margin: auto;" class=" button is-primary" type="submit" name="submit" value="submit">Upload</button>
+            </div>
+        </div>
+
+    </form>
+
+    <!--</div>-->
+    <!--if(confirm('Are you sure')){console.log('yes')}-->
+    <section class="box" style="margin-bottom: 40px;">
+        {% for exchange in exchanges %}
+        <div class="card block ">
+            <header class="card-header">
+                <p class="card-header-title">
+                    {{exchange.name}}
+                </p>
+                <a class="button is-dark has-text-primary" style=" margin: 15px;"
+                   href="/exchange/manage/{{exchange.id}}">
+                    Manage
+                </a>
+            </header>
+        </div>
+        {% endfor %}
+    </section>
+</div>
+
+<script>
+    const fileInput = document.querySelector('#file-js-example input[type=file]');
+    fileInput.onchange = () => {
+        if (fileInput.files.length > 0) {
+            const fileName = document.querySelector('#file-js-example .file-name');
+            fileName.textContent = fileInput.files[0].name;
+        }
+    }
+</script>
+
+{% endblock %}

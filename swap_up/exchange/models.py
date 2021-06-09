@@ -3,243 +3,179 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 
+PATHS = [
+        ('A', 'Algorythmic path'),
+        ('AA', 'Algorythmic-application path'),
+        ('SD', 'Software development path')
+    ]
+
+class Semester(models.IntegerChoices):
+        SEM1 = 1
+        SEM2 = 2
+        SEM3 = 3
+        SEM4 = 4
+        SEM5 = 5
+        SEM6 = 6
+        SEM7 = 7
+        SEM8 = 8
+        SEM9 = 9
+        SEM10 = 10
+
+class Exchange(models.Model):
+    
+    creation_time = models.DateTimeField(auto_now_add=True, null=True)
+    modification_time = models.DateTimeField(auto_now=True, null=True)
+    end_time = models.DateTimeField(null=True)
+    name = models.CharField(max_length=30, null=True)
+    semester = models.IntegerField(choices=Semester.choices, null=True)
+
+    def __str__(self):
+        return f'Exchange of semester {self.semester}'
+
+
 class Subject(models.Model):
-    subject_name = models.CharField(max_length=30)
-    category = models.CharField(max_length=30)
-    semester = models.IntegerField()
-    path = models.CharField(max_length=30)
-    mandatory = models.BooleanField()
 
-    def __init__(self, subject_name, category, semester, path, mandatory, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.subject_name = subject_name
-        self.category = category
-        self.semester = semester
-        self.path = path
-        self.mandatory = mandatory
+    name = models.CharField(max_length=30, null=True)
+    category = models.CharField(max_length=30, null=True)
+    path = models.CharField(max_length=30, choices=PATHS, null=True)
+    semester = models.IntegerField(choices=Semester.choices, null=True)
+    mandatory = models.BooleanField(null=True)
 
-    @property
-    def subject_name(self):
-        return self.subject_name
-
-    @subject_name.setter
-    def subject_name(self, name):
-        self.subject_name = name
-
-    @property
-    def category(self):
-        return self.category
-
-    @category.setter
-    def category(self, type):
-        self.type = category
-
-    @property
-    def semester(self):
-        return self.semester
-
-    @semester.setter
-    def semester(self, semester):
-        self.semester = semester
-
-    @property
-    def path(self):
-        return self.path
-
-    @path.setter
-    def path(self, path):
-        self.path = path
-
-    @property
-    def mandatory(self):
-        return self.mandatory
-
-    @mandatory.setter
-    def mandatory(self, mandatory):
-        self.mandatory = mandatory
+    def __str__(self):
+        return f'{self.name}, s{self.semester}, {self.path}'
 
 
 class Teacher(models.Model):
 
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    title = models.CharField(max_length=30)
+    TITLES = [
+        ('inż.', 'inżynier'),
+        ('mgr. inż.', 'magister inżynier'),
+        ('dr.', 'doktor'),
+        ('dr. inż.', 'doktor inżynier')
+    ]
 
-    def __init__(self, first_name, last_name, title, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.first_name = first_name
-        self.last_name = last_name
-        self.title = title
+    name = models.CharField(max_length=60, null=True)
+    title = models.CharField(max_length=30, choices=TITLES, null=True)
 
-    @property
-    def first_name(self):
-        return self.first_name
-
-    @first_name.setter
-    def first_name(self, name):
-        self.first_name = name
-
-    @property
-    def last_name(self):
-        return self.last_name
-
-    @last_name.setter
-    def last_name(self, name):
-        self.last_name = name
-
-    @property
-    def title(self):
-        return self.title
-
-    @title.setter
-    def title(self, title):
-        self.title = title
+    def __str__(self):
+        return f'{self.title} {self.name}'
 
 
 class Class(models.Model):
 
-    subject_id = models.ForeignKey(Subject, on_delete=models.CASCADE)
-    day = models.DateField()
-    time = models.TimeField()
-    row = models.CharField(max_length=20)
-    teacher_id = models.ForeignKey(Teacher, on_delete=models.CASCADE)
+    WEEK_CHOICES = [
+        ('A', 'Week A'),
+        ('B', 'Week B')
+    ]
 
-    def __init__(self, day, time, row, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.day = day
-        self.row = row
-        self.time = time
+    DAY_CHOICES = [
+        ('Pn', 'Poniedziałek'),
+        ('Wt', 'Wtorek'),
+        ('Śr', 'Środa'),
+        ('Czw', 'Czwartek'),
+        ('Pt', 'Piątek')
+    ]
+    
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True)
+    teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, null=True)
+    
+    day = models.CharField(max_length=10, choices=DAY_CHOICES, null=True)
+    time = models.TimeField(null=True)
+    capacity = models.IntegerField(null=True)
+    week = models.CharField(max_length=1, choices=WEEK_CHOICES, null=True)
 
-    @property
-    def day(self):
-        return self.day
+    group_number = models.IntegerField(null=True)
+    room = models.CharField(max_length=20, null=True)
 
-    @day.setter
-    def day(self, day):
-        self.day = day
+    def __str__(self):
+        return f'{self.subject}, {self.teacher}, {self.time} {self.day}, {self.room}'
 
-    @property
-    def time(self):
-        return self.time
+    def dictionary(self):
+        class_dict = {}
 
-    @time.setter
-    def time(self, time):
-        self.time = time
+        class_dict['subject'] = self.subject.name
+        class_dict['teacher'] = self.teacher.name
+        class_dict['day'] = self.day
+        class_dict['time'] = self.time
+        class_dict['week'] = self.week
 
-    @property
-    def row(self):
-        return self.row
-
-    @row.setter
-    def row(self, row):
-        self.row = row
-
-    @property
-    def subject_id(self):
-        return self.subject_id
-
-    @subject_id.setter
-    def subject_id(self, subject_id):
-        self.subject_id = subject_id
+        return class_dict
 
 
 class Student(models.Model):
+
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+
     index_number = models.IntegerField(unique=True, null=True)
     semester = models.IntegerField(null=True)
-    list_of_additional_subjects = models.ForeignKey(Subject, on_delete=models.CASCADE, null=True, blank=True)    # tutaj nie jestem pewien czy normalne settery
-    list_of_classes = models.ForeignKey(Class, on_delete=models.CASCADE, null=True, blank=True)                  # będą działały więc póki co zostawiam bez
-    path = models.CharField(max_length=40, null=True)
-    # tutaj łączymy studenta z użytkownikiem
-    # User w Django ma imie, nazwisko, email
-    # ma też grupy, i te grupy będą związane z określonymi uprawnieniami
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    path = models.CharField(max_length=40, choices=PATHS, null=True)
 
-    @property
-    def index_number(self):
-        return self.index_number
+    list_of_additional_subjects = models.ManyToManyField(Subject, blank=True)
+    list_of_classes = models.ManyToManyField(Class, blank=True)
 
-    @index_number.setter
-    def index_number(self, number):
-        self.index_number = number
+    subscribed = models.BooleanField(default=True, null=True)
 
-    @property
-    def semester(self):
-        return self.semester
-
-    @semester.setter
-    def semester(self, semester):
-        self.semester = semester
-
-    @property
-    def path(self):
-        return self.path
-
-    @path.setter
-    def path(self, path):
-        self.path = path
+    def __str__(self):
+        if self.user:
+            return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'
+        else:
+            return f'Student without user, {self.index_number}, s{self.semester}'
 
 
 class Offer(models.Model):
 
-    student_id = models.ForeignKey(Student, on_delete=models.CASCADE)
-    class_id = models.ForeignKey(Class, on_delete=models.CASCADE)
-    preferred_class_id_list = None
-    additional_information = models.CharField(max_length=100)
-    state = models.CharField(max_length=10)
-    other_student_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    other_offer_id = models.IntegerField()
+    STATES = [
+        ('N', 'New'),
+        ('P', 'Pending'),
+        ('C', 'Closed'),
+        ('A', 'Archived')
+    ]
 
-    def __init__(self, info, state, other_student_id, other_exchange_id, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.additional_information = info
-        self.state = state
-        self.other_exchange_id = other_exchange_id
-        self.other_student_id = other_student_id
+    # meta info
+    id = models.AutoField(primary_key=True)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True)
+    exchange = models.ForeignKey(Exchange, on_delete=models.CASCADE, null=True)
+    state = models.CharField(max_length=10, choices=STATES, default=STATES[0])
+    add_time = models.DateTimeField(auto_now_add=True, null=True)
 
-    @property
-    def additional_information(self):
-        return self.additional_information
+    # offer info
+    unwanted_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='unwanted_class', null=True)
+    preferred_days = None
+    preferred_times = None
+    preferred_classes = models.ManyToManyField(Class, related_name='user_green', null=True)
+    acceptable_classes = models.ManyToManyField(Class, related_name='user_yellow', null=True)
+    preferred_teachers = models.ManyToManyField(Teacher, null=True)
+    additional_information = models.CharField(max_length=100, null=True)
 
-    @additional_information.setter
-    def additional_information(self, additional_information):
-        self.additional_information = additional_information
+    # "transaction" info
+    other_student = models.ForeignKey(Student, on_delete=models.CASCADE, null=True, related_name='wantee')
+    other_offer = models.ForeignKey("Offer", on_delete=models.CASCADE, null=True)
 
-    @property
-    def state(self):
-        return self.state
+    def __str__(self):
+        return f'{self.state} offer from {self.student.user.username}'
 
-    @state.setter
-    def state(self, state):
-        self.state = state
+    def dictionary(self):
+        offer_dict = {}
 
-    @property
-    def other_student_id(self):
-        return self.other_student_id
+        offer_dict['student'] = f'{self.student.user.username}' if self.student.user.first_name and self.student.user.last_name else 'Anonymous'
+        offer_dict['subject'] = self.unwanted_class.subject.name if self.unwanted_class.subject.name else ''
+        offer_dict['time'] = f'{self.unwanted_class.day} {self.unwanted_class.week}, {self.unwanted_class.time}' if self.unwanted_class else ''
+        offer_dict['teacher'] = self.unwanted_class.teacher.name if self.unwanted_class.teacher else ''
+        offer_dict['comment'] = self.additional_information if self.additional_information else None
+        offer_dict['preferred_days'] = self.preferred_days
+        offer_dict['preferred_hours'] = self.preferred_times
+        offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
+        offer_dict['id'] = self.id
+        offer_dict['date'] = self.add_time
+        offer_dict['state'] = self.state if self.state else None
 
-    @other_student_id.setter
-    def other_student_id(self, other_student_id):
-        self.other_student_id = other_student_id
+        try:
+            term = [c for c in self.other_student.list_of_classes.all() if c.subject == self.unwanted_class.subject][0]
+        except:
+            term = None
 
-    @property
-    def other_exchange_id(self):
-        return self.other_exchange_id
+        offer_dict['other_time'] = f'{term.day} {term.time} {term.week}' if term else None
+        offer_dict['other_teacher'] = term.teacher if term else None
+        offer_dict['other_student'] = self.other_student
 
-    @other_exchange_id.setter
-    def other_exchange_id(self, other_exchange_id):
-        self.other_exchange_id = other_exchange_id
-
-    @property
-    def preferred_class_id_list(self):
-        return self.preferred_class_id_list
-
-    @preferred_class_id_list.setter
-    def preferred_class_id_list(self,preferred_class_id_list):
-        self.preferred_class_id_list=preferred_class_id_list
-
-    @property
-    def class_id(self):
-        return self.class_id
-
-    @class_id.setter
-    def class_id(self, class_id):
-        self.class_id=class_id
+        return offer_dict
