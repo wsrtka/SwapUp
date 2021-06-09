@@ -127,7 +127,8 @@ class Offer(models.Model):
     STATES = [
         ('N', 'New'),
         ('P', 'Pending'),
-        ('C', 'Closed')
+        ('C', 'Closed'),
+        ('A', 'Archived')
     ]
 
     # meta info
@@ -161,16 +162,12 @@ class Offer(models.Model):
         offer_dict['time'] = f'{self.unwanted_class.day} {self.unwanted_class.week}, {self.unwanted_class.time}' if self.unwanted_class else ''
         offer_dict['teacher'] = self.unwanted_class.teacher.name if self.unwanted_class.teacher else ''
         offer_dict['comment'] = self.additional_information if self.additional_information else None
-        offer_dict['state'] = self.state if self.state else 'Closed'
         offer_dict['preferred_days'] = self.preferred_days
         offer_dict['preferred_hours'] = self.preferred_times
         offer_dict['preferred_teachers'] = [teacher.name for teacher in self.preferred_teachers.all()]
         offer_dict['id'] = self.id
         offer_dict['date'] = self.add_time
         offer_dict['state'] = self.state if self.state else None
-
-        print(self.state)
-        print("eloleelo")
 
         try:
             term = [c for c in self.other_student.list_of_classes.all() if c.subject == self.unwanted_class.subject][0]

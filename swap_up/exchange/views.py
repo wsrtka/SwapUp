@@ -452,7 +452,7 @@ def edit_exchange(request):
 def user_offers(request):
     # dynamic offers
     current_student = request.user.student
-    db_offers = Offer.objects.filter(student=current_student.id)
+    db_offers = Offer.objects.filter(student=current_student.id).exclude(state=Offer.STATES[3])
     offers = [o.dictionary() for o in db_offers]
     # offers1=[]
     # for offer in db_offers:
@@ -470,7 +470,10 @@ def user_offers(request):
 
     if request.GET.get('delete_user_offer'):
         offer = Offer.objects.get(id=request.GET.get('delete_user_offer'))
-        offer.delete()
+        offer.state = Offer.STATES[3]
+        print(offer.state)
+        print(Offer.STATES[3])
+        offer.save()
         return redirect("/exchange/my-offers")
     return render(request, 'exchange/user_offers.html', {'offers': offers})
 
