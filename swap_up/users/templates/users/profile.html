@@ -24,6 +24,7 @@
         <p><strong>Index:</strong> {{ user.student.index_number }}</p>
         <p><strong>Semester:</strong> {{ user.student.semester }}</p>
         <p><strong>Path:</strong> {{ user.student.path }}</p>
+        <p><strong>Email notifications:</strong> {% if user.subscribed %} Enabled {% else %} Disabled {% endif %}</p>
 
         <a class="button is-primary is-outlined mt-4 " href="{% url 'update-profile'%}">Edit</a>
     </section>

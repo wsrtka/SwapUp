@@ -17,7 +17,29 @@ from .models import *
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from .service import *
+from django.core.mail import send_mail
 
+
+def send_offer_accept_mail(user):
+    send_mail(
+        subject='[SwapUp] Status of your offer changed',
+        message='Someone has just accepted one of your offers! Visit http://wsrtk.pythonanywhere.com/exchange/my-offers to see what\'s going on. \n\n \
+            If you don\'t want to receive notification emails, please go to your profile and change the appropriate option.',
+        from_email='swap.up.io.2021@gmail.com',
+        recipient_list=[user.email],
+        fail_silently=True
+    )
+
+
+def send_swap_accept_mail(user):
+    send_mail(
+        subject='[SwapUp] Status of your offer changed',
+        message='Someone has just confirmed your swap! Visit http://wsrtk.pythonanywhere.com/exchange/schedule/ to see your new schedule. \n\n \
+            If you don\'t want to receive notification emails, please go to your profile and change the appropriate option.',
+        from_email='swap.up.io.2021@gmail.com',
+        recipient_list=[user.email],
+        fail_silently=True
+    )
 
 class IndexView(generic.TemplateView):
     template_name = 'exchange/index.html'
@@ -536,6 +558,9 @@ def accept_offer(request, offer_id):
 
                 a_offer.state = Offer.STATES[2]
 
+                if a_offer.other_student.subscribed:
+                    send_swap_accept_mail(a_offer.other_student.user)
+
                 request.user.student.save()
                 a_offer.other_student.save()
                 a_offer.save()
@@ -543,8 +568,7 @@ def accept_offer(request, offer_id):
                 messages.success(request, 'You have successfully traded your term!')
 
             else:
-                messages.error(request,
-                               'We could not find the other student\'s class, make sure he attends the subject.')
+                messages.error(request, 'We could not find the other student\'s class, make sure he attends the subject.')
 
             return redirect('offers')
 
@@ -554,8 +578,10 @@ def accept_offer(request, offer_id):
             a_offer.state = Offer.STATES[1]
             a_offer.save()
 
-            messages.success(request,
-                             'You have accepted the offer! Now wait for exchange confirmation from your fellow student.')
+            if a_offer.student.subscribed:
+                send_offer_accept_mail(a_offer.student.user)
+
+            messages.success(request, 'You have accepted the offer! Now wait for exchange confirmation from your fellow student.')
 
             return redirect('offers')
 

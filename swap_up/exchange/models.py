@@ -113,6 +113,8 @@ class Student(models.Model):
     list_of_additional_subjects = models.ManyToManyField(Subject, blank=True)
     list_of_classes = models.ManyToManyField(Class, blank=True)
 
+    subscribed = models.BooleanField(default=True, null=True)
+
     def __str__(self):
         if self.user:
             return f'{self.user.first_name} {self.user.last_name}, {self.index_number}, s{self.semester}'

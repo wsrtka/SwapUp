@@ -74,5 +74,6 @@ class ProfileUpdateForm(forms.ModelForm):
         fields = [
             'index_number',
             'semester',
-            'path'
+            'path',
+            'subscribed'
         ]
