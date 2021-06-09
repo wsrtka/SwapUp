@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load static %}
+
 
 {% block content %}
 
@@ -11,32 +13,32 @@
     </section>
 
     <script>
-        var countDownDate = new Date({{ date|date:"U"}} * 1000).getTime();
+        var countDownDate = new Date({{date | date:"U"}} *1000).getTime();
 
         // Update the count down every 1 second
-        var x = setInterval(function() {
+        var x = setInterval(function () {
 
-        // Get today's date and time
-        var now = new Date().getTime();
+            // Get today's date and time
+            var now = new Date().getTime();
 
-        // Find the distance between now and the count down date
-        var distance = countDownDate - now;
+            // Find the distance between now and the count down date
+            var distance = countDownDate - now;
 
-        // Time calculations for days, hours, minutes and seconds
-        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            // Time calculations for days, hours, minutes and seconds
+            var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-        // Display the result in the element with id="demo"
-        document.getElementById("countdown").innerHTML = "This exchange ends in: " + days + " days, " + hours + " hours, "
-        + minutes + " minutes and " + seconds + " seconds.";
+            // Display the result in the element with id="demo"
+            document.getElementById("countdown").innerHTML = "This exchange ends in: " + days + " days, " + hours + " hours, "
+                + minutes + " minutes and " + seconds + " seconds.";
 
-        // If the count down is finished, write some text
-        if (distance < 0) {
-            clearInterval(x);
-            document.getElementById("countdown").innerHTML = "The exchange has closed!";
-        }
+            // If the count down is finished, write some text
+            if (distance < 0) {
+                clearInterval(x);
+                document.getElementById("countdown").innerHTML = "The exchange has closed!";
+            }
         }, 1000);
     </script>
 
@@ -45,45 +47,56 @@
 
         <div class="columns">
             {% if l_offers %}
-                {% for offer in l_offers %}
-                <div class="column card mx-2 mt-2">
-                    <header class="card-header">
+            {% for offer in l_offers %}
+            <div class="column card mx-2 mt-2">
+                <header class="card-header">
                     <p class="card-header-title">
                         {{ offer.subject }}
                     </p>
-                    </header>
-                    <div class="card-content">
-                        <div class="content">
-                            <em>{{offer.student}}</em> is giving away:
-                            <hr class="my-2">
-                            {{offer.time}} <br>
-                            With: {{offer.teacher}}
-                            <hr class="my-2">
-                            {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                </header>
+<div class="card-content">
+                        <div style="padding-bottom: 20px">
+                            <span class="has-text-primary">Who:</span>
+                            {{offer.student}}
+                        </div>
+                        <div class="container">
+                            <div class="notification is-light">
+                                <p class="has-text-primary">Giving away:</p>
+                                {{offer.time}} | {{offer.teacher}}
+                            </div>
+                        </div>
+                        <div class="container" style="padding-top: 20px">
+                            <div class="notification is-lightt">
+                                <p class="has-text-primary">Wants:</p>
+                                {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
                                 {% if offer.preferred_days %}
-                                    <p>Preferred days: {{offer.preferred_days}}</p>
+                                <p>Days: {{offer.preferred_days}}</p>
                                 {% endif %}
                                 {% if offer.preferred_times %}
-                                    <p>Preferred times: {{offer.preferred_times}}</p>
+                                <p>Times: {{offer.preferred_times}}</p>
                                 {% endif %}
                                 {% if offer.preferred_teachers %}
-                                    <p>Preferred teachers: {{offer.preferred_teachers}}</p>
+                                <p>Teachers: {{offer.preferred_teachers}}</p>
                                 {% endif %}
-                            {% else %}
+                                {% else %}
                                 Anything
-                            {% endif %}
-                            <br>
-                            <!-- todo: miejsce na wypisanie czasu dodania oferty -->
-                            <!-- <em>23:09, 04/01/2021</em> -->
+                                {% endif %}
+                                {% if offer.comment %}
+                                <p>Comment: {{offer.comment}}</p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
-                </div>
+                    <div style="margin: auto; padding: 10px; display: flex; ">
+                        <em style=" margin: auto;" class="has-text-grey-light">{{offer.date|date:"H:i, j/n/Y"}}</em>
+                    </div>
+            </div>
             {% endfor %}
-          {% else %}
-              <p>No offers available at the moment.</p>
-          {% endif %}
+            {% else %}
+            <p>No offers available at the moment.</p>
+            {% endif %}
         </div>
-    
+
         <hr>
 
         <a href="{% url 'offers' %}" class="button is-primary">Browse all offers.</a>
@@ -95,49 +108,60 @@
 
         <div class="is-flex is-flex-direction-row">
             {% if u_offers %}
-                {% for offer in u_offers %}
-                <div class="card mx-2">
-                    <header class="card-header">
-                        <p class="card-header-title">
-                            {{ offer.subject }}
-                        </p>
-                    </header>
-                    <div class="card-content">
-                        <div class="content">
-                            <em>{{offer.student}}</em> is giving away:
-                            <hr class="my-2">
-                            {{offer.time}} <br>
-                            With: {{offer.teacher}}
-                            <hr class="my-2">
+            {% for offer in u_offers %}
+            <div class="card mx-2">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        {{ offer.subject }}
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div style="padding-bottom: 20px">
+                        <span class="has-text-primary">Who:</span>
+                        {{offer.student}}
+                    </div>
+                    <div class="container">
+                        <div class="notification is-light">
+                            <p class="has-text-primary">Giving away:</p>
+                            {{offer.time}} | {{offer.teacher}}
+                        </div>
+                    </div>
+                    <div class="container" style="padding-top: 20px">
+                        <div class="notification is-lightt">
+                            <p class="has-text-primary">Wants:</p>
                             {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
-                                {% if offer.preferred_days %}
-                                    <p>Preferred days: {{offer.preferred_days}}</p>
-                                {% endif %}
-                                {% if offer.preferred_times %}
-                                    <p>Preferred times: {{offer.preferred_times}}</p>
-                                {% endif %}
-                                {% if offer.preferred_teachers %}
-                                    <p>Preferred teachers: {{offer.preferred_teachers}}</p>
-                                {% endif %}
+                            {% if offer.preferred_days %}
+                            <p>Days: {{offer.preferred_days}}</p>
+                            {% endif %}
+                            {% if offer.preferred_times %}
+                            <p>Times: {{offer.preferred_times}}</p>
+                            {% endif %}
+                            {% if offer.preferred_teachers %}
+                            <p>Teachers: {{offer.preferred_teachers}}</p>
+                            {% endif %}
                             {% else %}
                             Anything
                             {% endif %}
-                            <br>
-                            <!-- todo: miejsce na wypisanie czasu dodania oferty -->
-                            <!-- <em>23:09, 04/01/2021</em> -->
+                            {% if offer.comment %}
+                            <p>Comment: {{offer.comment}}</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
-                {% endfor %}
+                <div style="margin: auto; padding: 10px; display: flex; ">
+                    <em style=" margin: auto;" class="has-text-grey-light">{{offer.date|date:"H:i, j/n/Y"}}</em>
+                </div>
+            </div>
+            {% endfor %}
             {% else %}
-                <p>You have no public offers at the moment.</p>
+            <p>You have no public offers at the moment.</p>
             {% endif %}
         </div>
 
         <hr>
 
         <a href="{% url 'user-offers' %}" class="button is-primary">See all of your offers.</a>
-        
+
     </section>
 
 </div>
