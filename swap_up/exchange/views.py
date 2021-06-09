@@ -308,6 +308,8 @@ def offers(request):
     # db_offers = [offer for offer in db_offers if offer.exchange.semester == current_student.semester]
 
     offers = [o.dictionary() for o in db_offers]
+    for o in offers:
+        o['preferred_teachers'] = ",".join([teacher.name for teacher in o['preferred_teachers']])
     print(offers)
 
     offers1 = offers[::2]

@@ -1,107 +1,148 @@
 {% extends 'base.html' %}
+{% load static %}
+
 
 {% block content %}
 <div class="container is-max-desktop">
-
-<section class="content box mt-6 py-5">
-    <h1 class="hero">Available offers</h1>
-    <p>Want to add your own offer? <a href="{% url 'add-offer' %}">Click here!</a></p>
-</section>
-<section class="box">
-    <div class="columns">
-
-        {% if offers1 %}
-        
-        <div id="col1" class="column">
-
-          {% for offer in offers1 %}
-            <div class="card block">
-                <header class="card-header">
-                  <p class="card-header-title">
-                    {{ offer.subject }}
-                  </p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <em>{{offer.student}}</em> is giving away:
-                    <hr class="my-2">
-                    {{offer.time}} <br>
-                    With: {{offer.teacher}}
-                    <hr class="my-2">
-                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
-                      {% if offer.preferred_days %}
-                        <p>Preferred days: {{offer.preferred_days}}</p>
-                      {% endif %}
-                      {% if offer.preferred_times %}
-                        <p>Preferred times: {{offer.preferred_times}}</p>
-                      {% endif %}
-                      {% if offer.preferred_teachers %}
-                        <p>Preferred teachers: {{offer.preferred_teachers}}</p>
-                      {% endif %}
-                    {% else %}
-                      Anything
-                    {% endif %}
-                    <br>
-                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
-                  </div>
-                </div>
-                <footer class="card-footer">
-                  <!-- <a href="#" class="card-footer-item">Comment</a> -->
-                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
-                </footer>
-              </div>
-          {% endfor %}
-
-        </div>
-
-        <div id="col2" class="column">
-            {% for offer in offers2 %}
-            <div class="card block">
-                <header class="card-header">
-                  <p class="card-header-title">
-                    {{ offer.subject }}
-                  </p>
-                </header>
-                <div class="card-content">
-                  <div class="content">
-                    <em>{{offer.student}}</em> is giving away:
-                    <hr class="my-2">
-                    {{offer.time}} <br>
-                    With: {{offer.teacher}}
-                    <hr class="my-2">
-                    {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
-                      {% if offer.preferred_days %}
-                        <p>Preferred days: {{offer.preferred_days}}</p>
-                      {% endif %}
-                      {% if offer.preferred_times %}
-                        <p>Preferred days: {{offer.preferred_times}}</p>
-                      {% endif %}
-                      {% if offer.preferred_teachers %}
-                        <p>Preferred days: {{offer.preferred_teachers}}</p>
-                      {% endif %}
-                    {% else %}
-                      Anything
-                    {% endif %}
-                    <br>
-                    <em>{{offer.date|date:"H:i, j/n/Y"}}</em>
-                  </div>
-                </div>
-                <footer class="card-footer">
-                  <!-- <a href="#" class="card-footer-item">Comment</a> -->
-                  <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>
-                </footer>
-              </div>
-          {% endfor %}
-        </div>
-
-        {% else %}
-
-        <div class='column'>
-          There are no offers available.
-        </div>
-
-        {% endif %}
+    <div style="padding-top: 20px; padding-bottom: 20px;">
+        <h1 class="title is-3 is-spaced">Available Offers</h1>
     </div>
-</section>
+
+    <a class="button is-primary block" href="{% url 'schedule' %}">Add new offer</a>
+    <section class="box" style="margin-bottom: 70px;">
+        <div class="columns">
+
+            {% if offers1 %}
+
+            <div id="col1" class="column">
+
+                {% for offer in offers1 %}
+                <div class="card block">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            {{ offer.subject }}
+                        </p>
+                    </header>
+
+
+                    <div class="card-content">
+                        <div style="padding-bottom: 20px">
+                            <span class="has-text-primary">Who:</span>
+                            {{offer.student}}
+                        </div>
+                        <div class="container">
+                            <div class="notification is-light">
+                                <p class="has-text-primary">Giving away:</p>
+                                {{offer.time}} | {{offer.teacher}}
+                            </div>
+                        </div>
+                        <div style="margin: auto; padding: 10px; display: flex; align-content: center;">
+                            <a style=" margin: auto;" href="{% url 'accept-offer' offer.id%}">
+                                <figure class="image is-64x64 ">
+                                    <img style=" padding: 10px" class="is-rounded button is-primary" src="{% static 'exchange/exchange_arrows.png' %}">
+                                </figure>
+                            </a>
+                        </div>
+                        <div class="container">
+                            <div class="notification is-lightt">
+                                <p class="has-text-primary">Wants:</p>
+                                {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                                {% if offer.preferred_days %}
+                                <p>Days: {{offer.preferred_days}}</p>
+                                {% endif %}
+                                {% if offer.preferred_times %}
+                                <p>Times: {{offer.preferred_times}}</p>
+                                {% endif %}
+                                {% if offer.preferred_teachers %}
+                                <p>Teachers: {{offer.preferred_teachers}}</p>
+                                {% endif %}
+                                {% else %}
+                                Anything
+                                {% endif %}
+                                {% if offer.comment %}
+                                <p>Comment: {{offer.comment}}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin: auto; padding: 10px; display: flex; ">
+                        <em style=" margin: auto;" class="has-text-grey-light">{{offer.date|date:"H:i, j/n/Y"}}</em>
+                    </div>
+                    <!--                    <footer class="card-footer">-->
+                    <!--                        &lt;!&ndash; <a href="#" class="card-footer-item">Comment</a> &ndash;&gt;-->
+                    <!--                        <a href="{% url 'accept-offer' offer.id%}" class="card-footer-item">Accept</a>-->
+                    <!--                    </footer>-->
+                </div>
+                {% endfor %}
+
+            </div>
+
+            <div id="col2" class="column">
+                {% for offer in offers2 %}
+                <div class="card block">
+                    <header class="card-header">
+                        <p class="card-header-title">
+                            {{ offer.subject }}
+                        </p>
+                    </header>
+                    <div class="card-content">
+                        <div style="padding-bottom: 20px">
+                            <span class="has-text-primary">Who:</span>
+                            {{offer.student}}
+                        </div>
+                        <div class="container">
+                            <div class="notification is-light">
+                                <p class="has-text-primary">Giving away:</p>
+                                {{offer.time}} | {{offer.teacher}}
+                            </div>
+                        </div>
+                        <div style="margin: auto; padding: 10px; display: flex; align-content: center;">
+                            <a style=" margin: auto;" href="{% url 'accept-offer' offer.id%}">
+                                <figure class="image is-64x64 ">
+                                    <img style=" padding: 10px" class="is-rounded button is-primary" src="{% static 'exchange/exchange_arrows.png' %}">
+                                </figure>
+                            </a>
+                        </div>
+                        <div class="container">
+                            <div class="notification is-lightt">
+                                <p class="has-text-primary">Wants:</p>
+                                <!--                                <p>Days: Friday, Monday</p>-->
+                                <!--                                <p>Times: 8:30, 9:30</p>-->
+                                <!--                                <p>Teachers: Makej Kocinski</p>-->
+                                {% if offer.preferred_days or offer.preferred_times or offer.preferred_teachers %}
+                                {% if offer.preferred_days %}
+                                <p>Days: {{offer.preferred_days}}</p>
+                                {% endif %}
+                                {% if offer.preferred_times %}
+                                <p>Times: {{offer.preferred_times}}</p>
+                                {% endif %}
+                                {% if offer.preferred_teachers %}
+                                <p>Teachers: {{offer.preferred_teachers}}</p>
+                                {% endif %}
+                                {% else %}
+                                Anything
+                                {% endif %}
+                                {% if offer.comment %}
+                                <p>Comment: {{offer.comment}}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin: auto; padding: 10px; display: flex; ">
+                        <em style=" margin: auto;" class="has-text-grey-light">{{offer.date|date:"H:i, j/n/Y"}}</em>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            {% else %}
+
+            <div class='column'>
+                There are no offers available.
+            </div>
+
+            {% endif %}
+        </div>
+    </section>
 </div>
 {% endblock %}
