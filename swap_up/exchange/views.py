@@ -525,8 +525,12 @@ def dashboard(request):
 
     l_offers = [o.dictionary() for o in latest_offers]
     u_offers = [o.dictionary() for o in user_offers]
+    
+    exchange_closed = Exchange.objects.get(semester=request.user.student.semester).end_time
 
-    return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers})
+    print(exchange_closed)
+
+    return render(request, 'exchange/dashboard.html', {"l_offers": l_offers, "u_offers": u_offers, "date": exchange_closed})
 
 
 @login_required()
