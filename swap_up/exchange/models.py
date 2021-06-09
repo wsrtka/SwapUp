@@ -157,7 +157,7 @@ class Offer(models.Model):
     def dictionary(self):
         offer_dict = {}
 
-        offer_dict['student'] = f'{self.student.user.first_name} {self.student.user.last_name}' if self.student.user.first_name and self.student.user.last_name else 'Anonymous'
+        offer_dict['student'] = f'{self.student.user.username}' if self.student.user.first_name and self.student.user.last_name else 'Anonymous'
         offer_dict['subject'] = self.unwanted_class.subject.name if self.unwanted_class.subject.name else ''
         offer_dict['time'] = f'{self.unwanted_class.day} {self.unwanted_class.week}, {self.unwanted_class.time}' if self.unwanted_class else ''
         offer_dict['teacher'] = self.unwanted_class.teacher.name if self.unwanted_class.teacher else ''
