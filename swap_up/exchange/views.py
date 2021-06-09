@@ -544,7 +544,7 @@ def dashboard(request):
     for o in l_offers:
         o['preferred_teachers'] = ",".join([teacher for teacher in o['preferred_teachers']])
 
-    for o in l_offers:
+    for o in u_offers:
         o['u_offers'] = ",".join([teacher for teacher in o['preferred_teachers']])
 
 
