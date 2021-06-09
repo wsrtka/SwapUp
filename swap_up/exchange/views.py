@@ -358,6 +358,13 @@ def sign_for_class(request, unwanted_class_id, wanted_class_id):
 
 @login_required
 def add_offer(request):
+    
+    exchange_end_time = Exchange.objects.get(semester=request.user.student.semester).end_time
+
+    if exchange_end_time < timezone.now():
+        messages.error(request, 'Exchange has already closed!')
+        return redirect('schedule')
+
     if request.method == 'POST' and 'schedule_button' in request.POST:
         print(request.POST['schedule_button'])
         unwanted_class = Class.objects.get(id=request.POST['schedule_button'])
@@ -539,6 +546,12 @@ def accept_offer(request, offer_id):
     # 1. na wyświetlenie stronki "czy na pewno chcesz brać ofertę"
     # 2. na zaakceptowanie przez zainteresowanego studenta wymiany
     # 3. na ostateczne zaakceptowanie przez wystawiającego
+
+    exchange_end_time = Exchange.objects.get(semester=request.user.student.semester).end_time
+
+    if exchange_end_time < timezone.now():
+        messages.error(request, 'Exchange has already closed!')
+        return redirect('offers')
 
     a_offer = Offer.objects.get(id=offer_id)
 
