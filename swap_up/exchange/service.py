@@ -2,7 +2,7 @@ from .models import *
 """Skracanie nazw"""
 
 def shorten_subject_name(name, level):
-    levels_max_sizes = {1:40, 2:20, 3:14, 4: 9}
+    levels_max_sizes = {1:40, 2:20, 3:10, 4: 9}
     
     words = name.split(" ")
 
@@ -21,7 +21,7 @@ def shorten_subject_name(name, level):
         if len(words) == 2:
             return strip_two_words(words,to_cut)
         if len(words) == 3 and words[2].isnumeric():
-            return strip_two_words(words, to_cut) + " " + words[2]
+            return strip_two_words(words, to_cut) + words[2]
     
         return "".join(e[0] for e in name.split())    
     return name

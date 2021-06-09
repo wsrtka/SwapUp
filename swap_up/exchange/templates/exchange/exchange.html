@@ -2,8 +2,21 @@
 
 {% block content %}
 <div class="container is-max-desktop">
+    <nav class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <p class="title is-1"> {{name}}  </p>
+            </div>
+        </div>
+        <div class="level-right">
+            <div class="level-item">
+                <form action="" method="get">
+                    <button id="{{semester}}" style=" margin: 15px;" onclick="onClear('{{semester}}');" class="button is-danger" name="delete_exchange" value="">Clear</button>
+                </form>
+            </div>
+        </div>
+    </nav>
 
-    <p class="title is-1"> {{name}} </p>
     <table class='table'>
         <thead>
         <tr class="is-selected">
@@ -12,9 +25,6 @@
             <th>Wanted</th>
             <th>Comment</th>
             <th>
-                <form action="" method="get">
-                    <button id="{{semester}}" style=" margin: 15px;" onclick="onClear('{{semester}}');" class="button has-background-danger-light has-text-danger" name="delete_exchange" value="">Clear</button>
-                </form>
             </th>
         </tr>
         <tr></tr>
@@ -72,7 +82,7 @@
             </td>
             <td>
                 <form action="" method="get">
-                    <button id="{{item.id}}" onclick="onDelete('{{item.id}}');" class="button has-background-danger-light has-text-danger" name="delete_offer" value="">
+                    <button id="{{item.id}}" onclick="onDelete('{{item.id}}');" class="button is-danger is-outlined" name="delete_offer" value="">
                         Delete
                     </button>
                 </form>
@@ -94,7 +104,7 @@
     }
 
     function onClear(id) {
-        if (confirm("Are you sure you want to delete Semester " + id + "?")) {
+        if (confirm("Are you sure you want to delete all offers from Semester " + id + "?")) {
             document.getElementById(id).value = id;
         } else {
             document.getElementById(id).value = "";
