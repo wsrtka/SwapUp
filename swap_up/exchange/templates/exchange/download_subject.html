@@ -1,12 +1,20 @@
 {% extends 'base.html' %}
-
 {% block content %}
 
-{% for subject in subjects %}
-<div style="display: inline-block; text-align: center">
-    <a class="button is-primary mt-5" href="{% url 'download-certain-subject' subject_id=subject.id %}">Download list for {{subject.subject_name}} </a>
+<div class="container is-max-desktop" style="align-self: center">
+    <div style="padding-top: 20px; padding-bottom: 20px;">
+        <h1 class="title is-3 is-spaced">Download subject's student list</h1>
+    </div>
+    <section class="box">
+        {% for subject in subjects %}
+        <div style=" text-align: center; align-self: center; padding-bottom: 10px">
+            <label class="file-label">
+                <a class="button is-primary" href="{% url 'download-certain-subject' subject_id=subject.id %}">Download</a>
+                <span style="min-width: 600px" class="file-name">{{subject.name}}</span>
+
+            </label>
+        </div>
+        {% endfor %}
+    </section>
 </div>
-{% endfor %}
-
-
 {% endblock %}
